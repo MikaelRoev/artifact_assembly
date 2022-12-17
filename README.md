@@ -23,7 +23,9 @@ Science at NTNU Gjøvik. This program serves as my contribution to the
 
 ## Installation
 
-Make sure you have Tauri installed and every prerequisites from this page: <https://tauri.app/v1/guides/getting-started/prerequisites>
+Make sure you have Tauri installed and every prerequisites from this page:
+
+<https://tauri.app/v1/guides/getting-started/prerequisites>
 
 To run the project use the following commands:
 
