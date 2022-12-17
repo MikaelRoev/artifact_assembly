@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { Transformer, Image } from "react-konva";
 import useImage from "use-image";
 import GridContext from "../../pages/Canvas/GridContext";
-import "./TransformableImage.css";
 
 //TODO Add undo redo (ctrl+z, ctrl+y) functionality
 const TransformableImage = ({

@@ -6,26 +6,10 @@ const NavBar = (ImageID) => {
 	const { setGrid, grid } = useContext(GridContext);
 
 	const changeGrid = () => {
-		switch (grid) {
-			case 1:
-				setGrid(10);
-				break;
-			case 10:
-				setGrid(20);
-				break;
-			case 20:
-				setGrid(30);
-				break;
-			case 30:
-				setGrid(40);
-				break;
-			case 40:
-				setGrid(50);
-				break;
-
-			default:
-				setGrid(10);
-		}
+		const gridOptions = [10, 20, 30, 40, 50];
+		let currentIndex = gridOptions.indexOf(grid);
+		currentIndex = (currentIndex + 1) % gridOptions.length;
+		setGrid(gridOptions[currentIndex]);
 	};
 
 	return (
@@ -34,8 +18,12 @@ const NavBar = (ImageID) => {
 				<a href="/">Home</a>
 				<p>File</p>
 				<p>Edit</p>
-				<p onClick={changeGrid}>{grid !== 1 ? `${grid} x ${grid}` : "Grid"}</p>
-				<p onClick={() => setGrid(1)}>{grid !== 1 ? "Remove Grid" : ""}</p>
+				{grid !== 1 ? (
+					<p onClick={changeGrid}>{`${grid} x ${grid}`}</p>
+				) : (
+					<p onClick={() => setGrid(10)}>Enable Grid</p>
+				)}
+				{grid !== 1 ? <p onClick={() => setGrid(1)}>Remove Grid</p> : null}
 			</div>
 			<div className="nav-right">
 				<p className="nav-item-right">{"Oseberg1"}</p>

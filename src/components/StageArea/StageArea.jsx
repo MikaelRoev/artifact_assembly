@@ -2,14 +2,15 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import TransformableImage from "../TransformableImage/TransformableImage";
 import { initialImages } from "../../assets/InitialImages";
+import { useState } from "react";
 
 const StageArea = () => {
-	const [images, setImages] = React.useState(initialImages);
-	const [selectedId, selectedImage] = React.useState(null);
+	const [images, setImages] = useState(initialImages);
+	const [selectedId, selectedImage] = useState(null);
 
 	const checkDeselect = (e) => {
 		// deselect when clicked on empty area
-		const clickedOnEmpty = e.target === e.target.getStage();
+		const clickedOnEmpty = e.target === e.currentTarget;
 		if (clickedOnEmpty) {
 			selectedImage(null);
 		}

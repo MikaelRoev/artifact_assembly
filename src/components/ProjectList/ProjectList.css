@@ -11,7 +11,7 @@
 
 .headerCell {
 	display: table-cell;
-	/* padding-bottom: 1rem; */
+
 	text-align: justify;
 	border-bottom: 1px solid #f7f7f7;
 }
@@ -20,16 +20,8 @@
 	display: table-row-group;
 }
 
-.tableRow {
-	display: table-row;
-}
-
-.tableCell {
-	display: table-cell;
-	padding-top: 1rem;
-}
-
 .container h3 {
 	color: #f7f7f7;
 	font-weight: 400;
+	padding-top: 1rem;
 }
