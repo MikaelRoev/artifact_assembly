@@ -16,13 +16,13 @@ const LandingPage = () => {
 				<p>
 					This program is intended for archeologists and restorators to use to
 					piece together a complete picture of fragments found in archeological
-					sites without physically handling the fragile fragments themselves{" "}
+					sites without physically handling the fragile fragments themselves
 					<br />
 					<br />
-					This is a early version of part of my planned Master Thesis for the
+					This is an early version of part of my planned Master Thesis for the
 					spring semester of 2023 in the master's program Applied Computer
-					Science at NTNU Gjøvik. This program serves as my contribution to the
-					2022 course IMT4894 Advanced Project Work.
+					Science at NTNU Gjøvik. This program also serves as contribution to
+					the course IMT4894 Advanced Project Work.
 					<br />
 					-Casper F. Gulbrandsen
 				</p>
