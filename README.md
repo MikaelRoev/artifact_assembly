@@ -1,10 +1,13 @@
 # Past Perfect Beta
 
-This program is intended for archeologists and restorators to use to piece together a complete picture of fragments found in archeological sites without physically handling the fragile fragments themselves
+This program is designed for archaeologists and restorers to digitally
+reconstruct complete artifacts from fragments found at excavation
+sites, without the need to physically handle the fragile pieces.
 
-This is an early version of part of my planned Master Thesis for the
-spring semester of 2023 in the master's program Applied Computer
-Science at NTNU Gjøvik. This program serves as my contribution to the course IMT4894 Advanced Project Work.
+This software serves as part of my Master Thesis for the spring
+semester of 2023 in the Applied Computer Science program at NTNU
+Gjøvik, as well as a contribution to the IMT4894 Advanced Project Work
+course.
 
 ## Author
 
