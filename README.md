@@ -23,13 +23,11 @@ Science at NTNU Gjøvik. This program serves as my contribution to the
 
 ## Installation
 
-Make sure you have Tauri installed and every prerequisites from this page:
-
-<https://tauri.app/v1/guides/getting-started/prerequisites>
+Make sure you have Tauri installed and every[prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites)
 
 To run the project use the following commands:
 
 ```bash
-  npm install //to install the required dependencies
-  npm run tauri dev // to run the program in a Tauri instance
+  npm install #to install the required dependencies
+  npm run tauri dev #to run the program in a Tauri instance
 ```
