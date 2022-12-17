@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import "./NavBar.css";
 import GridContext from "../../pages/Canvas/GridContext";
 
-const NavBar = (ImageID) => {
+const NavBar = () => {
 	const { setGrid, grid } = useContext(GridContext);
 
 	const changeGrid = () => {
