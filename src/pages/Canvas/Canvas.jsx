@@ -6,7 +6,7 @@ import "./Canvas.css";
 import GridContext from "./GridContext";
 
 const Canvas = () => {
-	const [grid, setGrid] = useState(10);
+	const [grid, setGrid] = useState(1);
 
 	const providerValue = {
 		grid,

@@ -38,7 +38,6 @@ const TransformableImage = ({
 				draggable
 				onDragMove={(e) => {
 					//Moves selected image on a grid
-					//TODO Make this setting editable for user
 					e.target.x(Math.round(e.target.x() / grid) * grid);
 					e.target.y(Math.round(e.target.y() / grid) * grid);
 				}}
@@ -48,6 +47,8 @@ const TransformableImage = ({
 						x: e.target.x(),
 						y: e.target.y(),
 					});
+				}}
+				onMouseDown={(e) => {
 					//Moves selected image on top (z-index)
 					e.target.moveToTop();
 				}}
@@ -87,6 +88,10 @@ const TransformableImage = ({
 							return oldBox;
 						}
 						return newBox;
+					}}
+					onDragMove={(e) => {
+						//Moves selected image on top (z-index)
+						e.target.moveToTop();
 					}}
 				/>
 			)}

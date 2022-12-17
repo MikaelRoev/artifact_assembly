@@ -6,34 +6,41 @@ const NavBar = (ImageID) => {
 	const { setGrid, grid } = useContext(GridContext);
 
 	const changeGrid = () => {
-		if (grid === 50) setGrid(10);
-		else setGrid(50);
-	};
+		switch (grid) {
+			case 1:
+				setGrid(10);
+				break;
+			case 10:
+				setGrid(20);
+				break;
+			case 20:
+				setGrid(30);
+				break;
+			case 30:
+				setGrid(40);
+				break;
+			case 40:
+				setGrid(50);
+				break;
 
-	const removeGrid = () => {
-		setGrid(1);
+			default:
+				setGrid(10);
+		}
 	};
 
 	return (
-		<div className="navbar">
+		<nav className="navbar">
 			<div className="nav-left">
-				<a className="nav-item" href="/">
-					Home
-				</a>
-				<p className="nav-item">File</p>
-				<p className="nav-item">Edit</p>
-				<p className="nav-item">View</p>
-				<p className="nav-item">Run</p>
-				<p className="nav-item">Help</p>
-				<p className="nav-item">Reset</p>
-				<p className="nav-item">{`${grid} x ${grid}`}</p>
-				<button onClick={changeGrid}>Change grid</button>
-				<button onClick={removeGrid}>Remove Grid</button>
+				<a href="/">Home</a>
+				<p>File</p>
+				<p>Edit</p>
+				<p onClick={changeGrid}>{grid !== 1 ? `${grid} x ${grid}` : "Grid"}</p>
+				<p onClick={() => setGrid(1)}>{grid !== 1 ? "Remove Grid" : ""}</p>
 			</div>
 			<div className="nav-right">
 				<p className="nav-item-right">{"Oseberg1"}</p>
 			</div>
-		</div>
+		</nav>
 	);
 };
 

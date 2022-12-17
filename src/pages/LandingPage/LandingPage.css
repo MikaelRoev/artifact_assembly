@@ -7,9 +7,13 @@
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
-	gap: 1.8rem;
+	gap: 1rem;
 	width: 100%;
-	padding: 8rem 4rem;
+	padding: 8rem 6rem;
+}
+
+.left-main p {
+	max-width: 750px;
 }
 
 .left-main h1 {

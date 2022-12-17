@@ -16,7 +16,7 @@ const ProjectList = () => {
 					<h3 className={"tableCell"}>245MB</h3>
 				</div>
 				<div className={"tableRow"}>
-					<h3 className={"tableCell"}>Oseber2</h3>
+					<h3 className={"tableCell"}>Oseberg2</h3>
 					<h3 className={"tableCell"}>11.11.2011 13:37</h3>
 					<h3 className={"tableCell"}>245MB</h3>
 				</div>

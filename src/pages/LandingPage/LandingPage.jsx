@@ -1,8 +1,12 @@
 import React from "react";
 import ProjectList from "../../components/ProjectList/ProjectList";
 import "./LandingPage.css";
+import { appWindow } from "@tauri-apps/api/window";
 
 const LandingPage = () => {
+	async function handleClick() {
+		await appWindow.close();
+	}
 	return (
 		<div className="container">
 			<div className="left-main">
@@ -10,17 +14,26 @@ const LandingPage = () => {
 					Welcome to <br /> Past Perfect Desktop
 				</h1>
 				<p>
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero magnam
-					quod adipisci, qui sunt porro excepturi nobis repellendus? Unde neque
-					eaque aspernatur explicabo eligendi? Soluta quam doloremque possimus
-					distinctio assumenda?
+					This program is intended for archeologists and restorators to use to
+					piece together a complete picture of fragments found in archeological
+					sites without physically handling the fragile fragments themselves{" "}
+					<br />
+					<br />
+					This is a early version of part of my planned Master Thesis for the
+					spring semester of 2023 in the master's program Applied Computer
+					Science at NTNU Gjøvik. This program serves as my contribution to the
+					2022 course IMT4894 Advanced Project Work.
+					<br />
+					-Casper F. Gulbrandsen
 				</p>
 				<a href="/canvas" className="link-button">
 					Continue Project
 				</a>
 				<p className="link-button">New Project</p>
 				<p className="link-button secondary">Settings</p>
-				<p className="link-button secondary">Quit</p>
+				<p onClick={handleClick} className="link-button secondary">
+					Quit
+				</p>
 			</div>
 			<div className="right-main">
 				<h1>Projects</h1>
