@@ -1,0 +1,68 @@
+.container {
+	display: flex;
+	background-color: #f7f7f7;
+}
+
+.left-main {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	gap: 1.8rem;
+	width: 100%;
+	padding: 8rem 4rem;
+}
+
+.left-main h1 {
+	font-size: 3rem;
+	font-weight: 400;
+	color: #202020;
+}
+
+.right-main {
+	display: flex;
+	flex-direction: column;
+	padding: 2rem 2rem;
+	height: 100vh;
+	width: 70%;
+	background-color: #202020;
+}
+
+.right-main h1 {
+	font-size: 2.4rem;
+	font-weight: 400;
+	color: #f7f7f7;
+}
+
+.title {
+	margin: 0;
+	line-height: 1;
+	font-size: 4rem;
+}
+
+.title,
+.description {
+	text-align: center;
+}
+
+.description {
+	margin: 4rem 0;
+	line-height: 1.5;
+	font-size: 1.5rem;
+}
+
+.link-button {
+	font-size: 2rem;
+	width: max-content;
+	color: #202020;
+	text-decoration: none;
+	transition: 100ms ease-in;
+}
+
+.secondary {
+	font-size: 1.6rem;
+}
+
+.link-button:hover {
+	cursor: pointer;
+	transform: scale(1.05);
+}

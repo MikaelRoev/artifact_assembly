@@ -1,0 +1,35 @@
+.project-list-container {
+	width: 100%;
+	display: table;
+	padding-top: 1rem;
+}
+
+.header {
+	display: table-header-group;
+	font-size: 1.2rem;
+}
+
+.headerCell {
+	display: table-cell;
+	/* padding-bottom: 1rem; */
+	text-align: justify;
+	border-bottom: 1px solid #f7f7f7;
+}
+
+.tableBody {
+	display: table-row-group;
+}
+
+.tableRow {
+	display: table-row;
+}
+
+.tableCell {
+	display: table-cell;
+	padding-top: 1rem;
+}
+
+.container h3 {
+	color: #f7f7f7;
+	font-weight: 400;
+}
