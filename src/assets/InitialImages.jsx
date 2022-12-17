@@ -1,7 +1,7 @@
 const images = [];
 
 for (let i = 1; i <= 16; i++) {
-	images.push(require(`../Images/viking/image${i}.png`));
+	images.push(require(`../Images/vikingwebp/image${i}.webp`));
 }
 
 function getRandomCoordinates(padding = 80) {
