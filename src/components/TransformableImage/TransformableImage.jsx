@@ -1,6 +1,8 @@
 import React from "react";
+import { useContext } from "react";
 import { Transformer, Image } from "react-konva";
 import useImage from "use-image";
+import GridContext from "../../pages/Canvas/GridContext";
 import "./TransformableImage.css";
 
 //TODO Add undo redo (ctrl+z, ctrl+y) functionality
@@ -14,6 +16,7 @@ const TransformableImage = ({
 	const shapeRef = React.useRef();
 	const trRef = React.useRef();
 	const [image] = useImage(imageURL);
+	const { grid } = useContext(GridContext);
 
 	React.useEffect(() => {
 		if (isSelected) {
@@ -36,8 +39,8 @@ const TransformableImage = ({
 				onDragMove={(e) => {
 					//Moves selected image on a grid
 					//TODO Make this setting editable for user
-					e.target.x(Math.round(e.target.x() / 10) * 10);
-					e.target.y(Math.round(e.target.y() / 10) * 10);
+					e.target.x(Math.round(e.target.x() / grid) * grid);
+					e.target.y(Math.round(e.target.y() / grid) * grid);
 				}}
 				onDragEnd={(e) => {
 					onChange({
