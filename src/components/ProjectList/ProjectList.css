@@ -5,19 +5,14 @@
 }
 
 .header {
-	display: table-header-group;
 	font-size: 1.2rem;
+	/* background-color: red; */
+	border-bottom: 2px solid #f7f7f7;
 }
 
 .headerCell {
-	display: table-cell;
-
 	text-align: justify;
-	border-bottom: 1px solid #f7f7f7;
-}
-
-.tableBody {
-	display: table-row-group;
+	/* border-bottom: 1px solid #f7f7f7; */
 }
 
 .container h3 {
