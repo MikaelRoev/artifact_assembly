@@ -20,7 +20,7 @@ This project is a precursor to my Master's Thesis, which I plan to pursue in the
 
 ## Installation
 
-Make sure you have Tauri installed and every[prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites)
+Make sure you have Tauri installed and every [prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites)
 
 To run the project use the following commands:
 
