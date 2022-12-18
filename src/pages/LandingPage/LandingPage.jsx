@@ -14,15 +14,19 @@ const LandingPage = () => {
 					Welcome to <br /> Past Perfect Desktop
 				</h1>
 				<p>
-					This program is designed for archaeologists and restorers to digitally
-					reconstruct complete artifacts from fragments found at excavation
-					sites, without the need to physically handle the fragile pieces.
+					The goal of this project is to develop a software solution that helps
+					archaeologists reconstruct original artifacts from smaller, damaged
+					pieces. Specifically, the software will use images of archaeological
+					textile fragments and let the archaeologists manually piece together
+					the original.
 					<br />
 					<br />
-					This software serves as part of my Master Thesis for the spring
-					semester of 2023 in the Applied Computer Science program at NTNU
-					Gjøvik, as well as a contribution to the IMT4894 Advanced Project Work
-					course.
+					This project is a precursor to my Master's Thesis, which I plan to
+					pursue in the spring semester of 2023. The challenge of assembling
+					fragments of the past, particularly those that are fragile and
+					damaged, is a significant one for archaeologists. This project aims to
+					provide a tool that will make this process more efficient and
+					effective.
 					<br />
 					<br />
 				</p>
