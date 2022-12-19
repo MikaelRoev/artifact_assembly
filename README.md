@@ -1,6 +1,6 @@
 # Past Perfect Beta
 
-The goal of this project is to develop a software solution that helps archaeologists reconstruct original artifacts from smaller, damaged pieces. Specifically, the software will use images of archaeological textile fragments and let the archaeologists manually piece together the original object.
+The goal of this project is to develop a software solution that helps users reconstruct original artifacts from smaller, damaged pieces. Specifically, the software will use images of archaeological textile fragments and let the archaeologists manually piece together the original object.
 
 This project is a precursor to my Master's Thesis, which I plan to pursue in the spring semester of 2023. The challenge of assembling fragments of the past, particularly those that are fragile and damaged, is a significant one for archaeologists. This project aims to provide a tool that will make this process more efficient and effective.
 
