@@ -19,7 +19,7 @@ const NavBar = () => {
 				<p>File</p>
 				<p>Edit</p>
 				{grid !== 1 ? (
-					<p onClick={changeGrid}>{`${grid} x ${grid}`}</p>
+					<p onClick={changeGrid}>{`Edit Grid (${grid} x ${grid})`}</p>
 				) : (
 					<p onClick={() => setGrid(10)}>Enable Grid</p>
 				)}
