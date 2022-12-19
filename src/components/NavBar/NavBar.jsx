@@ -17,7 +17,7 @@ const NavBar = () => {
 			<div className="nav-left">
 				<a href="/">Home</a>
 				<p>File</p>
-				<p>Edit</p>
+
 				{grid !== 1 ? (
 					<p onClick={changeGrid}>{`Edit Grid (${grid} x ${grid})`}</p>
 				) : (
