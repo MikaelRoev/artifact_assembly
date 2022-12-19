@@ -10,13 +10,13 @@ This project is a precursor to my Master's Thesis, which I plan to pursue in the
 
 ## Screenshots
 
-![App Screenshot](./src/Images/screenshots/landing-page-screenshot.png)
+![App Screenshot](./src/assets/images/screenshots/landing-page-screenshot.png)
 
-![App Screenshot](./src/Images/screenshots/canvas-page-screenshot.png)
+![App Screenshot](./src/assets/images/screenshots/canvas-page-screenshot.png)
 
-![App Screenshot](./src/Images/screenshots/canvas-page-rotate-resize-screenshot.png)
+![App Screenshot](./src/assets/images/screenshots/canvas-page-rotate-resize-screenshot.png)
 
-![App Screenshot](./src/Images/screenshots/canvas-page-complete-screenshot.png)
+![App Screenshot](./src/assets/images/screenshots/canvas-page-complete-screenshot.png)
 
 ## Installation
 
