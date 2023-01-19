@@ -15,8 +15,15 @@
 		"react-konva": "^18.2.3",
 		"react-rnd": "^10.3.7",
 		"react-scripts": "5.0.1",
+		"react-zoom-pan-pinch": "^2.2.0",
 		"use-image": "^1.1.0",
 		"web-vitals": "^2.1.4"
+	},
+	"overrides": {
+		"react-zoom-pan-pinch": {
+			"react": "$react",
+			"react-dom": "$react-dom"
+		}
 	},
 	"scripts": {
 		"start": "cross-env BROWSER=none react-scripts start",
