@@ -4,6 +4,8 @@
 	align-items: center;
 	background: url("../../assets/images/bg.png");
 	background-repeat: repeat;
+	overflow-y: hidden;
+	height: 100vh;
 }
 
 .nav-bar {

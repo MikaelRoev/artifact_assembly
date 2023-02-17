@@ -2,7 +2,8 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import TransformableImage from "../TransformableImage/TransformableImage";
 import { initialImages } from "../../assets/InitialImages";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+
 import "./StageArea.css";
 
 const StageArea = () => {
@@ -27,11 +28,18 @@ const StageArea = () => {
 		};
 	}
 
-	function isTouchEnabled() {
-		const hasTouchEvents = "ontouchstart" in window;
-		const hasMaxTouchPoints = navigator.maxTouchPoints > 0;
-		const hasMsMaxTouchPoints = navigator.msMaxTouchPoints > 0;
-		return hasTouchEvents || hasMaxTouchPoints || hasMsMaxTouchPoints;
+	function resetStage() {
+		const stage = stageRef.current;
+		if (!stage) return;
+
+		// Reset scale and position
+		stage.scale({ x: 1, y: 1 });
+		stage.position({ x: 0, y: 0 });
+		stage.batchDraw();
+
+		// Reset last center and distance values
+		lastCenter = null;
+		lastDist = 0;
 	}
 
 	const checkDeselect = (e) => {
@@ -122,39 +130,60 @@ const StageArea = () => {
 		lastDist = 0;
 	}
 
+	useEffect(() => {
+		const handleKeyPress = (event) => {
+			if (event.key === "p") {
+				resetStage();
+			}
+		};
+		document.addEventListener("keydown", handleKeyPress);
+		return () => {
+			document.removeEventListener("keydown", handleKeyPress);
+		};
+	}, []);
+
 	return (
-		<Stage
-			width={window.innerWidth}
-			height={window.innerHeight}
-			className="stage"
-			draggable
-			onWheel={zoomStage}
-			onTouchMove={handleTouch}
-			onTouchEnd={handleTouchEnd}
-			onMouseDown={checkDeselect}
-			onTouchStart={checkDeselect}
-			ref={stageRef}>
-			<Layer className="layer">
-				{images.map((image, i) => {
-					return (
-						<TransformableImage
-							key={i}
-							imageURL={image.imageUrl}
-							shapeProps={image}
-							isSelected={image.id === selectedId}
-							onSelect={() => {
-								selectedImage(image.id);
-							}}
-							onChange={(newAttrs) => {
-								const rects = images.slice();
-								rects[i] = newAttrs;
-								setImages(rects);
-							}}
-						/>
-					);
-				})}
-			</Layer>
-		</Stage>
+		<>
+			<Stage
+				width={window.innerWidth}
+				height={window.innerHeight}
+				className="stage"
+				draggable
+				onWheel={zoomStage}
+				onTouchMove={handleTouch}
+				onTouchEnd={handleTouchEnd}
+				onMouseDown={checkDeselect}
+				onTouchStart={checkDeselect}
+				ref={stageRef}
+				onContextMenu={(e) => {
+					e.evt.preventDefault();
+					const contextMenu = document.getElementById("context-menu");
+					contextMenu.style.top = `${e.evt.clientY}px`;
+					contextMenu.style.left = `${e.evt.clientX}px`;
+					contextMenu.classList.add("active");
+				}}>
+				<Layer className="layer">
+					{images.map((image, i) => {
+						return (
+							<TransformableImage
+								key={i}
+								imageURL={image.imageUrl}
+								shapeProps={image}
+								isSelected={image.id === selectedId}
+								onSelect={() => {
+									selectedImage(image.id);
+								}}
+								onChange={(newAttrs) => {
+									const rects = images.slice();
+									rects[i] = newAttrs;
+									setImages(rects);
+								}}
+							/>
+						);
+					})}
+				</Layer>
+			</Stage>
+		</>
 	);
 };
 
