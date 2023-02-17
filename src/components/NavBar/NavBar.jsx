@@ -2,10 +2,12 @@ import React, { useContext } from "react";
 import "./NavBar.css";
 import GridContext from "../../pages/Canvas/GridContext";
 import ResizeContext from "../../pages/Canvas/ResizeContext";
+import LockContext from "../../pages/Canvas/LockContext";
 
 const NavBar = () => {
 	const { setGrid, grid } = useContext(GridContext);
 	const { setResize, resize } = useContext(ResizeContext);
+	const { setLock, lock } = useContext(LockContext);
 
 	const gridText = grid !== 1 ? `Edit Grid (${grid} x ${grid})` : "Enable Grid";
 
@@ -20,6 +22,10 @@ const NavBar = () => {
 		setResize((prevResize) => !prevResize);
 	};
 
+	const toggleLock = () => {
+		setLock((prevLock) => !prevLock);
+	};
+
 	return (
 		<nav className="navbar">
 			<div className="nav-left">
@@ -30,6 +36,7 @@ const NavBar = () => {
 				<p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
 				</p>
+				<p onClick={toggleLock}>{lock ? "Lock Canvas" : "Unlock Canvas"}</p>
 			</div>
 			<div className="nav-right">
 				<p className="nav-item-right">{"Oseberg1"}</p>

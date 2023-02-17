@@ -4,8 +4,6 @@ import TransformableImage from "../TransformableImage/TransformableImage";
 import { initialImages } from "../../assets/InitialImages";
 import { useState, useRef, useEffect } from "react";
 
-import "./StageArea.css";
-
 const StageArea = () => {
 	const [images, setImages] = useState(initialImages);
 	const [selectedId, selectedImage] = useState(null);
@@ -130,17 +128,17 @@ const StageArea = () => {
 		lastDist = 0;
 	}
 
-	useEffect(() => {
-		const handleKeyPress = (event) => {
-			if (event.key === "p") {
-				resetStage();
-			}
-		};
-		document.addEventListener("keydown", handleKeyPress);
-		return () => {
-			document.removeEventListener("keydown", handleKeyPress);
-		};
-	}, []);
+	// useEffect(() => {
+	// 	const handleKeyPress = (event) => {
+	// 		if (event.key === "p") {
+	// 			resetStage();
+	// 		}
+	// 	};
+	// 	document.addEventListener("keydown", handleKeyPress);
+	// 	return () => {
+	// 		document.removeEventListener("keydown", handleKeyPress);
+	// 	};
+	// }, []);
 
 	return (
 		<>

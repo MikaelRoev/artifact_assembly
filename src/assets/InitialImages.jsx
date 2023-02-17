@@ -4,7 +4,7 @@ const images = [];
 // 	images.push(require(`./images/vikingwebp/image${i}.webp`));
 // }
 
-function getRandomCoordinates(padding = 80) {
+function getRandomCoordinates(padding = 280) {
 	const { innerWidth, innerHeight } = window;
 	return {
 		x: Math.random() * (innerWidth - padding * 2) + padding,

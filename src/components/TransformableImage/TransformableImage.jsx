@@ -4,6 +4,7 @@ import { Transformer, Image } from "react-konva";
 import useImage from "use-image";
 import GridContext from "../../pages/Canvas/GridContext";
 import ResizeContext from "../../pages/Canvas/ResizeContext";
+import LockContext from "../../pages/Canvas/LockContext";
 
 //TODO Add undo redo (ctrl+z, ctrl+y) functionality
 const TransformableImage = ({
@@ -18,6 +19,7 @@ const TransformableImage = ({
 	const [image] = useImage(imageURL);
 	const { grid } = useContext(GridContext);
 	const { resize } = useContext(ResizeContext);
+	const { lock } = useContext(LockContext);
 
 	React.useEffect(() => {
 		if (isSelected) {
@@ -38,7 +40,7 @@ const TransformableImage = ({
 				onTap={onSelect}
 				ref={shapeRef}
 				{...shapeProps}
-				draggable
+				draggable={lock}
 				onDragMove={(e) => {
 					//Moves selected image on a grid
 					e.target.x(Math.round(e.target.x() / grid) * grid);
