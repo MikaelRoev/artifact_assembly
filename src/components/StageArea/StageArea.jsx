@@ -2,11 +2,36 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import TransformableImage from "../TransformableImage/TransformableImage";
 import { initialImages } from "../../assets/InitialImages";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const StageArea = () => {
 	const [images, setImages] = useState(initialImages);
 	const [selectedId, selectedImage] = useState(null);
+
+	const scaleBy = 1.05;
+	const stageRef = useRef(null);
+	let lastCenter = null;
+	let lastDist = 0;
+
+	function getDistance(p1, p2) {
+		const dx = p2.x - p1.x;
+		const dy = p2.y - p1.y;
+		return Math.sqrt(dx ** 2 + dy ** 2);
+	}
+
+	function getCenter(p1, p2) {
+		return {
+			x: (p1.x + p2.x) / 2,
+			y: (p1.y + p2.y) / 2,
+		};
+	}
+
+	function isTouchEnabled() {
+		const hasTouchEvents = "ontouchstart" in window;
+		const hasMaxTouchPoints = navigator.maxTouchPoints > 0;
+		const hasMsMaxTouchPoints = navigator.msMaxTouchPoints > 0;
+		return hasTouchEvents || hasMaxTouchPoints || hasMsMaxTouchPoints;
+	}
 
 	const checkDeselect = (e) => {
 		// deselect when clicked on empty area
@@ -16,13 +41,94 @@ const StageArea = () => {
 		}
 	};
 
+	function zoomStage(event) {
+		event.evt.preventDefault();
+
+		const stage = stageRef.current;
+		if (!stage) return;
+
+		const oldScale = stage.scaleX();
+		const pointer = stage.getPointerPosition();
+		const mousePointTo = {
+			x: (pointer.x - stage.x()) / oldScale,
+			y: (pointer.y - stage.y()) / oldScale,
+		};
+		const newScale =
+			event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+		stage.scale({ x: newScale, y: newScale });
+
+		const newPos = {
+			x: pointer.x - mousePointTo.x * newScale,
+			y: pointer.y - mousePointTo.y * newScale,
+		};
+		stage.position(newPos);
+		stage.batchDraw();
+	}
+
+	function handleTouch(e) {
+		e.evt.preventDefault();
+		const touches = e.evt.touches;
+		const stage = stageRef.current;
+
+		if (!stage || touches.length < 2) {
+			return;
+		}
+
+		const touch1 = touches[0];
+		const touch2 = touches[1];
+
+		if (stage.isDragging()) {
+			stage.stopDrag();
+		}
+
+		const p1 = { x: touch1.clientX, y: touch1.clientY };
+		const p2 = { x: touch2.clientX, y: touch2.clientY };
+		const newCenter = getCenter(p1, p2);
+		const dist = getDistance(p1, p2);
+
+		if (!lastCenter) {
+			lastCenter = newCenter;
+			return;
+		}
+
+		const scale = stage.scaleX() * (dist / lastDist);
+		const pointTo = {
+			x: (newCenter.x - stage.x()) / stage.scaleX(),
+			y: (newCenter.y - stage.y()) / stage.scaleX(),
+		};
+		const dx = newCenter.x - lastCenter.x;
+		const dy = newCenter.y - lastCenter.y;
+		const newPos = {
+			x: newCenter.x - pointTo.x * scale + dx,
+			y: newCenter.y - pointTo.y * scale + dy,
+		};
+
+		stage.scale({ x: scale, y: scale });
+		stage.position(newPos);
+		stage.batchDraw();
+
+		lastDist = dist;
+		lastCenter = newCenter;
+	}
+
+	function handleTouchEnd() {
+		lastCenter = null;
+		lastDist = 0;
+	}
+
 	return (
 		<Stage
 			width={window.innerWidth}
 			height={window.innerHeight}
 			className="stage"
+			draggable={!isTouchEnabled}
+			onWheel={zoomStage}
+			onTouchMove={handleTouch}
+			onTouchEnd={handleTouchEnd}
 			onMouseDown={checkDeselect}
-			onTouchStart={checkDeselect}>
+			onTouchStart={checkDeselect}
+			ref={stageRef}>
 			<Layer className="layer">
 				{images.map((image, i) => {
 					return (

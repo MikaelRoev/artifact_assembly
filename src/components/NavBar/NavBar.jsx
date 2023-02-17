@@ -26,7 +26,7 @@ const NavBar = () => {
 				<a href="/">Home</a>
 				<p>File</p>
 				<p onClick={grid !== 1 ? changeGrid : () => setGrid(10)}>{gridText}</p>
-				{grid !== 1 && <p onClick={() => setGrid(1)}>Remove Grid</p>}
+				{grid !== 1 && <p onClick={() => setGrid(1)}>Disable Grid</p>}
 				<p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
 				</p>

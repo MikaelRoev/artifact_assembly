@@ -32,6 +32,8 @@ const TransformableImage = ({
 			<Image
 				className="image"
 				image={image}
+				height={350}
+				width={350}
 				onClick={onSelect}
 				onTap={onSelect}
 				ref={shapeRef}

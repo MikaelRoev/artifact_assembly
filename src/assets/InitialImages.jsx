@@ -1,8 +1,8 @@
 const images = [];
 
-for (let i = 1; i <= 16; i++) {
-	images.push(require(`./images/vikingwebp/image${i}.webp`));
-}
+// for (let i = 1; i <= 16; i++) {
+// 	images.push(require(`./images/vikingwebp/image${i}.webp`));
+// }
 
 function getRandomCoordinates(padding = 80) {
 	const { innerWidth, innerHeight } = window;
@@ -11,6 +11,10 @@ function getRandomCoordinates(padding = 80) {
 		y: Math.random() * (innerHeight - padding * 2) + padding,
 	};
 }
+
+images.push(require("./images/SegmentedImages/texrec013_segmented.png"));
+images.push(require("./images/SegmentedImages/texrec004_segmented.png"));
+
 
 const initialImages = images.map((image, i) => ({
 	...getRandomCoordinates(),
