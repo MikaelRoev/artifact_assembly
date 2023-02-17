@@ -3,6 +3,7 @@ import { Stage, Layer } from "react-konva";
 import TransformableImage from "../TransformableImage/TransformableImage";
 import { initialImages } from "../../assets/InitialImages";
 import { useState, useRef } from "react";
+import "./StageArea.css";
 
 const StageArea = () => {
 	const [images, setImages] = useState(initialImages);
@@ -53,8 +54,12 @@ const StageArea = () => {
 			x: (pointer.x - stage.x()) / oldScale,
 			y: (pointer.y - stage.y()) / oldScale,
 		};
-		const newScale =
+
+		// Add a max limit to how much you can zoom out
+		const minScale = 0.4;
+		let newScale =
 			event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+		newScale = Math.max(minScale, newScale);
 
 		stage.scale({ x: newScale, y: newScale });
 
@@ -122,7 +127,7 @@ const StageArea = () => {
 			width={window.innerWidth}
 			height={window.innerHeight}
 			className="stage"
-			draggable={!isTouchEnabled}
+			draggable
 			onWheel={zoomStage}
 			onTouchMove={handleTouch}
 			onTouchEnd={handleTouchEnd}
