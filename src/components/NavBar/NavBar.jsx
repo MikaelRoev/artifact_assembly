@@ -36,7 +36,7 @@ const NavBar = () => {
 				<p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
 				</p>
-				<p onClick={toggleLock}>{lock ? "Lock Canvas" : "Unlock Canvas"}</p>
+				<p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
 			</div>
 			<div className="nav-right">
 				<p className="nav-item-right">{"Oseberg1"}</p>

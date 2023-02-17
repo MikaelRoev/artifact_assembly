@@ -40,7 +40,7 @@ const TransformableImage = ({
 				onTap={onSelect}
 				ref={shapeRef}
 				{...shapeProps}
-				draggable={lock}
+				draggable={!lock}
 				onDragMove={(e) => {
 					//Moves selected image on a grid
 					e.target.x(Math.round(e.target.x() / grid) * grid);
@@ -76,6 +76,8 @@ const TransformableImage = ({
 				onMouseEnter={(e) => {
 					// Adds a pointer cursor when hovering over the image
 					const container = e.target.getStage().container();
+					if (!lock) container.style.cursor = "default";
+
 					container.style.cursor = "pointer";
 				}}
 				onMouseLeave={(e) => {
