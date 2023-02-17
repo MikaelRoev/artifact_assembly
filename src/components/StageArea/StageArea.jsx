@@ -2,7 +2,7 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import TransformableImage from "../TransformableImage/TransformableImage";
 import { initialImages } from "../../assets/InitialImages";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 const StageArea = () => {
 	const [images, setImages] = useState(initialImages);
@@ -24,20 +24,6 @@ const StageArea = () => {
 			x: (p1.x + p2.x) / 2,
 			y: (p1.y + p2.y) / 2,
 		};
-	}
-
-	function resetStage() {
-		const stage = stageRef.current;
-		if (!stage) return;
-
-		// Reset scale and position
-		stage.scale({ x: 1, y: 1 });
-		stage.position({ x: 0, y: 0 });
-		stage.batchDraw();
-
-		// Reset last center and distance values
-		lastCenter = null;
-		lastDist = 0;
 	}
 
 	const checkDeselect = (e) => {
