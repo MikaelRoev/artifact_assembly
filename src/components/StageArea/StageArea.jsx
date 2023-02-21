@@ -9,15 +9,9 @@ const StageArea = () => {
 	const [selectedId, selectedImage] = useState(null);
 	const stageRef = useRef(null);
 
-	const zoomScale = 1.15;
-
-	/**
-	 * Calculates the distance between two points in a 2D coordinate system.
-	 *
-	 * @param {Object} p1 - An object representing the first point with x and y properties.
-	 * @param {Object} p2 - An object representing the second point with x and y properties.
-	 * @returns {number} The distance between the two points.
-	 */
+	const zoomScale = 1.17; //How much zoom each time
+	const min = 0.4; //zoom out limit
+	const max = 300; //zoom in limit
 
 	const checkDeselect = (e) => {
 		// deselect when clicked on empty area
@@ -32,11 +26,13 @@ const StageArea = () => {
 	 *
 	 * @param {Object} event - The event object containing information about the scroll event.
 	 */
-	function zoomStage(event) {
+	const zoomStage = (event) => {
 		event.evt.preventDefault();
 
 		const stage = stageRef.current;
-		if (!stage) return;
+		if (!stage) {
+			return;
+		}
 
 		const oldScale = stage.scaleX();
 		const pointer = stage.getPointerPosition();
@@ -45,11 +41,8 @@ const StageArea = () => {
 			y: (pointer.y - stage.y()) / oldScale,
 		};
 
-		// Add a max limit to how much you can zoom out
-		const limit = 0.4;
-		let newScale =
-			event.evt.deltaY < 0 ? oldScale * zoomScale : oldScale / zoomScale;
-		newScale = Math.max(limit, newScale);
+		const zoomFactor = event.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
+		const newScale = clamp(oldScale * zoomFactor, min, max);
 
 		stage.scale({ x: newScale, y: newScale });
 
@@ -59,15 +52,26 @@ const StageArea = () => {
 		};
 		stage.position(newPos);
 		stage.batchDraw();
-	}
+	};
+	/**
+	 * Clamps a numeric value between a minimum and maximum range.
+	 * @param {number} value - The numeric value to be clamped.
+	 * @param {number} min - The minimum value of the range.
+	 * @param {number} max - The maximum value of the range.
+	 * @returns {number} The clamped value.
+	 */
+
+	const clamp = (value, min, max) => {
+		return Math.min(Math.max(value, min), max);
+	};
 
 	return (
 		<>
 			<Stage
 				width={window.innerWidth}
 				height={window.innerHeight}
-				className="stage"
 				draggable
+				className="stage"
 				onWheel={zoomStage}
 				onMouseDown={checkDeselect}
 				onTouchStart={checkDeselect}

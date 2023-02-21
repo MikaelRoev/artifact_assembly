@@ -5,18 +5,12 @@ import ResizeContext from "../../pages/Canvas/ResizeContext";
 import LockContext from "../../pages/Canvas/LockContext";
 
 const NavBar = () => {
-	const { setGrid, grid } = useContext(GridContext);
-	const { setResize, resize } = useContext(ResizeContext);
-	const { setLock, lock } = useContext(LockContext);
+	const { grid, setGrid } = useContext(GridContext);
+	const { resize, setResize } = useContext(ResizeContext);
+	const { lock, setLock } = useContext(LockContext);
 
+	const gridOptions = [10, 20, 30, 40, 50];
 	const gridText = grid !== 1 ? `Edit Grid (${grid} x ${grid})` : "Enable Grid";
-
-	const changeGrid = () => {
-		const gridOptions = [10, 20, 30, 40, 50];
-		let currentIndex = gridOptions.indexOf(grid);
-		currentIndex = (currentIndex + 1) % gridOptions.length;
-		setGrid(gridOptions[currentIndex]);
-	};
 
 	const toggleResize = () => {
 		setResize((prevResize) => !prevResize);
@@ -24,6 +18,12 @@ const NavBar = () => {
 
 	const toggleLock = () => {
 		setLock((prevLock) => !prevLock);
+	};
+
+	const changeGrid = () => {
+		const nextGrid =
+			gridOptions[(gridOptions.indexOf(grid) + 1) % gridOptions.length];
+		setGrid(nextGrid);
 	};
 
 	return (
