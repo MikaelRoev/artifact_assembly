@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import "./NavBar.css";
-import GridContext from "../../pages/Canvas/GridContext";
-import ResizeContext from "../../pages/Canvas/ResizeContext";
-import LockContext from "../../pages/Canvas/LockContext";
+import GridContext from "../../pages/Canvas/Context/GridContext";
+import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
+import LockContext from "../../pages/Canvas/Context/LockContext";
 
 const NavBar = () => {
 	const { grid, setGrid } = useContext(GridContext);

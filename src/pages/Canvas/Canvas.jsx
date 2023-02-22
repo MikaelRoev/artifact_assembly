@@ -3,9 +3,9 @@ import { useState } from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
-import GridContext from "./GridContext";
-import ResizeContext from "./ResizeContext";
-import LockContext from "./LockContext";
+import GridContext from "./Context/GridContext";
+import ResizeContext from "./Context/ResizeContext";
+import LockContext from "./Context/LockContext";
 
 const Canvas = () => {
 	const [grid, setGrid] = useState(1);

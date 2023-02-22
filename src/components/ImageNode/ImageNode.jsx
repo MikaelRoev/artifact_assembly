@@ -2,9 +2,9 @@ import React from "react";
 import { useContext } from "react";
 import { Transformer, Image } from "react-konva";
 import useImage from "use-image";
-import GridContext from "../../pages/Canvas/GridContext";
-import ResizeContext from "../../pages/Canvas/ResizeContext";
-import LockContext from "../../pages/Canvas/LockContext";
+import GridContext from "../../pages/Canvas/Context/GridContext";
+import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
+import LockContext from "../../pages/Canvas/Context/LockContext";
 
 //TODO Add undo redo (ctrl+z, ctrl+y) functionality
 const ImageNode = ({
