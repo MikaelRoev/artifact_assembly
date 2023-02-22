@@ -1,6 +1,6 @@
 import React from "react";
 import { Stage, Layer } from "react-konva";
-import TransformableImage from "../TransformableImage/TransformableImage";
+import ImageNode from "../ImageNode/ImageNode";
 import { initialImages } from "../../assets/InitialImages";
 import { useState, useRef } from "react";
 
@@ -79,7 +79,7 @@ const StageArea = () => {
 				<Layer className="layer">
 					{images.map((image, i) => {
 						return (
-							<TransformableImage
+							<ImageNode
 								key={i}
 								imageURL={image.imageUrl}
 								shapeProps={image}

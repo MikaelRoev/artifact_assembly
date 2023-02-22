@@ -7,7 +7,7 @@ import ResizeContext from "../../pages/Canvas/ResizeContext";
 import LockContext from "../../pages/Canvas/LockContext";
 
 //TODO Add undo redo (ctrl+z, ctrl+y) functionality
-const TransformableImage = ({
+const ImageNode = ({
 	shapeProps,
 	isSelected,
 	onSelect,
@@ -84,6 +84,7 @@ const TransformableImage = ({
 					const container = e.target.getStage().container();
 					container.style.cursor = "default";
 				}}
+				perfectDrawEnabled={false}
 			/>
 			{isSelected && (
 				//Adds the konva transformer to the image item
@@ -107,4 +108,4 @@ const TransformableImage = ({
 	);
 };
 
-export default TransformableImage;
+export default ImageNode;
