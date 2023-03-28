@@ -12,8 +12,8 @@ const getRandomCoordinates = (padding = 280) => {
 	};
 };
 
-images.push(require("./images/SegmentedImages/texrec013_segmented.png"));
-images.push(require("./images/SegmentedImages/texrec004_segmented.png"));
+// images.push(require("./images/SegmentedImages/texrec013_segmented.png"));
+// images.push(require("./images/SegmentedImages/texrec004_segmented.png"));
 
 const initialImages = images.map((image, i) => ({
 	...getRandomCoordinates(),

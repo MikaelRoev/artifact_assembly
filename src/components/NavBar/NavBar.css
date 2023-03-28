@@ -23,10 +23,11 @@
 
 .nav-right {
 	display: flex;
-	padding-right: 2rem;
-	height: 50px;
-	justify-content: center;
+	justify-content: flex-end;
 	align-items: center;
+	padding-right: 2rem;
+	gap: 1rem;
+	width: 40%;
 }
 
 .nav-item-right {
@@ -56,4 +57,30 @@
 .nav-left p:hover,
 .nav-left a:hover {
 	background-color: #323842;
+}
+
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.inputfile + label {
+	font-size: 1rem;
+	font-weight: 400;
+	color: #abb2bf;
+	background-color: #202020;
+	display: inline-block;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+	background-color: #323842;
+}
+
+.inputfile + label {
+	cursor: pointer; /* "hand" cursor */
 }

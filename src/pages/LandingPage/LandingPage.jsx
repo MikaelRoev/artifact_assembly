@@ -14,14 +14,15 @@ const LandingPage = () => {
 					Welcome to <br /> Artifact Assembly
 				</h1>
 
-				<a href="/canvas" className="link-button">
-					Continue Project
-				</a>
-				<p className="link-button">New Project</p>
-				<p className="link-button secondary">Settings</p>
-				<p onClick={handleClick} className="link-button secondary">
-					Quit
-				</p>
+				<div className="link-buttons-container">
+					<a href="/canvas" className="link-button">
+						New Project
+					</a>
+					<p className="link-button secondary">Settings</p>
+					<p onClick={handleClick} className="link-button secondary">
+						Quit
+					</p>
+				</div>
 			</div>
 			<div className="right-main">
 				<h1>Projects</h1>

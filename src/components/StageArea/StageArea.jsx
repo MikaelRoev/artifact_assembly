@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Stage, Layer } from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
-import { initialImages } from "../../assets/InitialImages";
+// import { initialImages } from "../../assets/InitialImages";
+
 import { useState, useRef } from "react";
 
-const StageArea = () => {
-	const [images, setImages] = useState(initialImages);
+const StageArea = ({ uploadedImages, isLoading }) => {
+	const [images, setImages] = useState([]);
 	const [selectedId, selectedImage] = useState(null);
+
 	const stageRef = useRef(null);
 
 	const zoomScale = 1.17; //How much zoom each time
-	const min = 0.4; //zoom out limit
+	const min = 0.001; //zoom out limit
 	const max = 300; //zoom in limit
+
+	useEffect(() => {
+		// Check if the `images` array has changed
+		// and update the state if necessary
+		setImages(uploadedImages);
+	}, [uploadedImages]);
 
 	const checkDeselect = (e) => {
 		// deselect when clicked on empty area
@@ -77,24 +85,25 @@ const StageArea = () => {
 				onTouchStart={checkDeselect}
 				ref={stageRef}>
 				<Layer className="layer">
-					{images.map((image, i) => {
-						return (
-							<ImageNode
-								key={i}
-								imageURL={image.imageUrl}
-								shapeProps={image}
-								isSelected={image.id === selectedId}
-								onSelect={() => {
-									selectedImage(image.id);
-								}}
-								onChange={(newAttrs) => {
-									const rects = images.slice();
-									rects[i] = newAttrs;
-									setImages(rects);
-								}}
-							/>
-						);
-					})}
+					{images.length > 0 &&
+						images.map((image, i) => {
+							return (
+								<ImageNode
+									key={i}
+									imageURL={image.imageUrl}
+									shapeProps={image}
+									isSelected={image.id === selectedId}
+									onSelect={() => {
+										selectedImage(image.id);
+									}}
+									onChange={(newAttrs) => {
+										const rects = images.slice();
+										rects[i] = newAttrs;
+										setImages(rects);
+									}}
+								/>
+							);
+						})}
 				</Layer>
 			</Stage>
 		</>

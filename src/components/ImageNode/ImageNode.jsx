@@ -1,12 +1,11 @@
 import React from "react";
-import { useContext } from "react";
-import { Transformer, Image } from "react-konva";
+import { useContext, useRef, useEffect } from "react";
+import { Transformer, Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import GridContext from "../../pages/Canvas/Context/GridContext";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 
-//TODO Add undo redo (ctrl+z, ctrl+y) functionality
 const ImageNode = ({
 	shapeProps,
 	isSelected,
@@ -14,75 +13,102 @@ const ImageNode = ({
 	onChange,
 	imageURL,
 }) => {
-	const shapeRef = React.useRef();
-	const trRef = React.useRef();
-	const [image] = useImage(imageURL);
+	const imageRef = useRef();
+	const trRef = useRef();
+
+	const [imageSrc] = useImage(imageURL);
+
 	const { grid } = useContext(GridContext);
 	const { resize } = useContext(ResizeContext);
 	const { lock } = useContext(LockContext);
 
-	React.useEffect(() => {
+	const onMouseLeave = (e) => {
+		const container = e.target.getStage().container();
+		container.style.cursor = "default";
+	};
+
+	const onMouseDown = (e) => {
+		e.target.moveToTop();
+	};
+
+	const onMouseEnter = (e, lock) => {
+		const container = e.target.getStage().container();
+		if (!lock) container.style.cursor = "default";
+
+		container.style.cursor = "pointer";
+	};
+
+	const onTransformEnd = (imageRef, onChange, shapeProps) => {
+		const node = imageRef.current;
+		const scaleX = node.scaleX();
+		const scaleY = node.scaleY();
+
+		node.scaleX(1);
+		node.scaleY(1);
+		onChange({
+			...shapeProps,
+			x: node.x(),
+			y: node.y(),
+			// set minimal value
+			width: Math.max(5, node.width() * scaleX),
+			height: Math.max(node.height() * scaleY),
+		});
+	};
+
+	const onDragEnd = (onChange, shapeProps, e) => {
+		onChange({
+			...shapeProps,
+			x: e.target.x(),
+			y: e.target.y(),
+		});
+	};
+
+	const onDragMove = (e, grid) => {
+		e.target.x(Math.round(e.target.x() / grid) * grid);
+		e.target.y(Math.round(e.target.y() / grid) * grid);
+	};
+
+	useEffect(() => {
 		if (isSelected) {
 			// we need to attach transformer manually
-			trRef.current.nodes([shapeRef.current]);
+			trRef.current.nodes([imageRef.current]);
 			trRef.current.getLayer().batchDraw();
 		}
 	}, [isSelected]);
 
+	useEffect(() => {
+		if (imageSrc) {
+			console.log("caching...");
+			imageRef.current.cache();
+		}
+	}, [imageSrc]);
+
 	return (
 		<>
-			<Image
-				className="image"
-				image={image}
-				height={350}
-				width={350}
+			<KonvaImage
+				ref={imageRef}
+				image={imageSrc}
 				onClick={onSelect}
 				onTap={onSelect}
-				ref={shapeRef}
 				{...shapeProps}
 				draggable={!lock}
 				onDragMove={(e) => {
-					//Moves selected image on a grid
-					e.target.x(Math.round(e.target.x() / grid) * grid);
-					e.target.y(Math.round(e.target.y() / grid) * grid);
+					onDragMove(e, grid);
 				}}
 				onDragEnd={(e) => {
-					onChange({
-						...shapeProps,
-						x: e.target.x(),
-						y: e.target.y(),
-					});
+					onDragEnd(onChange, shapeProps, e);
 				}}
 				onMouseDown={(e) => {
-					//Moves selected image on top (z-index)
-					e.target.moveToTop();
+					onMouseDown(e);
 				}}
-				onTransformEnd={(e) => {
-					const node = shapeRef.current;
-					const scaleX = node.scaleX();
-					const scaleY = node.scaleY();
-
-					node.scaleX(1);
-					node.scaleY(1);
-					onChange({
-						...shapeProps,
-						x: node.x(),
-						y: node.y(),
-						// set minimal value
-						width: Math.max(5, node.width() * scaleX),
-						height: Math.max(node.height() * scaleY),
-					});
+				onTransformEnd={() => {
+					onTransformEnd(imageRef, onChange, shapeProps);
 				}}
 				onMouseEnter={(e) => {
-					// Adds a pointer cursor when hovering over the image
-					const container = e.target.getStage().container();
-					if (!lock) container.style.cursor = "default";
-
-					container.style.cursor = "pointer";
+					onMouseEnter(e, lock);
 				}}
 				onMouseLeave={(e) => {
-					const container = e.target.getStage().container();
-					container.style.cursor = "default";
+					onMouseLeave(e);
 				}}
 				perfectDrawEnabled={false}
 			/>
