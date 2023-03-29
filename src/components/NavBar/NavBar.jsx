@@ -13,7 +13,7 @@ const NavBar = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const handleFileChange = (e) => {
+	const handleImageUpload = (e) => {
 		setIsLoading(true);
 		const files = e.target.files;
 		const newImages = [];
@@ -34,10 +34,6 @@ const NavBar = () => {
 			};
 			reader.readAsDataURL(file);
 		}
-	};
-
-	const handleUploadClick = () => {
-		console.log(images);
 	};
 
 	const gridOptions = [10, 20, 30, 40, 50];
@@ -64,13 +60,13 @@ const NavBar = () => {
 				<div>
 					<input
 						type="file"
-						onChange={handleFileChange}
+						onChange={handleImageUpload}
 						multiple
 						accept="image/*"
 						className="inputfile"
 						id="file"
 					/>
-					<label for="file">Load Image</label>
+					<label htmlFor="file">Load Image</label>
 				</div>
 
 				<p onClick={grid !== 1 ? changeGrid : () => setGrid(10)}>{gridText}</p>

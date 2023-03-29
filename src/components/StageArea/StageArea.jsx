@@ -5,9 +5,9 @@ import ImageNode from "../ImageNode/ImageNode";
 
 import { useState, useRef } from "react";
 
-const StageArea = ({ uploadedImages, isLoading }) => {
+const StageArea = ({ uploadedImages }) => {
 	const [images, setImages] = useState([]);
-	const [selectedId, selectedImage] = useState(null);
+	const [selectedImageId, setSelectedImageId] = useState(null);
 
 	const stageRef = useRef(null);
 
@@ -21,11 +21,28 @@ const StageArea = ({ uploadedImages, isLoading }) => {
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
+	useEffect(() => {
+		const handleDelete = (e) => {
+			if (e.code === "Delete" && selectedImageId !== null) {
+				const updatedImages = images.filter(
+					(image) => image.id !== selectedImageId
+				);
+				console.log(`image ${selectedImageId} deleted`);
+				setImages(updatedImages);
+				selectImageId(null);
+			}
+		};
+		document.addEventListener("keydown", handleDelete);
+		return () => {
+			document.removeEventListener("keydown", handleDelete);
+		};
+	}, [selectedImageId, images]);
+
 	const checkDeselect = (e) => {
 		// deselect when clicked on empty area
 		const clickedOnEmpty = e.target === e.currentTarget;
 		if (clickedOnEmpty) {
-			selectedImage(null);
+			setSelectedImageId(null);
 		}
 	};
 
@@ -73,6 +90,11 @@ const StageArea = ({ uploadedImages, isLoading }) => {
 		return Math.min(Math.max(value, min), max);
 	};
 
+	const selectImageId = (imageId) => {
+		setSelectedImageId(imageId);
+		console.log(selectedImageId);
+	};
+
 	return (
 		<>
 			<Stage
@@ -92,14 +114,15 @@ const StageArea = ({ uploadedImages, isLoading }) => {
 									key={i}
 									imageURL={image.imageUrl}
 									shapeProps={image}
-									isSelected={image.id === selectedId}
+									isSelected={image.id === selectedImageId}
 									onSelect={() => {
-										selectedImage(image.id);
+										selectImageId(image.id);
 									}}
 									onChange={(newAttrs) => {
 										const rects = images.slice();
 										rects[i] = newAttrs;
 										setImages(rects);
+										console.log(images[selectedImageId - 1]);
 									}}
 								/>
 							);
