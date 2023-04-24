@@ -1,10 +1,12 @@
 import React from "react";
+import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Transformer, Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import GridContext from "../../pages/Canvas/Context/GridContext";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
+import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
 const ImageNode = ({
 	shapeProps,
@@ -21,6 +23,17 @@ const ImageNode = ({
 	const { grid } = useContext(GridContext);
 	const { resize } = useContext(ResizeContext);
 	const { lock } = useContext(LockContext);
+	const { filter } = useContext(ImageContext);
+	const { hue } = useContext(ImageContext);
+	const { saturation } = useContext(ImageContext);
+	const { luminance } = useContext(ImageContext);
+	const { contrast } = useContext(ImageContext);
+
+	const handleFilter = () => {
+		if (filter === true) {
+			return [Konva.Filters.HSL, Konva.Filters.Contrast];
+		} else return null;
+	};
 
 	useEffect(() => {
 		if (isSelected) {
@@ -40,6 +53,11 @@ const ImageNode = ({
 		<>
 			<KonvaImage
 				ref={imageRef}
+				filters={handleFilter()}
+				hue={hue}
+				saturation={saturation}
+				luminance={luminance}
+				contrast={contrast}
 				image={imageSrc}
 				onClick={onSelect}
 				onTap={onSelect}

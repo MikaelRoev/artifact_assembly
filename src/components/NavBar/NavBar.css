@@ -10,7 +10,7 @@
 	color: #f0f0f0;
 	width: 100%;
 	text-align: center;
-	height: 40px;
+	height: 50px;
 }
 
 .nav-left {
@@ -21,13 +21,19 @@
 	gap: 1rem;
 }
 
+.filter-form {
+	display: flex;
+}
+
 .nav-right {
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
 	padding-right: 2rem;
 	gap: 1rem;
-	width: 40%;
+	width: 20%;
+}
+label {
 }
 
 .nav-item-right {
@@ -38,7 +44,8 @@
 }
 
 .nav-left p,
-.nav-left a {
+.nav-left a,
+.nav-left > form > label {
 	width: auto;
 	text-align: left;
 	color: #abb2bf;

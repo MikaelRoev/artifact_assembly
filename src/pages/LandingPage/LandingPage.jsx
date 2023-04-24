@@ -16,9 +16,9 @@ const LandingPage = () => {
 
 				<div className="link-buttons-container">
 					<a href="/canvas" className="link-button">
-						New Project
+						Open Canvas
 					</a>
-					<p className="link-button secondary">Settings</p>
+
 					<p onClick={handleClick} className="link-button secondary">
 						Quit
 					</p>

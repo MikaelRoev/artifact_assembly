@@ -13,13 +13,34 @@ const Canvas = () => {
 	const [resize, setResize] = useState(false);
 	const [lock, setLock] = useState(false);
 	const [images, setImages] = useState([]);
+	// const [filter, setFilter] = useState({
+	// 	enabled: false,
+	// 	saturation: 0,
+	// 	hue: 0,
+	// 	contrast: 0,
+	// 	luminance: 0,
+	// });
+	const [filter, setFilter] = useState(false);
+	const [saturation, setSaturation] = useState(0);
+	const [hue, setHue] = useState(0);
+	const [contrast, setContrast] = useState(0);
+	const [luminance, setLuminance] = useState(0);
 
 	const providerValue = {
 		grid,
 		resize,
 		lock,
 		images,
-
+		filter,
+		saturation,
+		hue,
+		contrast,
+		luminance,
+		setSaturation,
+		setHue,
+		setContrast,
+		setLuminance,
+		setFilter,
 		setResize,
 		setGrid,
 		setLock,
