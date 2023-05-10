@@ -8,28 +8,29 @@ import { useState, useRef } from "react";
 const StageArea = ({ uploadedImages }) => {
 	const [images, setImages] = useState([]);
 	const [selectedImageId, setSelectedImageId] = useState(null);
+	const [history, setHistory] = useState([]);
+	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	const stageRef = useRef(null);
+	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
 	const min = 0.001; //zoom out limit
 	const max = 300; //zoom in limit
 
 	useEffect(() => {
-		// Check if the `images` array has changed
-		// and update the state if necessary
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
 	useEffect(() => {
 		const handleDelete = (e) => {
-			if (e.code === "Delete" && selectedImageId !== null) {
+			if (e.key === "Delete" && selectedImageId !== null) {
 				const updatedImages = images.filter(
 					(image) => image.id !== selectedImageId
 				);
 				console.log(`image ${selectedImageId} deleted`);
 				setImages(updatedImages);
-				selectImageId(null);
+				setSelectedImageId(null);
 			}
 		};
 		document.addEventListener("keydown", handleDelete);
@@ -37,6 +38,55 @@ const StageArea = ({ uploadedImages }) => {
 			document.removeEventListener("keydown", handleDelete);
 		};
 	}, [selectedImageId, images]);
+
+	useEffect(() => {
+		// Update the uploadedImages prop when the images state changes
+		uploadedImages.forEach((uploadedImage) => {
+			const index = images.findIndex((image) => image.id === uploadedImage.id);
+			if (index >= 0) {
+				uploadedImages[index] = images[index];
+			}
+		});
+	}, [images, uploadedImages]);
+
+	useEffect(() => {
+		const savedImages = localStorage.getItem("savedImages");
+		if (savedImages) {
+			setImages(JSON.parse(savedImages));
+		} else {
+			setImages(uploadedImages);
+		}
+	}, [uploadedImages]);
+
+	useEffect(() => {
+		const handleSave = (e) => {
+			if (e.ctrlKey && e.key === "s") {
+				e.preventDefault();
+				saveImagePositions();
+			}
+		};
+		document.addEventListener("keydown", handleSave);
+		return () => {
+			document.removeEventListener("keydown", handleSave);
+		};
+	}, [images]);
+
+	useEffect(() => {
+		const handleKeyDown = (e) => {
+			if (e.ctrlKey && e.key === "z") {
+				e.preventDefault();
+				handleUndo();
+			}
+		};
+		document.addEventListener("keydown", handleKeyDown);
+		return () => {
+			document.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [history, historyIndex]);
+
+	const saveImagePositions = () => {
+		localStorage.setItem("savedImages", JSON.stringify(images));
+	};
 
 	const checkDeselect = (e) => {
 		// deselect when clicked on empty area
@@ -91,8 +141,15 @@ const StageArea = ({ uploadedImages }) => {
 	};
 
 	const selectImageId = (imageId) => {
-		setSelectedImageId(imageId);
+		setSelectedImageId(Number(imageId));
 		console.log(selectedImageId);
+	};
+
+	const handleUndo = () => {
+		if (historyIndex > 0) {
+			setHistoryIndex(historyIndex - 1);
+			setImages(history[historyIndex - 1]);
+		}
 	};
 
 	return (
@@ -111,18 +168,30 @@ const StageArea = ({ uploadedImages }) => {
 						images.map((image, i) => {
 							return (
 								<ImageNode
-									key={i}
+									key={image.id} // Updated key prop
 									imageURL={image.imageUrl}
 									shapeProps={image}
 									isSelected={image.id === selectedImageId}
 									onSelect={() => {
-										selectImageId(image.id);
+										selectImageId(image.id.toString());
 									}}
 									onChange={(newAttrs) => {
 										const rects = images.slice();
 										rects[i] = newAttrs;
 										setImages(rects);
-										console.log(images[selectedImageId - 1]);
+
+										// Update history
+										const newHistory = history.slice(0, historyIndex + 1);
+										newHistory.push(rects);
+
+										// Enforce the maximum number of undo steps
+										if (newHistory.length > maxUndoSteps) {
+											newHistory.shift(); // Remove the oldest state
+										} else {
+											setHistoryIndex(historyIndex + 1);
+										}
+
+										setHistory(newHistory);
 									}}
 								/>
 							);

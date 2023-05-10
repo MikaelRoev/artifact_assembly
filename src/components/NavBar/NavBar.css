@@ -23,6 +23,8 @@
 
 .filter-form {
 	display: flex;
+	align-items: center;
+	gap: 0.3rem;
 }
 
 .nav-right {
@@ -32,8 +34,6 @@
 	padding-right: 2rem;
 	gap: 1rem;
 	width: 20%;
-}
-label {
 }
 
 .nav-item-right {

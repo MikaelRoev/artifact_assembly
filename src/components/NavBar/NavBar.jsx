@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
 import GridContext from "../../pages/Canvas/Context/GridContext";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
@@ -9,36 +10,56 @@ const NavBar = () => {
 	const { grid, setGrid } = useContext(GridContext);
 	const { resize, setResize } = useContext(ResizeContext);
 	const { lock, setLock } = useContext(LockContext);
-	const { images, setImages } = useContext(ImageContext);
-	const { filter, setFilter } = useContext(ImageContext);
-	const { saturation, setSaturation } = useContext(ImageContext);
-	const { hue, setHue } = useContext(ImageContext);
-	const { contrast, setContrast } = useContext(ImageContext);
-	const { luminance, setLuminance } = useContext(ImageContext);
+	const {
+		images,
+		setImages,
+		filter,
+		setFilter,
+		saturation,
+		setSaturation,
+		hue,
+		setHue,
+		contrast,
+		setContrast,
+		luminance,
+		setLuminance,
+	} = useContext(ImageContext);
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const handleImageUpload = (e) => {
+	const handleImageUpload = async (e) => {
 		setIsLoading(true);
 		const files = e.target.files;
 		const newImages = [];
-		for (let i = 0; i < files.length; i++) {
-			const file = files[i];
-			const reader = new FileReader();
-			reader.onload = () => {
-				const newImage = {
-					imageUrl: reader.result,
-					id: images.length + i + 1,
-					// Other properties for the `shapeProps` object
-				};
-				newImages.push(newImage);
-				if (newImages.length === files.length) {
-					setImages([...images, ...newImages]);
-					setIsLoading(false);
+
+		await Promise.all(
+			Array.from(files).map(async (file) => {
+				const reader = new FileReader();
+				reader.readAsDataURL(file);
+				try {
+					const imageUrl = await new Promise((resolve, reject) => {
+						reader.onload = () => {
+							resolve(reader.result);
+						};
+						reader.onerror = () => {
+							reject(reader.error);
+						};
+					});
+					const newImage = {
+						imageUrl,
+						id: Date.now(), // Assign a unique identifier using Date.now()
+						// Other properties for the `shapeProps` object
+					};
+					newImages.push(newImage);
+				} catch (error) {
+					console.error(error);
 				}
-			};
-			reader.readAsDataURL(file);
-		}
+			})
+		);
+
+		setImages([...images, ...newImages]);
+		setIsLoading(false);
+		e.target.value = ""; // Clear the input value after the upload is complete
 	};
 
 	const gridOptions = [10, 20, 30, 40, 50];
@@ -59,28 +80,19 @@ const NavBar = () => {
 	};
 
 	const toggleFilter = () => {
-		if (filter) {
-			setIsLoading(true);
-			setFilter(false);
-		} else {
-			setIsLoading(true);
-			setFilter(true);
-		}
-		setIsLoading(false);
-		console.log(filter);
+		setFilter((prevFilter) => !prevFilter);
 	};
 
-	const satUpdate = (e) => {
-		setSaturation(e.target.value);
-	};
-	const hueUpdate = (e) => {
-		setHue(e.target.value);
-	};
-	const lumUpdate = (e) => {
-		setLuminance(e.target.value);
-	};
-	const contrastUpdate = (e) => {
-		setContrast(e.target.value);
+	const handleHueChange = (e) => setHue(e.target.value);
+	const handleSaturationChange = (e) => setSaturation(e.target.value);
+	const handleLuminanceChange = (e) => setLuminance(e.target.value);
+	const handleContrastChange = (e) => setContrast(e.target.value);
+
+	const resetFilter = () => {
+		setHue(0);
+		setSaturation(0);
+		setLuminance(0);
+		setContrast(0);
 	};
 
 	return (
@@ -98,59 +110,50 @@ const NavBar = () => {
 					/>
 					<label htmlFor="file">Load Image</label>
 				</div>
-				<p onClick={grid !== 1 ? changeGrid : () => setGrid(10)}>{gridText}</p>
-				{grid !== 1 && <p onClick={() => setGrid(1)}>Disable Grid</p>}
-				<p onClick={toggleResize}>
+				{/* <p onClick={grid !== 1 ? changeGrid : () => setGrid(10)}>{gridText}</p>
+				{grid !== 1 && <p onClick={() => setGrid(1)}>Disable Grid</p>} */}
+				{/* <p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
-				</p>
+				</p> */}
 				<p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
 				<p onClick={toggleFilter}>
 					{!filter ? "Enable Filter" : "Disable Filter"}
 				</p>
-				{!filter ? (
-					""
-				) : (
+				{!filter ? null : (
 					<form className="filter-form">
-						<p>H:</p>
-						<input
-							id="hue"
-							type="number"
-							min="0"
-							max="259"
-							step="1"
+						<FilterForm
+							label="Hue"
+							min={0}
+							max={259}
+							step={1}
 							value={hue}
-							onChange={hueUpdate}
+							onChange={handleHueChange}
 						/>
-						<p>S:</p>
-						<input
-							id="saturation"
-							type="number"
-							min="-2"
-							max="10"
-							step="0.5"
+						<FilterForm
+							label="Saturation"
+							min={-2}
+							max={10}
+							step={0.5}
 							value={saturation}
-							onChange={satUpdate}
+							onChange={handleSaturationChange}
 						/>
-						<label>L:</label>
-						<input
-							id="luminance"
-							type="number"
-							min="-2"
-							max="2"
-							step="0.1"
+						<FilterForm
+							label="Luminance"
+							min={-2}
+							max={2}
+							step={0.1}
 							value={luminance}
-							onChange={lumUpdate}
+							onChange={handleLuminanceChange}
 						/>
-						<label>Contrast:</label>
-						<input
-							id="contrast"
-							type="number"
-							min="-100"
-							max="100"
-							step="1"
+						<FilterForm
+							label="Contrast"
+							min={-100}
+							max={100}
+							step={1}
 							value={contrast}
-							onChange={contrastUpdate}
+							onChange={handleContrastChange}
 						/>
+						<p onClick={resetFilter}>Reset</p>
 					</form>
 				)}
 			</div>

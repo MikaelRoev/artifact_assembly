@@ -20,14 +20,15 @@ const ImageNode = ({
 
 	const [imageSrc] = useImage(imageURL);
 
-	const { grid } = useContext(GridContext);
-	const { resize } = useContext(ResizeContext);
-	const { lock } = useContext(LockContext);
-	const { filter } = useContext(ImageContext);
-	const { hue } = useContext(ImageContext);
-	const { saturation } = useContext(ImageContext);
-	const { luminance } = useContext(ImageContext);
-	const { contrast } = useContext(ImageContext);
+	const gridContext = useContext(GridContext);
+	const resizeContext = useContext(ResizeContext);
+	const lockContext = useContext(LockContext);
+	const imageContext = useContext(ImageContext);
+
+	const { grid } = gridContext;
+	const { resize } = resizeContext;
+	const { lock } = lockContext;
+	const { filter, hue, saturation, luminance, contrast } = imageContext;
 
 	const handleFilter = () => {
 		if (filter === true) {
@@ -54,15 +55,18 @@ const ImageNode = ({
 			<KonvaImage
 				ref={imageRef}
 				filters={handleFilter()}
-				hue={hue}
-				saturation={saturation}
-				luminance={luminance}
-				contrast={contrast}
+				{...{
+					hue: hue,
+					saturation: Number(saturation),
+					luminance: Number(luminance),
+					contrast: Number(contrast),
+				}}
 				image={imageSrc}
 				onClick={onSelect}
 				onTap={onSelect}
 				{...shapeProps}
 				draggable={!lock}
+				onChange={onChange}
 				onDragMove={(e) => {
 					e.target.x(Math.round(e.target.x() / grid) * grid);
 					e.target.y(Math.round(e.target.y() / grid) * grid);
