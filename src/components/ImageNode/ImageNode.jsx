@@ -78,7 +78,6 @@ const ImageNode = ({
 				image={imageSrc}
 				onClick={onSelect}
 				onTap={onSelect}
-				ref={shapeRef}
 				{...shapeProps}
 				draggable={!lock}
 				onChange={onChange}
