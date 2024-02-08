@@ -3,6 +3,11 @@ import ProjectList from "../../components/ProjectList/ProjectList";
 import "./LandingPage.css";
 import { appWindow } from "@tauri-apps/api/window";
 
+/**
+ * Creates the initial landing page of the application.
+ * @returns {Element}
+ * @constructor
+ */
 const LandingPage = () => {
 	async function handleClick() {
 		await appWindow.close();

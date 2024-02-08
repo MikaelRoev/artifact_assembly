@@ -5,6 +5,12 @@ import ImageNode from "../ImageNode/ImageNode";
 
 import { useState, useRef } from "react";
 
+/**
+ * Creates the canvas area in the project page.
+ * @param uploadedImages
+ * @returns {Element}
+ * @constructor
+ */
 const StageArea = ({ uploadedImages }) => {
 	const [images, setImages] = useState([]);
 	const [selectedImageId, setSelectedImageId] = useState(null);

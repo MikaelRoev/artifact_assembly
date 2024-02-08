@@ -7,7 +7,7 @@
 		"distDir": "../build"
 	},
 	"package": {
-		"productName": "pastperfect",
+		"productName": "artifact_assembly",
 		"version": "0.1.0"
 	},
 	"tauri": {

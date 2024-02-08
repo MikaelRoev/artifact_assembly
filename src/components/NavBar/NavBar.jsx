@@ -6,6 +6,11 @@ import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
+/**
+ * Creates a navigation bar that is at the top of the project page.
+ * @returns {Element}
+ * @constructor
+ */
 const NavBar = () => {
 	const { grid, setGrid } = useContext(GridContext);
 	const { resize, setResize } = useContext(ResizeContext);
@@ -27,6 +32,11 @@ const NavBar = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
+	/**
+	 * Handles uploading of an image.
+	 * @param e
+	 * @returns {Promise<void>}
+	 */
 	const handleImageUpload = async (e) => {
 		setIsLoading(true);
 		const files = e.target.files;

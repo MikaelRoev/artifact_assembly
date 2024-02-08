@@ -8,6 +8,11 @@ import ResizeContext from "./Context/ResizeContext";
 import LockContext from "./Context/LockContext";
 import ImageContext from "./Context/ImageContext";
 
+/**
+ * Creates a project page.
+ * @returns {Element}
+ * @constructor
+ */
 const Canvas = () => {
 	const [grid, setGrid] = useState(1);
 	const [resize, setResize] = useState(false);
