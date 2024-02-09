@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, {useContext, useRef, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
 import GridContext from "../../pages/Canvas/Context/GridContext";
@@ -6,7 +6,9 @@ import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
-const NavBar = () => {
+
+
+const NavBar = ({ takeScreenshot }) => {
 	const { grid, setGrid } = useContext(GridContext);
 	const { resize, setResize } = useContext(ResizeContext);
 	const { lock, setLock } = useContext(LockContext);
@@ -95,6 +97,10 @@ const NavBar = () => {
 		setContrast(0);
 	};
 
+	const handleScreenShot = () => {
+		takeScreenshot();
+	}
+
 	return (
 		<nav className="navbar">
 			<div className="nav-left">
@@ -156,6 +162,7 @@ const NavBar = () => {
 						<p onClick={resetFilter}>Reset</p>
 					</form>
 				)}
+				<p className={"screenShotButton"} onClick={handleScreenShot}>Take screenshot</p>
 			</div>
 			<div className="nav-right">
 				{isLoading && <div className="nav-item-right">Loading images...</div>}

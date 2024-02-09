@@ -1,17 +1,14 @@
-import React, { useEffect } from "react";
-import { Stage, Layer } from "react-konva";
-import ImageNode from "../ImageNode/ImageNode";
 // import { initialImages } from "../../assets/InitialImages";
+import React, {useEffect, useRef, useState} from "react";
+import {Layer, Stage} from "react-konva";
+import ImageNode from "../ImageNode/ImageNode";
 
-import { useState, useRef } from "react";
-
-const StageArea = ({ uploadedImages }) => {
+const StageArea = ({ uploadedImages, stageRef, takeScreenshot }) => {
 	const [images, setImages] = useState([]);
 	const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
-	const stageRef = useRef(null);
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
@@ -84,6 +81,7 @@ const StageArea = ({ uploadedImages }) => {
 		};
 	}, [history, historyIndex]);
 
+
 	const saveImagePositions = () => {
 		localStorage.setItem("savedImages", JSON.stringify(images));
 	};
@@ -152,53 +150,56 @@ const StageArea = ({ uploadedImages }) => {
 		}
 	};
 
+
+
+
+
+
 	return (
-		<>
-			<Stage
-				width={window.innerWidth}
-				height={window.innerHeight}
-				draggable
-				className="stage"
-				onWheel={zoomStage}
-				onMouseDown={checkDeselect}
-				onTouchStart={checkDeselect}
-				ref={stageRef}>
-				<Layer className="layer">
-					{images.length > 0 &&
-						images.map((image, i) => {
-							return (
-								<ImageNode
-									key={image.id} // Updated key prop
-									imageURL={image.imageUrl}
-									shapeProps={image}
-									isSelected={image.id === selectedImageId}
-									onSelect={() => {
-										selectImageId(image.id.toString());
-									}}
-									onChange={(newAttrs) => {
-										const rects = images.slice();
-										rects[i] = newAttrs;
-										setImages(rects);
+		<Stage
+			width={window.innerWidth}
+			height={window.innerHeight}
+			draggable
+			className="stage"
+			onWheel={zoomStage}
+			onMouseDown={checkDeselect}
+			onTouchStart={checkDeselect}
+			ref={stageRef}>
+			<Layer className="layer">
+				{images.length > 0 &&
+					images.map((image, i) => {
+						return (
+							<ImageNode
+								key={image.id} // Updated key prop
+								imageURL={image.imageUrl}
+								shapeProps={image}
+								isSelected={image.id === selectedImageId}
+								onSelect={() => {
+									selectImageId(image.id.toString());
+								}}
+								onChange={(newAttrs) => {
+									const rects = images.slice();
+									rects[i] = newAttrs;
+									setImages(rects);
 
-										// Update history
-										const newHistory = history.slice(0, historyIndex + 1);
-										newHistory.push(rects);
+									// Update history
+									const newHistory = history.slice(0, historyIndex + 1);
+									newHistory.push(rects);
 
-										// Enforce the maximum number of undo steps
-										if (newHistory.length > maxUndoSteps) {
-											newHistory.shift(); // Remove the oldest state
-										} else {
-											setHistoryIndex(historyIndex + 1);
-										}
+									// Enforce the maximum number of undo steps
+									if (newHistory.length > maxUndoSteps) {
+										newHistory.shift(); // Remove the oldest state
+									} else {
+										setHistoryIndex(historyIndex + 1);
+									}
 
-										setHistory(newHistory);
-									}}
-								/>
-							);
-						})}
-				</Layer>
-			</Stage>
-		</>
+									setHistory(newHistory);
+								}}
+							/>
+						);
+					})}
+			</Layer>
+		</Stage>
 	);
 };
 
