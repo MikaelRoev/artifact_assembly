@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
 import { Stage, Layer } from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
-// import { initialImages } from "../../assets/InitialImages";
-
 import { useState, useRef } from "react";
+import { invoke } from '@tauri-apps/api/tauri'
 
 /**
  * Creates the canvas area in the project page.
  * @param uploadedImages is the initial images on the canvas.
- * @returns {Element}
+ * @returns {Element} the stage of the canvas.
  * @constructor
  */
 const StageArea = ({ uploadedImages }) => {
@@ -95,8 +94,12 @@ const StageArea = ({ uploadedImages }) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				saveImagePositions();
-			}
+				invoke('save_file', {filePath: '../data.json', content: stageRef.current.toJSON()}).then()
+					.catch((error) => console.error('Error when saving to file: ' + error));
+				invoke('read_file', {filePath: '../data.json'})
+					.then((message) => console.log('No error: ' + message))
+					.catch((error) => console.error('Error: ' + error));
+ 			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
 		return () => {
