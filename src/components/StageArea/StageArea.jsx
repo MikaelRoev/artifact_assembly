@@ -13,7 +13,7 @@ import { useState, useRef } from "react";
  */
 const StageArea = ({ uploadedImages }) => {
 	const [images, setImages] = useState([]);
-	const [selectedImageId, setSelectedImageId] = useState(null);
+	const [selectedImageId, setSelectedImageId] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
@@ -45,11 +45,11 @@ const StageArea = ({ uploadedImages }) => {
 		const handleDeletePressed = (e) => {
 			if (e.key === "Delete" && selectedImageId !== null) {
 				const updatedImages = images.filter(
-					(image) => image.id !== selectedImageId
+					(image) =>  !selectedImageId.includes(image.id)
 				);
 				console.log(`image ${selectedImageId} deleted`);
 				setImages(updatedImages);
-				setSelectedImageId(null);
+				setSelectedImageId([]);
 			}
 		};
 		document.addEventListener("keydown", handleDeletePressed);
@@ -115,7 +115,7 @@ const StageArea = ({ uploadedImages }) => {
 		const handleUndoPressed = (e) => {
 			if (e.ctrlKey && e.key === "z") {
 				e.preventDefault();
-				Undo();
+				handleUndo();
 			}
 		};
 		document.addEventListener("keydown", handleUndoPressed);
@@ -137,7 +137,7 @@ const StageArea = ({ uploadedImages }) => {
 	 */
 	const checkDeselect = (e) => {
 		if (e.target === e.currentTarget) {
-			setSelectedImageId(null);
+			setSelectedImageId([]);
 		}
 	};
 
@@ -173,7 +173,6 @@ const StageArea = ({ uploadedImages }) => {
 		stage.position(newPos);
 		stage.batchDraw();
 	};
-
 	/**
 	 * Clamps a numeric value between a minimum and maximum range.
 	 * @param {number} value - The numeric value to be clamped.
@@ -181,23 +180,17 @@ const StageArea = ({ uploadedImages }) => {
 	 * @param {number} max - The maximum value of the range.
 	 * @returns {number} The clamped value.
 	 */
+
 	const clamp = (value, min, max) => {
 		return Math.min(Math.max(value, min), max);
 	};
 
-	/**
-	 * Selects an image.
-	 * @param imageId
-	 */
 	const selectImageId = (imageId) => {
-		setSelectedImageId(Number(imageId));
+		selectedImageId.push(Number(imageId));
 		console.log(selectedImageId);
 	};
 
-	/**
-	 * Undoes the last action in the history.
-	 */
-	const Undo = () => {
+	const handleUndo = () => {
 		if (historyIndex > 0) {
 			setHistoryIndex(historyIndex - 1);
 			setImages(history[historyIndex - 1]);
@@ -223,7 +216,7 @@ const StageArea = ({ uploadedImages }) => {
 									key={image.id} // Updated key prop
 									imageURL={image.imageUrl}
 									shapeProps={image}
-									isSelected={image.id === selectedImageId}
+									isSelected={selectedImageId.includes(image.id)}
 									onSelect={() => {
 										selectImageId(image.id.toString());
 									}}
