@@ -9,7 +9,7 @@ import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
 /**
- * Represents an canvas object on the canvas.
+ * Represents a canvas object on the canvas.
  * @param shapeProps
  * @param isSelected
  * @param onSelect
