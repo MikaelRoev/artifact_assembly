@@ -73,7 +73,6 @@ const StageArea = ({ uploadedImages }) => {
 	/**
 	 * If there are any saved images in the local storage, sets the images to the saved images.
 	 * else sets them as the uploaded images,
-	 */
 	useEffect(() => {
 		const savedImages = localStorage.getItem("savedImages");
 		if (savedImages) {
@@ -82,6 +81,7 @@ const StageArea = ({ uploadedImages }) => {
 			setImages(uploadedImages);
 		}
 	}, [uploadedImages]);
+		*/
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -94,11 +94,8 @@ const StageArea = ({ uploadedImages }) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				invoke('save_file', {filePath: '../data.json', content: stageRef.current.toJSON()}).then()
-					.catch((error) => console.error('Error when saving to file: ' + error));
-				invoke('read_file', {filePath: '../data.json'})
-					.then((message) => console.log('No error: ' + message))
-					.catch((error) => console.error('Error: ' + error));
+				const projectName = 'NameOfProject'
+				saveProjectToJSONFile(projectName, '../projects/', 'this is a project');
  			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
@@ -106,6 +103,80 @@ const StageArea = ({ uploadedImages }) => {
 			document.removeEventListener("keydown", handleSavePressed);
 		};
 	}, [images]);
+
+	/**
+	 * Saves the project to a JSON file.
+	 * @param name of the project and the file.
+	 * @param filePath of the file not including the name and type.
+	 * @param description of the project.
+	 */
+	const saveProjectToJSONFile = (name, filePath, description) => {
+		const stage = stageRef.current.getStage();
+
+		const layerList = stage.getChildren();
+
+		const project = {
+			name: name,
+			description: description,
+			x: stage.x(),
+			y: stage.y(),
+			zoom: stage.scaleX(),
+			layers: []
+		};
+
+		layerList.forEach(layer => {
+			const layerData = {
+				name: layer.name(),
+				id: layer.id(),
+				width: layer.width(),
+				height: layer.height(),
+				elements: [],
+			};
+
+			layer.getChildren().forEach(element => {
+				const className = element.getClassName();
+
+				const elementData = {
+					name: element.name(),
+					className: className,
+					x: element.x(),
+					y: element.y(),
+					filePath: ""
+				};
+				if (className === 'Image') {
+					elementData.filePath = '../images/lol.jpg';
+				}
+
+				layerData.elements.push({
+					name: element.name(),
+					className: className,
+					x: element.x(),
+					y: element.y()
+				});
+			});
+
+			project.layers.push(layerData);
+		});
+		saveObjectToFile(project, filePath + name + '.json');
+	};
+
+	/**
+	 * Saves an object to a file in a JASON format.
+	 * @param object to be saved.
+	 * @param filePath the path to the file including the file name and type.
+	 */
+	const saveObjectToFile = (object, filePath) => {
+		invoke('save_file', {filePath: filePath, content: JSON.stringify(object)}).then(() => {
+			readFile(filePath)
+		})
+			.catch((error) => console.error('Error when saving to file: ' + error));
+	};
+
+	const readFile = (filePath) => {
+		invoke('read_file', {filePath: filePath})
+			.then((message) => console.log('No error: ' + message))
+			.catch((error) => console.error('Error: ' + error));
+	}
 
 	/**
 	 * Sets up and cleans up the undo event listener.
