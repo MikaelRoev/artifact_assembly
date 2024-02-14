@@ -45,6 +45,7 @@
 
 .nav-left p,
 .nav-left a,
+.nav-left div,
 .nav-left > form > label {
 	width: auto;
 	text-align: left;
@@ -62,7 +63,8 @@
 }
 
 .nav-left p:hover,
-.nav-left a:hover {
+.nav-left a:hover,
+.nav-left div:hover{
 	background-color: #323842;
 }
 
@@ -76,18 +78,51 @@
 }
 
 .inputfile + label {
-	font-size: 1rem;
-	font-weight: 400;
-	color: #abb2bf;
-	background-color: #202020;
-	display: inline-block;
-}
-
-.inputfile:focus + label,
-.inputfile + label:hover {
-	background-color: #323842;
-}
-
-.inputfile + label {
 	cursor: pointer; /* "hand" cursor */
+	padding-right: 100px;
+}
+
+.filebutton {
+	position: absolute;
+}
+
+.fileDiv {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav-left .dropdown {
+	position: absolute;
+	top: 100%;
+	background-color: #f9f9f9;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	padding: 0;
+}
+.dropdown:hover {
+	background-color: #f9f9f9;
+}
+
+.dropdown ul {
+	width: 100%;
+	list-style-type: none;
+	background-color: #f9f9f9;
+	padding: 0;
+	margin: 0;
+}
+
+.dropdown li {
+	width: inherit;
+	padding: 8px 12px;
+	cursor: pointer;
+	color: black;
+}
+
+.nav-left .dropdown li:hover {
+	background-color: #ddd;
+}
+
+#scale {
+	width: 40px;
 }

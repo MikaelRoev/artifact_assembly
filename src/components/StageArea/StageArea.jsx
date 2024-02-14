@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {Layer, Stage} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 
-const StageArea = ({ uploadedImages, stageRef, takeScreenshot }) => {
+const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
 	const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
