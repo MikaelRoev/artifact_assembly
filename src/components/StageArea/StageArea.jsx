@@ -12,16 +12,22 @@ import { invoke } from '@tauri-apps/api/tauri'
  */
 const StageArea = ({ uploadedImages }) => {
 	const [images, setImages] = useState([]);
-	const [selectedImageId, setSelectedImageId] = useState(null);
+	const [selectedImageId, setSelectedImageId] = useState('');
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	const stageRef = useRef(null);
+	const renderCount = useRef(0);
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
-	const min = 0.001; //zoom out limit
-	const max = 300; //zoom in limit
+	const zoomMin = 0.001; //zoom out limit
+	const zoomMax = 300; //zoom in limit
+
+	useEffect(() => {
+		renderCount.current = renderCount.current + 1;
+		console.log(renderCount.current);
+	});
 
 	/**
 	 * Sets the images when the list of uploaded images changes.
@@ -236,7 +242,7 @@ const StageArea = ({ uploadedImages }) => {
 		};
 
 		const zoomFactor = event.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
-		const newScale = clamp(oldScale * zoomFactor, min, max);
+		const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
 
 		stage.scale({ x: newScale, y: newScale });
 
@@ -264,7 +270,7 @@ const StageArea = ({ uploadedImages }) => {
 	 * @param imageId
 	 */
 	const selectImageId = (imageId) => {
-		setSelectedImageId(Number(imageId));
+		setSelectedImageId(imageId);
 		console.log(selectedImageId);
 	};
 
@@ -299,7 +305,7 @@ const StageArea = ({ uploadedImages }) => {
 									shapeProps={image}
 									isSelected={image.id === selectedImageId}
 									onSelect={() => {
-										selectImageId(image.id.toString());
+										selectImageId(image.id);
 									}}
 									onChange={(newAttrs) => {
 										const rects = images.slice();

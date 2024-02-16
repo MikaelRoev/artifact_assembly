@@ -3,7 +3,6 @@ import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Transformer, Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import GridContext from "../../pages/Canvas/Context/GridContext";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
@@ -30,12 +29,10 @@ const ImageNode = ({
 
 	const [imageSrc] = useImage(imageURL);
 
-	const gridContext = useContext(GridContext);
 	const resizeContext = useContext(ResizeContext);
 	const lockContext = useContext(LockContext);
 	const imageContext = useContext(ImageContext);
 
-	const { grid } = gridContext;
 	const { resize } = resizeContext;
 	const { lock } = lockContext;
 	const { filter, hue, saturation, luminance, contrast } = imageContext;
@@ -45,9 +42,8 @@ const ImageNode = ({
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
 	 */
 	const handleFilter = () => {
-		if (filter === true) {
-			return [Konva.Filters.HSL, Konva.Filters.Contrast];
-		} else return null;
+		if (filter !== true) return null;
+		return [Konva.Filters.HSL, Konva.Filters.Contrast];
 	};
 
 	useEffect(() => {
@@ -78,14 +74,10 @@ const ImageNode = ({
 				image={imageSrc}
 				onClick={onSelect}
 				onTap={onSelect}
+				onDragStart={onSelect}
 				{...shapeProps}
 				draggable={!lock}
 				onChange={onChange}
-				onDragMove={(e) => {
-					//Moves selected image on a grid
-					e.target.x(Math.round(e.target.x() / grid) * grid);
-					e.target.y(Math.round(e.target.y() / grid) * grid);
-				}}
 				onDragEnd={(e) => {
 					onChange({
 						...shapeProps,

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
-import GridContext from "../../pages/Canvas/Context/GridContext";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
@@ -12,7 +11,6 @@ import ImageContext from "../../pages/Canvas/Context/ImageContext";
  * @constructor
  */
 const NavBar = () => {
-	const { grid, setGrid } = useContext(GridContext);
 	const { resize, setResize } = useContext(ResizeContext);
 	const { lock, setLock } = useContext(LockContext);
 	const {
@@ -57,7 +55,7 @@ const NavBar = () => {
 					});
 					const newImage = {
 						imageUrl,
-						id: Date.now(), // Assign a unique identifier using Date.now()
+						id: Date.now().toString(), // Assign a unique identifier using Date.now()
 						// Other properties for the `shapeProps` object
 					};
 					newImages.push(newImage);
@@ -72,21 +70,12 @@ const NavBar = () => {
 		e.target.value = ""; // Clear the input value after the upload is complete
 	};
 
-	const gridOptions = [10, 20, 30, 40, 50];
-	const gridText = grid !== 1 ? `Edit Grid (${grid} x ${grid})` : "Enable Grid";
-
 	const toggleResize = () => {
 		setResize((prevResize) => !prevResize);
 	};
 
 	const toggleLock = () => {
 		setLock((prevLock) => !prevLock);
-	};
-
-	const changeGrid = () => {
-		const nextGrid =
-			gridOptions[(gridOptions.indexOf(grid) + 1) % gridOptions.length];
-		setGrid(nextGrid);
 	};
 
 	const toggleFilter = () => {
@@ -120,8 +109,6 @@ const NavBar = () => {
 					/>
 					<label htmlFor="file">Load Image</label>
 				</div>
-				{/* <p onClick={grid !== 1 ? changeGrid : () => setGrid(10)}>{gridText}</p>
-				{grid !== 1 && <p onClick={() => setGrid(1)}>Disable Grid</p>} */}
 				{/* <p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
 				</p> */}
