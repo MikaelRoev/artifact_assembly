@@ -3,6 +3,8 @@ import { Stage, Layer } from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 import { useState, useRef } from "react";
 import { invoke } from '@tauri-apps/api/tauri'
+import { dialog } from '@tauri-apps/api';
+import {basename} from "@tauri-apps/api/path";
 
 /**
  * Creates the canvas area in the project page.
@@ -100,30 +102,30 @@ const StageArea = ({ uploadedImages }) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				const projectName = 'NameOfProject'
-				saveProjectToJSONFile(projectName, '../projects/', 'this is a project');
+				saveProjectDialog().then(() => {
+					console.log('Project saved!');
+				});
  			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
 		return () => {
 			document.removeEventListener("keydown", handleSavePressed);
 		};
-	}, [images]);
+	});
 
 	/**
 	 * Saves the project to a JSON file.
-	 * @param name of the project and the file.
-	 * @param filePath of the file not including the name and type.
-	 * @param description of the project.
+	 * @param filePath of the file including the name and type.
 	 */
-	const saveProjectToJSONFile = (name, filePath, description) => {
+	const saveProjectToJSONFile = async (filePath) => {
 		const stage = stageRef.current.getStage();
-
 		const layerList = stage.getChildren();
 
+		// get the file name from the file path.
+		const fileName = filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1');
 		const project = {
-			name: name,
-			description: description,
+			name: fileName,
+			//description: description,
 			x: stage.x(),
 			y: stage.y(),
 			zoom: stage.scaleX(),
@@ -163,7 +165,26 @@ const StageArea = ({ uploadedImages }) => {
 
 			project.layers.push(layerData);
 		});
-		saveObjectToFile(project, filePath + name + '.json');
+		await saveObjectToFile(project, filePath);
+	};
+
+	/**
+	 * Opens the save project as dialog window.
+	 */
+	const saveProjectDialog = async () => {
+		try {
+			const filePath = await dialog.save({
+				title: 'Save Project As',
+				filters: [{name: 'JSON Files', extensions: ['json']}]
+			});
+			if (filePath) {
+				await saveProjectToJSONFile(filePath);
+			} else {
+				console.log('No file selected or save operation cancelled.');
+			}
+		} catch (error) {
+			console.error('Error during file save dialog:', error);
+		}
 	};
 
 	/**
@@ -171,11 +192,9 @@ const StageArea = ({ uploadedImages }) => {
 	 * @param object to be saved.
 	 * @param filePath the path to the file including the file name and type.
 	 */
-	const saveObjectToFile = (object, filePath) => {
-		invoke('save_file', {filePath: filePath, content: JSON.stringify(object)}).then(() => {
-			readFile(filePath)
-		})
-			.catch((error) => console.error('Error when saving to file: ' + error));
+	const saveObjectToFile = async (object, filePath) => {
+		await invoke('save_file', {filePath: filePath, content: JSON.stringify(object)})
+			.catch((error) => console.error('Error when saving to file:', error));
 	};
 
 	const readFile = (filePath) => {
@@ -203,13 +222,6 @@ const StageArea = ({ uploadedImages }) => {
 			document.removeEventListener("keydown", handleUndoPressed);
 		};
 	}, [history, historyIndex]);
-
-	/**
-	 * Saves the image positions.
-	 */
-	const saveImagePositions = () => {
-		localStorage.setItem("savedImages", JSON.stringify(images));
-	};
 
 	/**
 	 * Deselects when the mouse clicks on an empty area on the canvas.
