@@ -1,6 +1,9 @@
 import React from "react";
 import "./ProjectList.css";
 
+/**
+ * Represents the list of projects on the landing page.
+ */
 const ProjectList = () => {
 	return (
 		<table className={"project-list-container"}>

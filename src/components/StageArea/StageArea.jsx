@@ -3,6 +3,13 @@ import React, {useEffect, useRef, useState} from "react";
 import {Layer, Stage} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 
+/**
+ * Creates the canvas area in the project page.
+ * @param uploadedImages is the initial images on the canvas.
+ * @param stageRef is the reference for the stage used.
+ * @returns {Element}
+ * @constructor
+ */
 const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
 	const [selectedImageId, setSelectedImageId] = useState(null);
@@ -15,12 +22,25 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	const min = 0.001; //zoom out limit
 	const max = 300; //zoom in limit
 
+	/**
+	 * Sets the images when the list of uploaded images changes.
+	 */
 	useEffect(() => {
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
+
+
+	/**
+	 * Sets up and cleans up the delete event listener.
+	 */
 	useEffect(() => {
-		const handleDelete = (e) => {
+
+		/**
+	 	* Deletes the selected images if the delete key is pressed.
+	 	* @param e the event.
+		 */
+		const handleDeletePressed = (e) => {
 			if (e.key === "Delete" && selectedImageId !== null) {
 				const updatedImages = images.filter(
 					(image) => image.id !== selectedImageId
@@ -30,12 +50,15 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				setSelectedImageId(null);
 			}
 		};
-		document.addEventListener("keydown", handleDelete);
+		document.addEventListener("keydown", handleDeletePressed);
 		return () => {
-			document.removeEventListener("keydown", handleDelete);
+			document.removeEventListener("keydown", handleDeletePressed);
 		};
 	}, [selectedImageId, images]);
 
+	/**
+	 * Updates the uploaded images when an image changes state.
+	 */
 	useEffect(() => {
 		// Update the uploadedImages prop when the images state changes
 		uploadedImages.forEach((uploadedImage) => {
@@ -46,6 +69,10 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		});
 	}, [images, uploadedImages]);
 
+	/**
+	 * If there are any saved images in the local storage, sets the images to the saved images.
+	 * else sets them as the uploaded images,
+	 */
 	useEffect(() => {
 		const savedImages = localStorage.getItem("savedImages");
 		if (savedImages) {
@@ -55,41 +82,59 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		}
 	}, [uploadedImages]);
 
+	/**
+	 * Sets up and cleans up the save event listener.
+	 */
 	useEffect(() => {
-		const handleSave = (e) => {
+		/**
+		 * Saves the image positions if ctrl + S is pressed.
+		 * @param e the event.
+		 */
+		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
 				saveImagePositions();
 			}
 		};
-		document.addEventListener("keydown", handleSave);
+		document.addEventListener("keydown", handleSavePressed);
 		return () => {
-			document.removeEventListener("keydown", handleSave);
+			document.removeEventListener("keydown", handleSavePressed);
 		};
 	}, [images]);
 
+	/**
+	 * Sets up and cleans up the undo event listener.
+	 */
 	useEffect(() => {
-		const handleKeyDown = (e) => {
+		/**
+		 * Undo the last step in the history if ctrl + z is pressed.
+		 * @param e the event.
+		 */
+		const handleUndoPressed = (e) => {
 			if (e.ctrlKey && e.key === "z") {
 				e.preventDefault();
-				handleUndo();
+				Undo();
 			}
 		};
-		document.addEventListener("keydown", handleKeyDown);
+		document.addEventListener("keydown", handleUndoPressed);
 		return () => {
-			document.removeEventListener("keydown", handleKeyDown);
+			document.removeEventListener("keydown", handleUndoPressed);
 		};
 	}, [history, historyIndex]);
 
-
+	/**
+	 * Saves the image positions.
+	 */
 	const saveImagePositions = () => {
 		localStorage.setItem("savedImages", JSON.stringify(images));
 	};
 
+	/**
+	 * Deselects when the mouse clicks on an empty area on the canvas.
+	 * @param e the event.
+	 */
 	const checkDeselect = (e) => {
-		// deselect when clicked on empty area
-		const clickedOnEmpty = e.target === e.currentTarget;
-		if (clickedOnEmpty) {
+		if (e.target === e.currentTarget) {
 			setSelectedImageId(null);
 		}
 	};
@@ -126,6 +171,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		stage.position(newPos);
 		stage.batchDraw();
 	};
+
 	/**
 	 * Clamps a numeric value between a minimum and maximum range.
 	 * @param {number} value - The numeric value to be clamped.
@@ -133,27 +179,28 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 * @param {number} max - The maximum value of the range.
 	 * @returns {number} The clamped value.
 	 */
-
 	const clamp = (value, min, max) => {
 		return Math.min(Math.max(value, min), max);
 	};
 
+	/**
+	 * Selects an image.
+	 * @param imageId
+	 */
 	const selectImageId = (imageId) => {
 		setSelectedImageId(Number(imageId));
 		console.log(selectedImageId);
 	};
 
-	const handleUndo = () => {
+	/**
+	 * Undoes the last action in the history.
+	 */
+	const Undo = () => {
 		if (historyIndex > 0) {
 			setHistoryIndex(historyIndex - 1);
 			setImages(history[historyIndex - 1]);
 		}
 	};
-
-
-
-
-
 
 	return (
 		<Stage

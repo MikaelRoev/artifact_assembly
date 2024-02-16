@@ -1,4 +1,4 @@
-# Artifact Assembly Beta
+# Artifact Assembly
 
 The goal of this project is to develop a software solution that helps users reconstruct original artifacts from smaller, damaged pieces. Specifically, the software will use images of archaeological textile fragments and let the archaeologists manually piece together the original object.
 

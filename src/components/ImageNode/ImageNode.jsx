@@ -8,6 +8,16 @@ import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
+/**
+ * Represents a canvas object on the canvas.
+ * @param shapeProps
+ * @param isSelected
+ * @param onSelect
+ * @param onChange
+ * @param imageURL
+ * @returns {Element}
+ * @constructor
+ */
 const ImageNode = ({
 	shapeProps,
 	isSelected,
@@ -30,6 +40,10 @@ const ImageNode = ({
 	const { lock } = lockContext;
 	const { filter, hue, saturation, luminance, contrast } = imageContext;
 
+	/**
+	 * Handles the filter on the image.
+	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
+	 */
 	const handleFilter = () => {
 		if (filter === true) {
 			return [Konva.Filters.HSL, Konva.Filters.Contrast];
@@ -68,6 +82,7 @@ const ImageNode = ({
 				draggable={!lock}
 				onChange={onChange}
 				onDragMove={(e) => {
+					//Moves selected image on a grid
 					e.target.x(Math.round(e.target.x() / grid) * grid);
 					e.target.y(Math.round(e.target.y() / grid) * grid);
 				}}
@@ -79,6 +94,7 @@ const ImageNode = ({
 					});
 				}}
 				onMouseDown={(e) => {
+					//Moves selected image on top (z-index)
 					e.target.moveToTop();
 				}}
 				onTransformEnd={() => {
@@ -98,6 +114,7 @@ const ImageNode = ({
 					});
 				}}
 				onMouseEnter={(e) => {
+					// Adds a pointer cursor when hovering over the image
 					const container = e.target.getStage().container();
 					if (!lock) container.style.cursor = "default";
 

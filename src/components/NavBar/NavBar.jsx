@@ -5,9 +5,12 @@ import GridContext from "../../pages/Canvas/Context/GridContext";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
-import {Layer, Rect, Stage, Text} from "react-konva";
 
-
+/**
+ * Creates a navigation bar that is at the top of the project page.
+ * @returns {Element}
+ * @constructor
+ */
 const NavBar = ({takeScreenshot}) => {
     const {grid, setGrid} = useContext(GridContext);
     const {resize, setResize} = useContext(ResizeContext);
@@ -28,14 +31,19 @@ const NavBar = ({takeScreenshot}) => {
     } = useContext(ImageContext);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [numberValue, setNumberValue] = useState(1);
+    const [numberValue, setNumberValue] = useState(100);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const inputRef = useRef(null);
 
-    const handleImageUpload = async (e) => {
-        setIsLoading(true);
-        const files = e.target.files;
-        const newImages = [];
+	/**
+	 * Handles uploading of an image.
+	 * @param e
+	 * @returns {Promise<void>}
+	 */
+	const handleImageUpload = async (e) => {
+		setIsLoading(true);
+		const files = e.target.files;
+		const newImages = [];
 
         await Promise.all(
             Array.from(files).map(async (file) => {

@@ -1,3 +1,4 @@
+//TODO: do not contain this file in the end delivery
 const images = [];
 
 // for (let i = 1; i <= 16; i++) {
