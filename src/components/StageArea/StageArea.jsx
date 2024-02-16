@@ -4,7 +4,7 @@ import ImageNode from "../ImageNode/ImageNode";
 import { useState, useRef } from "react";
 import { invoke } from '@tauri-apps/api/tauri'
 import { dialog } from '@tauri-apps/api';
-import {basename} from "@tauri-apps/api/path";
+import Konva from "konva";
 
 /**
  * Creates the canvas area in the project page.
@@ -25,6 +25,9 @@ const StageArea = ({ uploadedImages }) => {
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
+
+	let projectName = "";
+	let projectDescription = "";
 
 	useEffect(() => {
 		renderCount.current = renderCount.current + 1;
@@ -102,9 +105,8 @@ const StageArea = ({ uploadedImages }) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				saveProjectDialog().then(() => {
-					console.log('Project saved!');
-				});
+				saveProjectDialog().then(() => {console.log('Project saved!');});
+				openProjectDialog().then(() => {console.log('Project opened!');});
  			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
@@ -113,19 +115,56 @@ const StageArea = ({ uploadedImages }) => {
 		};
 	});
 
+	const openProjectDialog = async () => {
+		try {
+			const filePath = await dialog.open({
+				title: "Open Project",
+				multiple: false,
+				filters: [{name: 'JSON Files', extensions: ['json']}]
+			});
+			if (filePath) {
+				jsonToProject(await readFile(filePath));
+			} else {
+				console.log('No file selected or operation cancelled.');
+			}
+		} catch (error) {
+			console.error('Error during open project dialog: ', error);
+		}
+	}
+
 	/**
-	 * Saves the project to a JSON file.
-	 * @param filePath of the file including the name and type.
+	 * Opens the save project as dialog window.
 	 */
-	const saveProjectToJSONFile = async (filePath) => {
+	const saveProjectDialog = async () => {
+		try {
+			const filePath = await dialog.save({
+				title: 'Save Project As',
+				filters: [{name: 'JSON Files', extensions: ['json']}]
+			});
+			if (filePath) {
+				// get the project name from the file path.
+				projectName = filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1');
+				await saveToFile(projectToJSON(), filePath);
+				await readFile(filePath);
+			} else {
+				console.log('No file selected or operation cancelled.');
+			}
+		} catch (error) {
+			console.error('Error during file save dialog: ', error);
+		}
+	};
+
+	/**
+	 * Parses the project into a JSON representation.
+	 * @returns {string} containing the resulting JSON.
+	 */
+	const projectToJSON = ()   => {
 		const stage = stageRef.current.getStage();
 		const layerList = stage.getChildren();
 
-		// get the file name from the file path.
-		const fileName = filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1');
 		const project = {
-			name: fileName,
-			//description: description,
+			name: projectName,
+			description: projectDescription,
 			x: stage.x(),
 			y: stage.y(),
 			zoom: stage.scaleX(),
@@ -136,8 +175,6 @@ const StageArea = ({ uploadedImages }) => {
 			const layerData = {
 				name: layer.name(),
 				id: layer.id(),
-				width: layer.width(),
-				height: layer.height(),
 				elements: [],
 			};
 
@@ -165,42 +202,97 @@ const StageArea = ({ uploadedImages }) => {
 
 			project.layers.push(layerData);
 		});
-		await saveObjectToFile(project, filePath);
-	};
+
+		return JSON.stringify(project);
+	}
 
 	/**
-	 * Opens the save project as dialog window.
+	 * Parses a JSON representation of a project into the project.
+	 * @param {string} json - The JSON representation of the project.
 	 */
-	const saveProjectDialog = async () => {
+	const jsonToProject = (json) => {
 		try {
-			const filePath = await dialog.save({
-				title: 'Save Project As',
-				filters: [{name: 'JSON Files', extensions: ['json']}]
+			const project = JSON.parse(json);
+			projectName = project.name;
+			projectDescription = project.description;
+			const stage = stageRef.current;
+			if (stage === null) return;
+
+			// Set stage properties
+			stage.x(project.x);
+			stage.y(project.y);
+			stage.scaleX(project.zoom);
+			stage.scaleY(project.zoom);
+
+			// Reconstruct layers and elements
+			project.layers.forEach(layerData => {
+				// Reconstruct layer
+				const layer = new Konva.Layer({
+					name: layerData.name,
+					id: layerData.id
+				});
+
+				// Reconstruct elements
+				layerData.elements.forEach(elementData => {
+					let element;
+					if (elementData.className === 'Image') {
+						// Reconstruct image element
+						element = new Konva.Image({
+							name: elementData.name,
+							x: elementData.x,
+							y: elementData.y,
+							image: new Image(), // You may need to load the image separately
+							draggable: true
+						});
+						// Set image source
+						element.image.src = elementData.filePath;
+					} else {
+						// Reconstruct other types of elements
+						// For example, shapes, text, etc.
+						// You need to handle other types of elements here
+					}
+
+					// Add the element to the layer
+					layer.add(element);
+				});
+
+				// Add the layer to the stage
+				stage.add(layer);
 			});
-			if (filePath) {
-				await saveProjectToJSONFile(filePath);
-			} else {
-				console.log('No file selected or save operation cancelled.');
-			}
+
+			// Layer order might need to be reconstructed
+			//can you help me...
 		} catch (error) {
-			console.error('Error during file save dialog:', error);
+			console.error('Error parsing JSON: ', error);
 		}
-	};
+	}
 
 	/**
-	 * Saves an object to a file in a JASON format.
-	 * @param object to be saved.
+	 * Saves a string into a file.
+	 * @param content to be saved.
 	 * @param filePath the path to the file including the file name and type.
 	 */
-	const saveObjectToFile = async (object, filePath) => {
-		await invoke('save_file', {filePath: filePath, content: JSON.stringify(object)})
-			.catch((error) => console.error('Error when saving to file:', error));
+	const saveToFile = async (content, filePath) => {
+		await invoke('save_file', {filePath: filePath, content: content})
+			.catch((error) => console.error('Error when saving to file: ', error));
 	};
 
+	/**
+	 * Reads the contents of a file.
+	 * @param filePath of the file including name and type.
+	 * @return {Promise<String>} Promise resolving to the contents of the file.
+	 */
 	const readFile = (filePath) => {
-		invoke('read_file', {filePath: filePath})
-			.then((message) => console.log('No error: ' + message))
-			.catch((error) => console.error('Error: ' + error));
+		return new Promise((resolve, reject) => {
+			invoke('read_file', { filePath: filePath })
+				.then((content) => {
+					resolve(content);
+				})
+				.catch((error) => {
+					console.error('Error reading from file: ', error);
+					reject(error);
+				});
+		});
 	}
 
 	/**
