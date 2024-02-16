@@ -156,17 +156,18 @@ const NavBar = ({takeScreenshot}) => {
                                     <label htmlFor="file">Load Image</label>
                                 </li>
                                 <li>
-                                    <span className={"screenShotButton"} id={"ssButton"}>Take screenshot </span>
+                                    <span className={"screenShotButton"} id={"ssButton"}>Export canvas as image </span>
                                     <input
                                         ref={inputRef}
                                         type={"number"}
                                         id={"scale"}
-                                        min={1}
-                                        max={10}
-                                        step={1}
+                                        min={100}
+                                        max={1000}
+                                        step={10}
                                         value={numberValue}
                                         onChange={handleInputChange}
                                     />
+                                    <span>%</span>
                                 </li>
                             </ul>
                         </div>

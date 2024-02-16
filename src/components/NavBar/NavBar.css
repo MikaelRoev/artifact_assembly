@@ -79,7 +79,7 @@
 
 .inputfile + label {
 	cursor: pointer; /* "hand" cursor */
-	padding-right: 100px;
+	padding-right: 150px;
 }
 
 .filebutton {
@@ -124,5 +124,5 @@
 }
 
 #scale {
-	width: 40px;
+	width: 60px;
 }

@@ -46,7 +46,7 @@ const Canvas = () => {
      * @param number the scaling number of the screenshot. 2 for 2x height and width.
      */
     const takeScreenshot = (number) => {
-        let dataURL = stageRef.current.toDataURL({pixelRatio: number});
+        let dataURL = stageRef.current.toDataURL({pixelRatio: number/100});
         downloadURI(dataURL, "canvas.png");
     }
 
