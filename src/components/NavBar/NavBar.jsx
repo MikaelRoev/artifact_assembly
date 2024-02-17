@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
@@ -10,7 +10,7 @@ import ImageContext from "../../pages/Canvas/Context/ImageContext";
  * @returns {Element}
  * @constructor
  */
-const NavBar = () => {
+const NavBar = ({takeScreenshot}) => {
 	const { resize, setResize } = useContext(ResizeContext);
 	const { lock, setLock } = useContext(LockContext);
 	const {
@@ -28,7 +28,10 @@ const NavBar = () => {
 		setLuminance,
 	} = useContext(ImageContext);
 
-	const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [numberValue, setNumberValue] = useState(100);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const inputRef = useRef(null);
 
 	/**
 	 * Handles uploading of an image.
@@ -40,125 +43,184 @@ const NavBar = () => {
 		const files = e.target.files;
 		const newImages = [];
 
-		await Promise.all(
-			Array.from(files).map(async (file) => {
-				const reader = new FileReader();
-				reader.readAsDataURL(file);
-				try {
-					const imageUrl = await new Promise((resolve, reject) => {
-						reader.onload = () => {
-							resolve(reader.result);
-						};
-						reader.onerror = () => {
-							reject(reader.error);
-						};
-					});
-					const newImage = {
-						imageUrl,
-						id: Date.now().toString(), // Assign a unique identifier using Date.now()
-						// Other properties for the `shapeProps` object
-					};
-					newImages.push(newImage);
-				} catch (error) {
-					console.error(error);
-				}
-			})
-		);
+        await Promise.all(
+            Array.from(files).map(async (file) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                try {
+                    const imageUrl = await new Promise((resolve, reject) => {
+                        reader.onload = () => {
+                            resolve(reader.result);
+                        };
+                        reader.onerror = () => {
+                            reject(reader.error);
+                        };
+                    });
+                    const newImage = {
+                        imageUrl,
+                        id: Date.now(), // Assign a unique identifier using Date.now()
+                        // Other properties for the `shapeProps` object
+                    };
+                    newImages.push(newImage);
+                } catch (error) {
+                    console.error(error);
+                }
+            })
+        );
 
-		setImages([...images, ...newImages]);
-		setIsLoading(false);
-		e.target.value = ""; // Clear the input value after the upload is complete
-	};
+        setImages([...images, ...newImages]);
+        setIsLoading(false);
+        e.target.value = ""; // Clear the input value after the upload is complete
+        handleFileButtonClick()
+    };
 
 	const toggleResize = () => {
 		setResize((prevResize) => !prevResize);
 	};
 
-	const toggleLock = () => {
-		setLock((prevLock) => !prevLock);
-	};
+    const toggleLock = () => {
+        setLock((prevLock) => !prevLock);
+    };
 
 	const toggleFilter = () => {
 		setFilter((prevFilter) => !prevFilter);
 	};
 
-	const handleHueChange = (e) => setHue(e.target.value);
-	const handleSaturationChange = (e) => setSaturation(e.target.value);
-	const handleLuminanceChange = (e) => setLuminance(e.target.value);
-	const handleContrastChange = (e) => setContrast(e.target.value);
+    const handleHueChange = (e) => setHue(e.target.value);
+    const handleSaturationChange = (e) => setSaturation(e.target.value);
+    const handleLuminanceChange = (e) => setLuminance(e.target.value);
+    const handleContrastChange = (e) => setContrast(e.target.value);
 
-	const resetFilter = () => {
-		setHue(0);
-		setSaturation(0);
-		setLuminance(0);
-		setContrast(0);
-	};
+    const resetFilter = () => {
+        setHue(0);
+        setSaturation(0);
+        setLuminance(0);
+        setContrast(0);
+    };
 
-	return (
-		<nav className="navbar">
-			<div className="nav-left">
-				<a href="/">Home</a>
-				<div>
-					<input
-						type="file"
-						onChange={handleImageUpload}
-						multiple
-						accept="image/*"
-						className="inputfile"
-						id="file"
-					/>
-					<label htmlFor="file">Load Image</label>
-				</div>
-				{/* <p onClick={toggleResize}>
+    /**
+     * Constant function to set the visibility of the file dropdown menu.
+     */
+    const handleFileButtonClick = () => {
+        setDropdownVisible(!dropdownVisible)
+    }
+
+    /**
+     * Constant function to update the number inside the numberinput for scaling the screenshot
+     * @param e
+     */
+    const handleInputChange = (e) => {
+        setNumberValue(parseInt(e.target.value))
+    }
+
+    /**
+     * Effect for handling taking a screenshot of the current stage visible on the screen.
+     */
+    useEffect(() => {
+        const handleScreenShot = () => {
+            takeScreenshot(inputRef.current.value);
+            handleFileButtonClick()
+        }
+
+        const screenshot = document.getElementById("ssButton");
+        if (screenshot) {
+            screenshot.addEventListener("click", handleScreenShot, false);
+            return () => screenshot.removeEventListener("click", handleScreenShot);
+        }
+    }, [takeScreenshot, handleFileButtonClick]);
+
+
+    return (
+        <nav className="navbar">
+            <div className="nav-left">
+                <a href="/">Home</a>
+                <div className={"fileDiv"}>
+                    <div className={"fileButton"} onClick={() => handleFileButtonClick()}>
+                        File
+                    </div>
+                    {/* Dropdown menu. Add <li> elements to expand the menu */}
+                    {dropdownVisible && (
+                        <div className={"dropdown"}>
+                            <ul>
+                                <li>
+                                    <input
+                                        type="file"
+                                        onChange={handleImageUpload}
+                                        multiple
+                                        accept="image/*"
+                                        className="inputfile"
+                                        id="file"
+                                    />
+                                    <label htmlFor="file">Load Image</label>
+                                </li>
+                                <li>
+                                    <span className={"screenShotButton"} id={"ssButton"}>Export canvas as image </span>
+                                    <input
+                                        ref={inputRef}
+                                        type={"number"}
+                                        id={"scale"}
+                                        min={100}
+                                        max={1000}
+                                        step={10}
+                                        value={numberValue}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
+                </div>
+                {/* <p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
 				</p> */}
-				<p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
-				<p onClick={toggleFilter}>
-					{!filter ? "Enable Filter" : "Disable Filter"}
-				</p>
-				{!filter ? null : (
-					<form className="filter-form">
-						<FilterForm
-							label="Hue"
-							min={0}
-							max={259}
-							step={1}
-							value={hue}
-							onChange={handleHueChange}
-						/>
-						<FilterForm
-							label="Saturation"
-							min={-2}
-							max={10}
-							step={0.5}
-							value={saturation}
-							onChange={handleSaturationChange}
-						/>
-						<FilterForm
-							label="Luminance"
-							min={-2}
-							max={2}
-							step={0.1}
-							value={luminance}
-							onChange={handleLuminanceChange}
-						/>
-						<FilterForm
-							label="Contrast"
-							min={-100}
-							max={100}
-							step={1}
-							value={contrast}
-							onChange={handleContrastChange}
-						/>
-						<p onClick={resetFilter}>Reset</p>
-					</form>
-				)}
-			</div>
-			<div className="nav-right">
-				{isLoading && <div className="nav-item-right">Loading images...</div>}
-			</div>
-		</nav>
-	);
+                <p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
+                <p onClick={toggleFilter}>
+                    {!filter ? "Enable Filter" : "Disable Filter"}
+                </p>
+                {!filter ? null : (
+                    <form className="filter-form">
+                        <FilterForm
+                            label="Hue"
+                            min={0}
+                            max={259}
+                            step={1}
+                            value={hue}
+                            onChange={handleHueChange}
+                        />
+                        <FilterForm
+                            label="Saturation"
+                            min={-2}
+                            max={10}
+                            step={0.5}
+                            value={saturation}
+                            onChange={handleSaturationChange}
+                        />
+                        <FilterForm
+                            label="Luminance"
+                            min={-2}
+                            max={2}
+                            step={0.1}
+                            value={luminance}
+                            onChange={handleLuminanceChange}
+                        />
+                        <FilterForm
+                            label="Contrast"
+                            min={-100}
+                            max={100}
+                            step={1}
+                            value={contrast}
+                            onChange={handleContrastChange}
+                        />
+                        <p onClick={resetFilter}>Reset</p>
+                    </form>
+                )}
+            </div>
+            <div className="nav-right">
+                {isLoading && <div className="nav-item-right">Loading images...</div>}
+            </div>
+        </nav>
+    );
 };
 
 export default NavBar;

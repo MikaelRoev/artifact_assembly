@@ -9,16 +9,16 @@ import Konva from "konva";
 /**
  * Creates the canvas area in the project page.
  * @param uploadedImages is the initial images on the canvas.
- * @returns {Element} the stage of the canvas.
+ * @param stageRef is the reference for the stage used.
+ * @returns {Element}
  * @constructor
  */
-const StageArea = ({ uploadedImages }) => {
+const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
-	const [selectedImageId, setSelectedImageId] = useState('');
+	const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
-	const stageRef = useRef(null);
 	const renderCount = useRef(0);
 	const maxUndoSteps = 20;
 
@@ -430,10 +430,10 @@ const StageArea = ({ uploadedImages }) => {
 										selectImageId(image.id);
 									}}
 									onChange={(newAttrs) => {
-										const rects = images.slice();
-										rects[i] = newAttrs;
-										setImages(rects);
-										updateHistory(rects);
+										const changes = images.slice();
+										changes[i] = newAttrs;
+										setImages(changes);
+										updateHistory(changes);
 									}}
 								/>
 							);
