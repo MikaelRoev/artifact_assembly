@@ -388,6 +388,24 @@ const StageArea = ({ uploadedImages }) => {
 		}
 	};
 
+	/**
+	 * Updates the history of the canvas by adding changes.
+	 * @param change the change to be added.
+	 */
+	const updateHistory = (change) => {
+		// Update history
+		const newHistory = history.slice(0, historyIndex + 1);
+		newHistory.push(change);
+
+		// Enforce the maximum number of undo steps
+		if (newHistory.length > maxUndoSteps) {
+			newHistory.shift(); // Remove the oldest state
+		} else {
+			setHistoryIndex(historyIndex + 1);
+		}
+		setHistory(newHistory);
+	}
+
 	return (
 		<>
 			<Stage
@@ -415,19 +433,7 @@ const StageArea = ({ uploadedImages }) => {
 										const rects = images.slice();
 										rects[i] = newAttrs;
 										setImages(rects);
-
-										// Update history
-										const newHistory = history.slice(0, historyIndex + 1);
-										newHistory.push(rects);
-
-										// Enforce the maximum number of undo steps
-										if (newHistory.length > maxUndoSteps) {
-											newHistory.shift(); // Remove the oldest state
-										} else {
-											setHistoryIndex(historyIndex + 1);
-										}
-
-										setHistory(newHistory);
+										updateHistory(rects);
 									}}
 								/>
 							);
