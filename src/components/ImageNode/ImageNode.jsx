@@ -1,11 +1,11 @@
 import React from "react";
 import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
-import { Transformer, Image as KonvaImage } from "react-konva";
+import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
-import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
+import ElementNode from "../StageNode/ElementNode";
 
 /**
  * Represents a canvas object on the canvas.
@@ -25,17 +25,11 @@ const ImageNode = ({
 	imageURL,
 }) => {
 	const imageRef = useRef();
-	const trRef = useRef();
 
 	const [imageSrc] = useImage(imageURL);
 
-	const resizeContext = useContext(ResizeContext);
-	const lockContext = useContext(LockContext);
-	const imageContext = useContext(ImageContext);
-
-	const { resize } = resizeContext;
-	const { lock } = lockContext;
-	const { filter, hue, saturation, luminance, contrast } = imageContext;
+	const { resizable } = useContext(ResizeContext);
+	const { filter, hue, saturation, luminance, contrast } = useContext(ImageContext);
 
 	/**
 	 * Handles the filter on the image.
@@ -47,21 +41,18 @@ const ImageNode = ({
 	};
 
 	useEffect(() => {
-		if (isSelected) {
-			// we need to attach transformer manually
-			trRef.current.nodes([imageRef.current]);
-			trRef.current.getLayer().batchDraw();
-		}
-	}, [isSelected]);
-
-	useEffect(() => {
 		if (imageSrc) {
 			imageRef.current.cache();
 		}
 	}, [imageSrc]);
 
 	return (
-		<>
+		<ElementNode
+			isSelected={isSelected}
+			resizable={resizable}
+			onSelect={onSelect}
+			onChange={onChange}
+		>
 			<KonvaImage
 				ref={imageRef}
 				filters={handleFilter()}
@@ -72,71 +63,14 @@ const ImageNode = ({
 					contrast: Number(contrast),
 				}}
 				image={imageSrc}
-				onClick={onSelect}
-				onTap={onSelect}
-				onDragStart={onSelect}
 				{...shapeProps}
-				draggable={!lock}
-				onChange={onChange}
-				onDragEnd={(e) => {
-					onChange({
-						...shapeProps,
-						x: e.target.x(),
-						y: e.target.y(),
-					});
-				}}
 				onMouseDown={(e) => {
 					//Moves selected image on top (z-index)
 					e.target.moveToTop();
 				}}
-				onTransformEnd={() => {
-					const node = imageRef.current;
-					const scaleX = node.scaleX();
-					const scaleY = node.scaleY();
-
-					node.scaleX(1);
-					node.scaleY(1);
-					onChange({
-						...shapeProps,
-						x: node.x(),
-						y: node.y(),
-						// set minimal value
-						width: Math.max(5, node.width() * scaleX),
-						height: Math.max(node.height() * scaleY),
-					});
-				}}
-				onMouseEnter={(e) => {
-					// Adds a pointer cursor when hovering over the image
-					const container = e.target.getStage().container();
-					if (!lock) container.style.cursor = "default";
-
-					container.style.cursor = "pointer";
-				}}
-				onMouseLeave={(e) => {
-					const container = e.target.getStage().container();
-					container.style.cursor = "default";
-				}}
 				perfectDrawEnabled={false}
 			/>
-			{isSelected && (
-				//Adds the konva transformer to the image item
-				<Transformer
-					ref={trRef}
-					boundBoxFunc={(oldBox, newBox) => {
-						// limit resize
-						if (newBox.width < 5 || newBox.height < 5) {
-							return oldBox;
-						}
-						return newBox;
-					}}
-					onDragMove={(e) => {
-						//Moves selected image on top (z-index)
-						e.target.moveToTop();
-					}}
-					resizeEnabled={resize}
-				/>
-			)}
-		</>
+		</ElementNode>
 	);
 };
 
