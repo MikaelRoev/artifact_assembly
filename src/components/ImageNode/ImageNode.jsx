@@ -5,7 +5,7 @@ import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
-import ElementNode from "../StageNode/ElementNode";
+import ElementNode from "../ElementNode";
 
 /**
  * Represents a canvas object on the canvas.

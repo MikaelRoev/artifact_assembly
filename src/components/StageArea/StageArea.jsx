@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { Stage, Layer } from "react-konva";
+import {Stage, Layer, Rect as KonvaRect, Group, Text} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 import { useState, useRef } from "react";
 import { invoke } from '@tauri-apps/api/tauri'
 import { dialog } from '@tauri-apps/api';
 import Konva from "konva";
+import ElementNode from "../ElementNode";
 
 /**
  * Creates the canvas area in the project page.
@@ -406,19 +407,73 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setHistory(newHistory);
 	}
 
+	const shapes = [
+		<KonvaRect
+			key="rect"
+			x={20}
+			y={20}
+			width={100}
+			height={50}
+			fill="blue"
+		/>,
+		<Text
+			key="text"
+			x={150}
+			y={20}
+			text="Hello, Konva!"
+			fontSize={20}
+			fill="green"
+		/>,
+		<Group key="group" >
+			<KonvaRect
+				x={250}
+				y={20}
+				width={50}
+				height={50}
+				fill="red"
+			/>
+			<KonvaRect
+				x={250}
+				y={80}
+				width={50}
+				height={50}
+				fill="yellow"
+			/>
+		</Group>
+	]
+
 	return (
 		<>
 			<Stage
 				width={window.innerWidth}
 				height={window.innerHeight}
-				draggable
+				//draggable
 				className="stage"
 				onWheel={zoomStage}
 				onMouseDown={checkDeselect}
 				onTouchStart={checkDeselect}
 				ref={stageRef}>
 				<Layer className="layer">
-					{images.length > 0 &&
+					{
+						shapes.length > 0 && shapes.map((shape, index) => (
+							<ElementNode
+								key={shape.key}
+								isSelected={shape.key === selectedImageId}
+								onSelect={() => {
+									selectImageId(shape.key);
+								}}
+								onChange={(newAttrs) => {
+									const changes = images.slice();
+									changes[index] = newAttrs;
+									setImages(changes);
+									updateHistory(changes);
+								}}
+							>
+								{shape}
+							</ElementNode>
+						))
+					}
+					{/*images.length > 0 &&
 						images.map((image, i) => {
 							return (
 								<ImageNode
@@ -437,7 +492,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 									}}
 								/>
 							);
-						})}
+						})*/}
 				</Layer>
 			</Stage>
 		</>
