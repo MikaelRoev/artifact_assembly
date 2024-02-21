@@ -34,8 +34,14 @@ const ElementNode = ({ children, isSelected = false, onSelect, onChange, shapePr
             {React.cloneElement(children, {
                 ref: nodeRef,
                 draggable: !lock && isSelected,
-                onClick: onSelect,
-                onTap: onSelect,
+                onClick: (event) => {
+                    onSelect();
+                    event.target.moveToTop();
+                },
+                onTap: (event) => {
+                    onSelect();
+                    event.target.moveToTop();
+                },
                 onMouseEnter: (e) => {
                     // Adds a pointer cursor when hovering over the image
                     const container = e.target.getStage().container();
