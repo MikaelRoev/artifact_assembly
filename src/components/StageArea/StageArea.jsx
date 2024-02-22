@@ -16,11 +16,12 @@ import ElementNode from "../ElementNode";
  */
 const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
-	const [selectedImageId, setSelectedImageId] = useState(null);
+	//const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	const renderCount = useRef(0);
+	const selectedGroupRef= useRef(null);
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
@@ -50,24 +51,20 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	useEffect(() => {
 
 		/**
-	 	* Deletes the selected images if the delete key is pressed.
+	 	* Deletes the selected elements if the delete key is pressed.
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedImageId !== null) {
-				const updatedImages = images.filter(
-					(image) => image.id !== selectedImageId
-				);
-				console.log(`image ${selectedImageId} deleted`);
-				setImages(updatedImages);
-				setSelectedImageId(null);
+			if (e.key === "Delete" && selectedGroupRef.current) {
+				console.log(`elements ${selectedGroupRef.current} deleted`);
+				selectedGroupRef.current.removeChildren();
 			}
 		};
 		document.addEventListener("keydown", handleDeletePressed);
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [selectedImageId, images]);
+	});
 
 	/**
 	 * Updates the uploaded images when an image changes state.
@@ -317,12 +314,42 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	}, [history, historyIndex]);
 
 	/**
-	 * Deselects when the mouse clicks on an empty area on the canvas.
+	 * Handles it when the mouse clicks on an empty area on the canvas.
 	 * @param e the event.
 	 */
-	const checkDeselect = (e) => {
-		if (e.target === e.currentTarget) {
-			setSelectedImageId(null);
+	const handleClick = (e) => {
+		const selectedGroup = selectedGroupRef.current;
+
+		if (!selectedGroup) {
+			console.log("group is null")
+			return
+		}
+
+		if (e.target !== e.currentTarget) { //clicked on element
+			if (!e.ctrlKey) { // handles what to do with the existing elements in list
+				selectedGroup.removeChildren();
+			}
+			console.log(e.target);
+			//selectedGroup.add(e.target);    // add the selected element to list
+		} else if (!e.ctrlKey) {		//clicked on empty canvas and not ctrl
+			console.log('empty and not ctrl');
+		} // jumps out if clicked on empty canvas AND used ctrl
+		console.log('group exist');
+	};
+
+	const select = (node) => {
+		const selectedGroup = selectedGroupRef.current;
+		if (selectedGroup) {
+			selectedGroup.add(node);
+		}
+
+	};
+	const deselect = () => {
+		const selectedGroup = selectedGroupRef.current;
+		if (selectedGroup) {
+			shapes.add(selectedGroup.getChildren());
+			selectedGroup.removeChildren();
+
 		}
 	};
 
@@ -368,15 +395,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 */
 	const clamp = (value, min, max) => {
 		return Math.min(Math.max(value, min), max);
-	};
-
-	/**
-	 * Selects an image.
-	 * @param imageId
-	 */
-	const selectImageId = (imageId) => {
-		setSelectedImageId(imageId);
-		console.log(selectedImageId);
 	};
 
 	/**
@@ -450,17 +468,17 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				//draggable
 				className="stage"
 				onWheel={zoomStage}
-				onMouseDown={checkDeselect}
-				onTouchStart={checkDeselect}
+				onMouseDown={handleClick}
+				onTouchStart={handleClick}
 				ref={stageRef}>
 				<Layer className="layer">
 					{
 						shapes.length > 0 && shapes.map((shape, index) => (
 							<ElementNode
 								key={shape.key}
-								isSelected={shape.key === selectedImageId}
+
 								onSelect={() => {
-									selectImageId(shape.key);
+									select(shape);
 								}}
 								onChange={(newAttrs) => {
 									const changes = images.slice();
@@ -472,6 +490,19 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 								{shape}
 							</ElementNode>
 						))
+					}
+					{
+						//SelectedGroup
+						<ElementNode isSelected={true}
+							/*onChange={(newAttrs) => {
+							const changes = images.slice();
+							changes[index] = newAttrs;
+							setImages(changes);
+							updateHistory(changes);
+						}}*/
+						>
+							<Group ref={selectedGroupRef}/>
+						</ElementNode>
 					}
 					{/*images.length > 0 &&
 						images.map((image, i) => {
