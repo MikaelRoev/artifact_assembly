@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
 import {Stage, Layer, Rect as KonvaRect, Group, Text} from "react-konva";
-import ImageNode from "../ImageNode/ImageNode";
 import { useState, useRef } from "react";
-import { invoke } from '@tauri-apps/api/tauri'
-import { dialog } from '@tauri-apps/api';
-import Konva from "konva";
 import ElementNode from "../ElementNode";
+import FileHandling from "../FileHandling";
 
 /**
  * Creates the canvas area in the project page.
@@ -82,18 +79,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		});
 	}, [images, uploadedImages]);
 
-	/**
-	 * If there are any saved images in the local storage, sets the images to the saved images.
-	 * else sets them as the uploaded images,
-	useEffect(() => {
-		const savedImages = localStorage.getItem("savedImages");
-		if (savedImages) {
-			setImages(JSON.parse(savedImages));
-		} else {
-			setImages(uploadedImages);
-		}
-	}, [uploadedImages]);
-		*/
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -106,8 +91,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				saveProjectDialog().then(() => {console.log('Project saved!');});
-				openProjectDialog().then(() => {console.log('Project opened!');});
+				FileHandling.saveProjectDialog().then(() => {console.log('Project saved!');});
+				FileHandling.openProjectDialog().then(() => {console.log('Project opened!');});
  			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
@@ -115,186 +100,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			document.removeEventListener("keydown", handleSavePressed);
 		};
 	});
-
-	const openProjectDialog = async () => {
-		try {
-			const filePath = await dialog.open({
-				title: "Open Project",
-				multiple: false,
-				filters: [{name: 'JSON Files', extensions: ['json']}]
-			});
-			if (filePath) {
-				jsonToProject(await readFile(filePath));
-			} else {
-				console.log('No file selected or operation cancelled.');
-			}
-		} catch (error) {
-			console.error('Error during open project dialog: ', error);
-		}
-	}
-
-	/**
-	 * Opens the save project as dialog window.
-	 */
-	const saveProjectDialog = async () => {
-		try {
-			const filePath = await dialog.save({
-				title: 'Save Project As',
-				filters: [{name: 'JSON Files', extensions: ['json']}]
-			});
-			if (filePath) {
-				// get the project name from the file path.
-				projectName = filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1');
-				await saveToFile(projectToJSON(), filePath);
-				await readFile(filePath);
-			} else {
-				console.log('No file selected or operation cancelled.');
-			}
-		} catch (error) {
-			console.error('Error during file save dialog: ', error);
-		}
-	};
-
-	/**
-	 * Parses the project into a JSON representation.
-	 * @returns {string} containing the resulting JSON.
-	 */
-	const projectToJSON = ()   => {
-		const stage = stageRef.current.getStage();
-		const layerList = stage.getChildren();
-
-		const project = {
-			name: projectName,
-			description: projectDescription,
-			x: stage.x(),
-			y: stage.y(),
-			zoom: stage.scaleX(),
-			layers: []
-		};
-
-		layerList.forEach(layer => {
-			const layerData = {
-				name: layer.name(),
-				id: layer.id(),
-				elements: [],
-			};
-
-			layer.getChildren().forEach(element => {
-				const className = element.getClassName();
-
-				const elementData = {
-					name: element.name(),
-					className: className,
-					x: element.x(),
-					y: element.y(),
-					filePath: ""
-				};
-				if (className === 'Image') {
-					elementData.filePath = '../images/lol.jpg';
-				}
-
-				layerData.elements.push({
-					name: element.name(),
-					className: className,
-					x: element.x(),
-					y: element.y()
-				});
-			});
-
-			project.layers.push(layerData);
-		});
-
-		return JSON.stringify(project);
-	}
-
-	/**
-	 * Parses a JSON representation of a project into the project.
-	 * @param {string} json - The JSON representation of the project.
-	 */
-	const jsonToProject = (json) => {
-		try {
-			const project = JSON.parse(json);
-			projectName = project.name;
-			projectDescription = project.description;
-			const stage = stageRef.current;
-			if (stage === null) return;
-
-			// Set stage properties
-			stage.x(project.x);
-			stage.y(project.y);
-			stage.scaleX(project.zoom);
-			stage.scaleY(project.zoom);
-
-			// Reconstruct layers and elements
-			project.layers.forEach(layerData => {
-				// Reconstruct layer
-				const layer = new Konva.Layer({
-					name: layerData.name,
-					id: layerData.id
-				});
-
-				// Reconstruct elements
-				layerData.elements.forEach(elementData => {
-					let element;
-					if (elementData.className === 'Image') {
-						// Reconstruct image element
-						element = new Konva.Image({
-							name: elementData.name,
-							x: elementData.x,
-							y: elementData.y,
-							image: new Image(), // You may need to load the image separately
-							draggable: true
-						});
-						// Set image source
-						element.image.src = elementData.filePath;
-					} else {
-						// Reconstruct other types of elements
-						// For example, shapes, text, etc.
-						// You need to handle other types of elements here
-					}
-
-					// Add the element to the layer
-					layer.add(element);
-				});
-
-				// Add the layer to the stage
-				stage.add(layer);
-			});
-
-			// Layer order might need to be reconstructed
-			//can you help me...
-		} catch (error) {
-			console.error('Error parsing JSON: ', error);
-		}
-	}
-
-	/**
-	 * Saves a string into a file.
-	 * @param content to be saved.
-	 * @param filePath the path to the file including the file name and type.
-	 */
-	const saveToFile = async (content, filePath) => {
-		await invoke('save_file', {filePath: filePath, content: content})
-			.catch((error) => console.error('Error when saving to file: ', error));
-	};
-
-	/**
-	 * Reads the contents of a file.
-	 * @param filePath of the file including name and type.
-	 * @return {Promise<String>} Promise resolving to the contents of the file.
-	 */
-	const readFile = (filePath) => {
-		return new Promise((resolve, reject) => {
-			invoke('read_file', { filePath: filePath })
-				.then((content) => {
-					resolve(content);
-				})
-				.catch((error) => {
-					console.error('Error reading from file: ', error);
-					reject(error);
-				});
-		});
-	}
 
 	/**
 	 * Sets up and cleans up the undo event listener.
