@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import {Stage, Layer, Rect as KonvaRect, Group, Text} from "react-konva";
+import {Stage, Layer, Rect as KonvaRect, Group, Text, Rect} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 import { useState, useRef } from "react";
 import { invoke } from '@tauri-apps/api/tauri'
 import { dialog } from '@tauri-apps/api';
 import Konva from "konva";
 import ElementNode from "../ElementNode";
+import SelectedGroup from "../SelectedGroup";
 
 /**
  * Creates the canvas area in the project page.
@@ -463,16 +464,19 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	return (
 		<>
 			<Stage
+				className="stage"
 				width={window.innerWidth}
 				height={window.innerHeight}
 				//draggable
-				className="stage"
 				onWheel={zoomStage}
 				onMouseDown={handleClick}
 				onTouchStart={handleClick}
 				ref={stageRef}>
 				<Layer className="layer">
-					{
+					<SelectedGroup>
+						<Rect width={100} height={100} fill="red"/>
+					</SelectedGroup>
+					{/*
 						shapes.length > 0 && shapes.map((shape, index) => (
 							<ElementNode
 								key={shape.key}
@@ -490,8 +494,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 								{shape}
 							</ElementNode>
 						))
-					}
-					{
+					*/}
+					{/*
 						//SelectedGroup
 						<ElementNode isSelected={true}
 							/*onChange={(newAttrs) => {
@@ -499,11 +503,11 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 							changes[index] = newAttrs;
 							setImages(changes);
 							updateHistory(changes);
-						}}*/
+						}}
 						>
 							<Group ref={selectedGroupRef}/>
 						</ElementNode>
-					}
+					*/}
 					{/*images.length > 0 &&
 						images.map((image, i) => {
 							return (
