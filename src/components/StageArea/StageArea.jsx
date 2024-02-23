@@ -475,7 +475,11 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				ref={stageRef}>
 				<Layer className="layer">
 					<SelectedGroup>
-						<Rect width={100} height={100} fill="red"/>
+						<Rect
+							width={100}
+							height={100}
+							fill="red"
+						/>
 					</SelectedGroup>
 					{
 						// elements

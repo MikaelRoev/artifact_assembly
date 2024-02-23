@@ -1,10 +1,13 @@
-import {Group, Rect, Transformer} from "react-konva";
+import {Group, Transformer} from "react-konva";
 import React, {useContext, useEffect, useRef} from "react";
+import ResizeContext from "../pages/Canvas/Context/ResizeContext";
+import LockContext from "../pages/Canvas/Context/LockContext";
 
-
-const SelectedGroup = ({children}) => {
-    const groupRef = useRef();
-    const trRef = useRef()
+const SelectedGroup = ({children, ref}) => {
+    const groupRef = useRef(null);
+    const trRef = useRef(null);
+    const {resize} = useContext(ResizeContext);
+    const {lock} = useContext(LockContext)
 
     useEffect(() => {
         if (groupRef.current && trRef.current) {
@@ -15,31 +18,18 @@ const SelectedGroup = ({children}) => {
 
     return (
         <>
-            <Group ref={groupRef}
-                /*draggable={true}
-                onTransform={()=> {
-                    const node = groupRef.current;
-                    const scaleX = node.scaleX();
-                    const scaleY = node.scaleY();
-                    node.scaleX(1);
-                    node.scaleY(1);
-
-                }}*/
+            <Group
+                ref={groupRef}
+                draggable = {!lock}
             >
-
                 {children}
             </Group>
-
-            // if it is selected add a transformer
-
             <Transformer
                 ref={trRef}
-                flipEnabled={false}
-
+                resizeEnabled={resize}
             />
         </>
     );
-
-};
+}
 
 export default SelectedGroup;
