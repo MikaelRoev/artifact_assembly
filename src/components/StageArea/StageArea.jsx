@@ -354,7 +354,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			document.removeEventListener('keydown', handleCtrlDown);
 			document.removeEventListener('keyup', handleCtrlUp);
 		};
-	}, [ctrlPressed]);
+	}, []);
 
 	/**
 	 * Handles the selecting of en element
