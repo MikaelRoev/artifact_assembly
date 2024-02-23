@@ -338,17 +338,18 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		console.log('group exist');
 	};
 
-	const select = (node) => {
+	const handleSelect = (node) => {
 		const selectedGroup = selectedGroupRef.current;
+		console.log("selectedGroup: ", selectedGroup)
 		if (selectedGroup) {
 			selectedGroup.add(node);
 		}
 
 	};
-	const deselect = () => {
+	const handleDeselect = () => {
 		const selectedGroup = selectedGroupRef.current;
 		if (selectedGroup) {
-			shapes.add(selectedGroup.getChildren());
+			elements.add(selectedGroup.getChildren());
 			selectedGroup.removeChildren();
 
 		}
@@ -426,7 +427,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setHistory(newHistory);
 	}
 
-	const shapes = [
+	const elements = [
 		<KonvaRect
 			key="rect"
 			x={20}
@@ -477,13 +478,55 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 						<Rect width={100} height={100} fill="red"/>
 						<Rect width={100} height={100} x={200} y={200} fill="blue"/>
 					</SelectedGroup>
-					{/*
-						shapes.length > 0 && shapes.map((shape, index) => (
+					{
+						// elements
+						(elements.length > 0) && elements.map((element, index) => {
+							console.log("In the element making loop");
+							// for each
+							return React.cloneElement(element, {
+								// add select
+								onClick: (event) => {
+									handleSelect(element);
+									event.target.moveToTop();
+									//TODO: make group move on top
+								},
+								onTap: (event) => {
+									handleSelect(element);
+									event.target.moveToTop();
+								},
+								// add mouse pointer change
+								onMouseEnter: (e) => {
+									// Adds a pointer cursor when hovering over the image
+									const container = e.target.getStage().container();
+									container.style.cursor = "pointer";
+								},
+								onMouseLeave: (e) => {
+									const container = e.target.getStage().container();
+									container.style.cursor = "default";
+								},
+								// add change update?
+								/*
+								onDragEnd: (e) => {
+									const changes = images.slice();
+									changes[index] = {
+										...shapeProps,
+										x: e.target.x(),
+										y: e.target.y(),
+									};
+									setImages(changes);
+									updateHistory(changes);
+
+								},
+								 */
+							});
+
+						})
+							/*
 							<ElementNode
-								key={shape.key}
+								key={element.key}
 
 								onSelect={() => {
-									select(shape);
+									select(element);
 								}}
 								onChange={(newAttrs) => {
 									const changes = images.slice();
@@ -492,10 +535,11 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 									updateHistory(changes);
 								}}
 							>
-								{shape}
+								{element}
 							</ElementNode>
-						))
-					*/}
+							 */
+					}
+
 					{/*
 						//SelectedGroup
 						<ElementNode isSelected={true}
