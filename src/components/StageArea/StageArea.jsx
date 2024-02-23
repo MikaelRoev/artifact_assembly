@@ -427,8 +427,13 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setHistory(newHistory);
 	}
 
+	// Callback function to get the groupRef from SelectedGroup
+	const handleGroupRef = (ref) => {
+		selectedGroupRef.current = ref;
+	};
+
 	const elements = [
-		<KonvaRect
+		<Rect
 			key="rect"
 			x={20}
 			y={20}
@@ -445,14 +450,14 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			fill="green"
 		/>,
 		<Group key="group" >
-			<KonvaRect
+			<Rect
 				x={250}
 				y={20}
 				width={50}
 				height={50}
 				fill="red"
 			/>
-			<KonvaRect
+			<Rect
 				x={250}
 				y={80}
 				width={50}
@@ -470,11 +475,9 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				height={window.innerHeight}
 				//draggable
 				onWheel={zoomStage}
-				onMouseDown={handleClick}
-				onTouchStart={handleClick}
 				ref={stageRef}>
 				<Layer className="layer">
-					<SelectedGroup>
+					<SelectedGroup groupRefCallback={handleGroupRef}>
 						<Rect width={100} height={100} fill="red"/>
 						<Rect width={100} height={100} x={200} y={200} fill="blue"/>
 					</SelectedGroup>

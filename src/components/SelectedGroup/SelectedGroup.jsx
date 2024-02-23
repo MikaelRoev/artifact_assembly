@@ -1,9 +1,9 @@
 import {Group, Transformer} from "react-konva";
 import React, {useContext, useEffect, useRef} from "react";
-import ResizeContext from "../pages/Canvas/Context/ResizeContext";
-import LockContext from "../pages/Canvas/Context/LockContext";
+import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
+import LockContext from "../../pages/Canvas/Context/LockContext";
 
-const SelectedGroup = ({children}) => {
+function SelectedGroup({children, groupRefCallback}) {
     const groupRef = useRef(null);
     const trRef = useRef(null);
     const {resize} = useContext(ResizeContext);
@@ -15,6 +15,13 @@ const SelectedGroup = ({children}) => {
             trRef.current.getLayer().batchDraw();
         }
     });
+
+    // Execute the ref callback to pass the groupRef to the parent
+    useEffect(() => {
+        if (typeof groupRefCallback === 'function') {
+            groupRefCallback(groupRef);
+        }
+    }, [groupRefCallback, groupRef]);
 
     return (
         <>
