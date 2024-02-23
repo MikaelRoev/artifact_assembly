@@ -1,5 +1,4 @@
-import React from "react";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
@@ -7,6 +6,8 @@ import GridContext from "./Context/GridContext";
 import ResizeContext from "./Context/ResizeContext";
 import LockContext from "./Context/LockContext";
 import ImageContext from "./Context/ImageContext";
+import {dialog} from "@tauri-apps/api";
+import imageNode from "../../components/ImageNode/ImageNode";
 
 /**
  * Creates a project page.
@@ -23,7 +24,8 @@ const Canvas = () => {
     const [hue, setHue] = useState(0);
     const [contrast, setContrast] = useState(0);
     const [luminance, setLuminance] = useState(0);
-    const stageRef = useState(null)
+    const stageRef = useRef(null)
+    const layerRef = useRef(null)
 
     const providerValue = {
         grid,
@@ -69,14 +71,38 @@ const Canvas = () => {
         document.body.removeChild(link);
     }
 
+    /**
+     * Function to open up the score window for all the images on the canvas.
+     * @returns Void
+     */
+    const openScoreWindow = async () => {
+        const layer = layerRef.current;
+
+        if (layer) {
+            const imageNodes = layer.getChildren().filter((child) => child.getClassName() === 'Image');
+            const imageData = imageNodes.map((image) => {
+                return {
+                    id: image.name(),
+                    width: image.width().toFixed(0),
+                    height: image.height().toFixed(0),
+                }
+            });
+            const message = imageData.map(data => `ID: ${data.id}, Width: ${data.width}, Height: ${data.height}`).join('\n')
+            await dialog.message(message, {
+                title: "Score Window",
+                type: "info"
+            });
+        }
+    };
+
     return (
         <ImageContext.Provider value={providerValue}>
             <GridContext.Provider value={providerValue}>
                 <ResizeContext.Provider value={providerValue}>
                     <LockContext.Provider value={providerValue}>
                         <div className="stage-container">
-                            <NavBar takeScreenshot={takeScreenshot}/>
-                            <StageArea uploadedImages={images} stageRef={stageRef}/>
+                            <NavBar takeScreenshot={takeScreenshot} openScoreWindow={openScoreWindow} />
+                            <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
                         </div>
                     </LockContext.Provider>
                 </ResizeContext.Provider>

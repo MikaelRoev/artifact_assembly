@@ -11,7 +11,7 @@ import ImageContext from "../../pages/Canvas/Context/ImageContext";
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({takeScreenshot}) => {
+const NavBar = ({takeScreenshot, openScoreWindow}) => {
     const {grid, setGrid} = useContext(GridContext);
     const {resize, setResize} = useContext(ResizeContext);
     const {lock, setLock} = useContext(LockContext);
@@ -60,7 +60,8 @@ const NavBar = ({takeScreenshot}) => {
                     });
                     const newImage = {
                         imageUrl,
-                        id: Date.now(), // Assign a unique identifier using Date.now()
+                        id: Date.now().toString(), // Assign a unique identifier using Date.now()
+                        name: file.name,
                         // Other properties for the `shapeProps` object
                     };
                     newImages.push(newImage);
@@ -176,6 +177,9 @@ const NavBar = ({takeScreenshot}) => {
                                         onChange={handleInputChange}
                                     />
                                     <span>%</span>
+                                </li>
+                                <li>
+                                    <span id={"showScoreWindowButton"} onClick={openScoreWindow}>Open score window</span>
                                 </li>
                             </ul>
                         </div>
