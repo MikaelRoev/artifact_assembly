@@ -171,9 +171,9 @@ const NavBar = ({takeScreenshot}) => {
                         </div>
                     )}
                 </div>
-                {/* <p onClick={toggleResize}>
+                <p onClick={toggleResize}>
 					{resize ? "Disable Resize" : "Enable Resize"}
-				</p> */}
+				</p>
                 <p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
                 <p onClick={toggleFilter}>
                     {!filter ? "Enable Filter" : "Disable Filter"}

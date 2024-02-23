@@ -475,6 +475,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				<Layer className="layer">
 					<SelectedGroup>
 						<Rect width={100} height={100} fill="red"/>
+						<Rect width={100} height={100} x={200} y={200} fill="blue"/>
 					</SelectedGroup>
 					{/*
 						shapes.length > 0 && shapes.map((shape, index) => (
