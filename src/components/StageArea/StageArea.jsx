@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import {Stage, Layer, Rect as KonvaRect, Group, Text, Rect} from "react-konva";
-import ImageNode from "../ImageNode/ImageNode";
+import {Stage, Layer, Group, Text, Rect} from "react-konva";
 import { useState, useRef } from "react";
 import { invoke } from '@tauri-apps/api/tauri'
 import { dialog } from '@tauri-apps/api';
 import Konva from "konva";
-import ElementNode from "../ElementNode";
-import SelectedGroup from "../SelectedGroup";
+import SelectedGroup from "../SelectedGroup/SelectedGroup";
 
 /**
  * Creates the canvas area in the project page.
@@ -20,11 +18,11 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	//const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [ctrlPressed, setCtrlPressed] = useState(false);
 
-	const renderCount = useRef(0);
 	const selectedGroupRef= useRef(null);
-	const maxUndoSteps = 20;
 
+	const maxUndoSteps = 20;
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
@@ -33,8 +31,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	let projectDescription = "";
 
 	useEffect(() => {
-		renderCount.current = renderCount.current + 1;
-		console.log(renderCount.current);
+		console.log("Render");
 	});
 
 	/**
@@ -315,36 +312,61 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	}, [history, historyIndex]);
 
 	/**
-	 * Handles it when the mouse clicks on an empty area on the canvas.
-	 * @param e the event.
+	 * Set up and cleans up the deselect check.
 	 */
-	const handleClick = (e) => {
-		const selectedGroup = selectedGroupRef.current;
-
-		if (!selectedGroup) {
-			console.log("group is null")
-			return
-		}
-
-		if (e.target !== e.currentTarget) { //clicked on element
-			if (!e.ctrlKey) { // handles what to do with the existing elements in list
-				selectedGroup.removeChildren();
+	useEffect(() => {
+		/**
+		 * The mouse event handler.
+		 * @param e
+		 */
+		const handleMouseDown = (e) => {
+			if (e.type === 'mousedown' && !ctrlPressed) {
+				handleDeselect();
 			}
-			console.log(e.target);
-			//selectedGroup.add(e.target);    // add the selected element to list
-		} else if (!e.ctrlKey) {		//clicked on empty canvas and not ctrl
-			console.log('empty and not ctrl');
-		} // jumps out if clicked on empty canvas AND used ctrl
-		console.log('group exist');
-	};
+		};
 
-	const handleSelect = (node) => {
+		/**
+		 * The ctrl key down event handler.
+		 * @param e
+		 */
+		const handleCtrlDown = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(true);
+			}
+		};
+
+		/**
+		 * The ctrl key up event handler.
+		 * @param e
+		 */
+		const handleCtrlUp = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleMouseDown);
+		document.addEventListener('keydown', handleCtrlDown);
+		document.addEventListener('keyup', handleCtrlUp);
+
+		return () => {
+			document.removeEventListener('mousedown', handleMouseDown);
+			document.removeEventListener('keydown', handleCtrlDown);
+			document.removeEventListener('keyup', handleCtrlUp);
+		};
+	}, [ctrlPressed]);
+
+	/**
+	 * Handles the selecting of en element
+	 * @param element to be selected
+	 */
+	const handleSelect = (element) => {
 		const selectedGroup = selectedGroupRef.current;
 		console.log("selectedGroup: ", selectedGroup)
 		if (selectedGroup) {
-			selectedGroup.add(node);
+			console.log(selectedGroup)
+			selectedGroup.add(element);
 		}
-
 	};
 	const handleDeselect = () => {
 		const selectedGroup = selectedGroupRef.current;
@@ -484,7 +506,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 					{
 						// elements
 						(elements.length > 0) && elements.map((element, index) => {
-							console.log("In the element making loop");
 							// for each
 							return React.cloneElement(element, {
 								// add select
