@@ -7,7 +7,13 @@ import Konva from "konva";
  * Abstract functional component representing an object on the stage area.
  * @constructor
  */
-const ElementNode = ({ children, isSelected = false, onSelect, onChange, shapeProps, resizable }) => {
+const ElementNode = ({
+                         children,
+                         isSelected = false,
+                         onSelect,
+                         onChange,
+                         shapeProps,
+                         resizable = false}) => {
     /**
      * Checks if the children is a Konva node.
      */
@@ -34,8 +40,15 @@ const ElementNode = ({ children, isSelected = false, onSelect, onChange, shapePr
             {React.cloneElement(children, {
                 ref: nodeRef,
                 draggable: !lock && isSelected,
-                onClick: onSelect,
-                onTap: onSelect,
+                onClick: (event) => {
+                    onSelect();
+                    event.target.moveToTop();
+                    //TODO: make group move on top
+                },
+                onTap: (event) => {
+                    onSelect();
+                    event.target.moveToTop();
+                },
                 onMouseEnter: (e) => {
                     // Adds a pointer cursor when hovering over the image
                     const container = e.target.getStage().container();
@@ -47,18 +60,12 @@ const ElementNode = ({ children, isSelected = false, onSelect, onChange, shapePr
                     const container = e.target.getStage().container();
                     container.style.cursor = "default";
                 },
-                onDragStart: (e) => {
-                    //Moves selected image on top (z-index)
-                    e.target.moveToTop();
-                },
                 onDragEnd: (e) => {
-                    if (!lock) {
-                        onChange({
-                            ...shapeProps,
-                            x: e.target.x(),
-                            y: e.target.y(),
-                        });
-                    }
+                    onChange({
+                        ...shapeProps,
+                        x: e.target.x(),
+                        y: e.target.y(),
+                    });
                 },
                 /*
                 onTransformEnd: (e) => {
@@ -83,8 +90,9 @@ const ElementNode = ({ children, isSelected = false, onSelect, onChange, shapePr
                 isSelected && (
                 <Transformer
                     ref={trRef}
-                    resizeEnabled={!lock && resizable}
+                    resizeEnabled={!lock || resizable}
                     rotateEnabled={!lock}
+
                     onDragStart={(e) => {
                         //Moves selected image on top (z-index)
                         e.target.moveToTop();

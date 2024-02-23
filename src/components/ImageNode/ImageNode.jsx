@@ -25,6 +25,7 @@ const ImageNode = ({
 	imageURL,
 }) => {
 	const imageRef = useRef();
+	const trRef = useRef();
 
 	const [imageSrc] = useImage(imageURL);
 
@@ -64,6 +65,14 @@ const ImageNode = ({
 				}}
 				image={imageSrc}
 				{...shapeProps}
+				onChange={onChange}
+				onDragEnd={(e) => {
+					onChange({
+						...shapeProps,
+						x: e.target.x(),
+						y: e.target.y(),
+					});
+				}}
 				onMouseDown={(e) => {
 					//Moves selected image on top (z-index)
 					e.target.moveToTop();

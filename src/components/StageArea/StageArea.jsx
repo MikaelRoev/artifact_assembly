@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import {Stage, Layer, Rect as KonvaRect, Group, Text} from "react-konva";
+import {Stage, Layer, Group, Text, Rect} from "react-konva";
 import { useState, useRef } from "react";
-import ElementNode from "../ElementNode";
+import SelectedGroup from "../SelectedGroup/SelectedGroup";
 import FileHandling from "../FileHandling";
+
 
 /**
  * Creates the canvas area in the project page.
@@ -13,13 +14,14 @@ import FileHandling from "../FileHandling";
  */
 const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
-	const [selectedImageId, setSelectedImageId] = useState(null);
+	//const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [ctrlPressed, setCtrlPressed] = useState(false);
 
-	const renderCount = useRef(0);
+	const selectedGroupRef= useRef(null);
+
 	const maxUndoSteps = 20;
-
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
@@ -28,8 +30,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	let projectDescription = "";
 
 	useEffect(() => {
-		renderCount.current = renderCount.current + 1;
-		console.log(renderCount.current);
+		console.log("Render");
 	});
 
 	/**
@@ -47,24 +48,20 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	useEffect(() => {
 
 		/**
-	 	* Deletes the selected images if the delete key is pressed.
+	 	* Deletes the selected elements if the delete key is pressed.
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedImageId !== null) {
-				const updatedImages = images.filter(
-					(image) => image.id !== selectedImageId
-				);
-				console.log(`image ${selectedImageId} deleted`);
-				setImages(updatedImages);
-				setSelectedImageId(null);
+			if (e.key === "Delete" && selectedGroupRef.current) {
+				console.log(`elements ${selectedGroupRef.current} deleted`);
+				selectedGroupRef.current.removeChildren();
 			}
 		};
 		document.addEventListener("keydown", handleDeletePressed);
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [selectedImageId, images]);
+	}, []);
 
 	/**
 	 * Updates the uploaded images when an image changes state.
@@ -122,12 +119,68 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	}, [history, historyIndex]);
 
 	/**
-	 * Deselects when the mouse clicks on an empty area on the canvas.
-	 * @param e the event.
+	 * Set up and cleans up the deselect check.
 	 */
-	const checkDeselect = (e) => {
-		if (e.target === e.currentTarget) {
-			setSelectedImageId(null);
+	useEffect(() => {
+		/**
+		 * The mouse event handler.
+		 * @param e
+		 */
+		const handleMouseDown = (e) => {
+			if (e.type === 'mousedown' && !ctrlPressed) {
+				handleDeselect();
+			}
+		};
+
+		/**
+		 * The ctrl key down event handler.
+		 * @param e
+		 */
+		const handleCtrlDown = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(true);
+			}
+		};
+
+		/**
+		 * The ctrl key up event handler.
+		 * @param e
+		 */
+		const handleCtrlUp = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleMouseDown);
+		document.addEventListener('keydown', handleCtrlDown);
+		document.addEventListener('keyup', handleCtrlUp);
+
+		return () => {
+			document.removeEventListener('mousedown', handleMouseDown);
+			document.removeEventListener('keydown', handleCtrlDown);
+			document.removeEventListener('keyup', handleCtrlUp);
+		};
+	}, []);
+
+	/**
+	 * Handles the selecting of en element
+	 * @param element to be selected
+	 */
+	const handleSelect = (element) => {
+		const selectedGroup = selectedGroupRef.current;
+		console.log("selectedGroup: ", selectedGroup)
+		if (selectedGroup) {
+			console.log(selectedGroup)
+			selectedGroup.add(element);
+		}
+	};
+	const handleDeselect = () => {
+		const selectedGroup = selectedGroupRef.current;
+		if (selectedGroup) {
+			elements.add(selectedGroup.getChildren());
+			selectedGroup.removeChildren();
+
 		}
 	};
 
@@ -176,15 +229,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	};
 
 	/**
-	 * Selects an image.
-	 * @param imageId
-	 */
-	const selectImageId = (imageId) => {
-		setSelectedImageId(imageId);
-		console.log(selectedImageId);
-	};
-
-	/**
 	 * Undoes the last action in the history.
 	 */
 	const Undo = () => {
@@ -212,8 +256,13 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setHistory(newHistory);
 	}
 
-	const shapes = [
-		<KonvaRect
+	// Callback function to get the groupRef from SelectedGroup
+	const handleGroupRef = (ref) => {
+		selectedGroupRef.current = ref;
+	};
+
+	const elements = [
+		<Rect
 			key="rect"
 			x={20}
 			y={20}
@@ -230,14 +279,14 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			fill="green"
 		/>,
 		<Group key="group" >
-			<KonvaRect
+			<Rect
 				x={250}
 				y={20}
 				width={50}
 				height={50}
 				fill="red"
 			/>
-			<KonvaRect
+			<Rect
 				x={250}
 				y={80}
 				width={50}
@@ -250,22 +299,65 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	return (
 		<>
 			<Stage
+				className="stage"
 				width={window.innerWidth}
 				height={window.innerHeight}
 				//draggable
-				className="stage"
 				onWheel={zoomStage}
-				onMouseDown={checkDeselect}
-				onTouchStart={checkDeselect}
 				ref={stageRef}>
 				<Layer className="layer">
+					<SelectedGroup groupRefCallback={handleGroupRef}>
+						<Rect width={100} height={100} fill="red"/>
+						<Rect width={100} height={100} x={200} y={200} fill="blue"/>
+					</SelectedGroup>
 					{
-						shapes.length > 0 && shapes.map((shape, index) => (
+						// elements
+						(elements.length > 0) && elements.map((element, index) => {
+							// for each
+							return React.cloneElement(element, {
+								// add select
+								onClick: (event) => {
+									handleSelect(element);
+									event.target.moveToTop();
+									//TODO: make group move on top
+								},
+								onTap: (event) => {
+									handleSelect(element);
+									event.target.moveToTop();
+								},
+								// add mouse pointer change
+								onMouseEnter: (e) => {
+									// Adds a pointer cursor when hovering over the image
+									const container = e.target.getStage().container();
+									container.style.cursor = "pointer";
+								},
+								onMouseLeave: (e) => {
+									const container = e.target.getStage().container();
+									container.style.cursor = "default";
+								},
+								// add change update?
+								/*
+								onDragEnd: (e) => {
+									const changes = images.slice();
+									changes[index] = {
+										...shapeProps,
+										x: e.target.x(),
+										y: e.target.y(),
+									};
+									setImages(changes);
+									updateHistory(changes);
+
+								},
+								 */
+							});
+
+						})
+							/*
 							<ElementNode
-								key={shape.key}
-								isSelected={shape.key === selectedImageId}
+								key={element.key}
+
 								onSelect={() => {
-									selectImageId(shape.key);
+									select(element);
 								}}
 								onChange={(newAttrs) => {
 									const changes = images.slice();
@@ -274,10 +366,24 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 									updateHistory(changes);
 								}}
 							>
-								{shape}
+								{element}
 							</ElementNode>
-						))
+							 */
 					}
+
+					{/*
+						//SelectedGroup
+						<ElementNode isSelected={true}
+							/*onChange={(newAttrs) => {
+							const changes = images.slice();
+							changes[index] = newAttrs;
+							setImages(changes);
+							updateHistory(changes);
+						}}
+						>
+							<Group ref={selectedGroupRef}/>
+						</ElementNode>
+					*/}
 					{/*images.length > 0 &&
 						images.map((image, i) => {
 							return (
