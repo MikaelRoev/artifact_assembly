@@ -3,30 +3,22 @@ import React, {useContext, useEffect, useRef} from "react";
 import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 
-function SelectedGroup({children, groupRefCallback}) {
-    const groupRef = useRef(null);
+function SelectedGroup({children, selectedGroupRef}) {
     const trRef = useRef(null);
     const {resize} = useContext(ResizeContext);
     const {lock} = useContext(LockContext)
 
     useEffect(() => {
-        if (groupRef.current && trRef.current) {
-            trRef.current.nodes([groupRef.current]);
+        if (selectedGroupRef.current && trRef.current) {
+            trRef.current.nodes([selectedGroupRef.current]);
             trRef.current.getLayer().batchDraw();
         }
     });
 
-    // Execute the ref callback to pass the groupRef to the parent
-    useEffect(() => {
-        if (typeof groupRefCallback === 'function') {
-            groupRefCallback(groupRef);
-        }
-    }, [groupRefCallback, groupRef]);
-
     return (
         <>
             <Group
-                ref={groupRef}
+                ref={selectedGroupRef}
                 draggable = {!lock}
             >
                 {children}

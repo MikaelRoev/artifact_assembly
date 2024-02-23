@@ -3,6 +3,7 @@ import {Stage, Layer, Group, Text, Rect} from "react-konva";
 import { useState, useRef } from "react";
 import SelectedGroup from "../SelectedGroup/SelectedGroup";
 import FileHandling from "../FileHandling";
+import Konva from "konva";
 
 
 /**
@@ -14,11 +15,10 @@ import FileHandling from "../FileHandling";
  */
 const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
-	//const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
-
+	const [elements, setElements] = useState([]);
 	const selectedGroupRef= useRef(null);
 
 	const maxUndoSteps = 20;
@@ -178,11 +178,57 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	const handleDeselect = () => {
 		const selectedGroup = selectedGroupRef.current;
 		if (selectedGroup) {
-			elements.add(selectedGroup.getChildren());
+			setElements([...elements, selectedGroup.getChildren()]);
 			selectedGroup.removeChildren();
-
 		}
 	};
+
+	// Function to add new Konva node objects
+	useEffect(() => {
+			// Create new Konva node objects
+			const rect = new window.Konva.Rect({
+				x: 20,
+				y: 20,
+				width: 100,
+				height: 50,
+				fill: 'blue',
+			});
+
+			const text = new window.Konva.Text({
+				x: 150,
+				y: 20,
+				text: 'Hello, Konva!',
+				fontSize: 20,
+				fill: 'green',
+			});
+
+			const group = new window.Konva.Group({
+				x: 250,
+				y: 20,
+			});
+
+			const rect1 = new window.Konva.Rect({
+				x: 0,
+				y: 0,
+				width: 50,
+				height: 50,
+				fill: 'red',
+			});
+
+			const rect2 = new window.Konva.Rect({
+				x: 0,
+				y: 60,
+				width: 50,
+				height: 50,
+				fill: 'yellow',
+			});
+
+			group.add(rect1);
+			group.add(rect2);
+
+			// Update state with new Konva node objects
+			setElements([...elements, rect, text, group]);
+	}, []);
 
 	/**
 	 * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
@@ -256,45 +302,63 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setHistory(newHistory);
 	}
 
-	// Callback function to get the groupRef from SelectedGroup
-	const handleGroupRef = (ref) => {
-		selectedGroupRef.current = ref;
-	};
+	useEffect(() => {
+		console.log("element is type of ", elements[0] instanceof window.Konva.Node);
 
-	const elements = [
-		<Rect
-			key="rect"
-			x={20}
-			y={20}
-			width={100}
-			height={50}
-			fill="blue"
-		/>,
-		<Text
-			key="text"
-			x={150}
-			y={20}
-			text="Hello, Konva!"
-			fontSize={20}
-			fill="green"
-		/>,
-		<Group key="group" >
-			<Rect
-				x={250}
-				y={20}
-				width={50}
-				height={50}
-				fill="red"
-			/>
-			<Rect
-				x={250}
-				y={80}
-				width={50}
-				height={50}
-				fill="yellow"
-			/>
-		</Group>
-	]
+		const onSelect = (event, element) => {
+			handleSelect(element);
+			event.target.moveToTop();
+			//TODO: make group move on top
+		}
+
+		const cursorToPointer = (event) => {
+			const container = event.target.getStage().container();
+			container.style.cursor = "pointer";
+		}
+
+		const cursorToDefault = (event) => {
+			const container = event.target.getStage().container();
+			container.style.cursor = "default";
+		}
+
+		// add change update?
+		/*
+        onDragEnd: (e) => {
+            const changes = images.slice();
+            changes[index] = {
+                ...shapeProps,
+                x: e.target.x(),
+                y: e.target.y(),
+            };
+            setImages(changes);
+            updateHistory(changes);
+
+        },
+         */
+		elements.forEach((element) => {
+			element.on('click', (event) => {
+				onSelect(event, element);
+			});
+			element.on('tap', (event) => {
+				onSelect(event, element);
+			});
+			element.on('mouseenter', (event) => {
+				cursorToPointer(event);
+			});
+			element.on('mouseleave', (event) => {
+				cursorToDefault(event);
+			});
+		});
+
+		return () => {
+			elements.forEach((element) => {
+				element.off('click');
+				element.off('tap');
+				element.off('mouseenter');
+				element.off('mouseleave');
+			});
+		}
+	}, [elements]);
 
 	return (
 		<>
@@ -306,52 +370,11 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				onWheel={zoomStage}
 				ref={stageRef}>
 				<Layer className="layer">
-					<SelectedGroup groupRefCallback={handleGroupRef}>
+					<SelectedGroup selectedGroupRef={selectedGroupRef}>
 						<Rect width={100} height={100} fill="red"/>
 						<Rect width={100} height={100} x={200} y={200} fill="blue"/>
 					</SelectedGroup>
 					{
-						// elements
-						(elements.length > 0) && elements.map((element, index) => {
-							// for each
-							return React.cloneElement(element, {
-								// add select
-								onClick: (event) => {
-									handleSelect(element);
-									event.target.moveToTop();
-									//TODO: make group move on top
-								},
-								onTap: (event) => {
-									handleSelect(element);
-									event.target.moveToTop();
-								},
-								// add mouse pointer change
-								onMouseEnter: (e) => {
-									// Adds a pointer cursor when hovering over the image
-									const container = e.target.getStage().container();
-									container.style.cursor = "pointer";
-								},
-								onMouseLeave: (e) => {
-									const container = e.target.getStage().container();
-									container.style.cursor = "default";
-								},
-								// add change update?
-								/*
-								onDragEnd: (e) => {
-									const changes = images.slice();
-									changes[index] = {
-										...shapeProps,
-										x: e.target.x(),
-										y: e.target.y(),
-									};
-									setImages(changes);
-									updateHistory(changes);
-
-								},
-								 */
-							});
-
-						})
 							/*
 							<ElementNode
 								key={element.key}
