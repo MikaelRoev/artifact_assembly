@@ -474,7 +474,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 				onTouchStart={handleClick}
 				ref={stageRef}>
 				<Layer className="layer">
-					<SelectedGroup>
+					<SelectedGroup ref={selectedGroupRef}>
 						<Rect
 							width={100}
 							height={100}

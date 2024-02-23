@@ -3,7 +3,7 @@ import React, {useContext, useEffect, useRef} from "react";
 import ResizeContext from "../pages/Canvas/Context/ResizeContext";
 import LockContext from "../pages/Canvas/Context/LockContext";
 
-const SelectedGroup = ({children, ref}) => {
+const SelectedGroup = ({children}) => {
     const groupRef = useRef(null);
     const trRef = useRef(null);
     const {resize} = useContext(ResizeContext);
