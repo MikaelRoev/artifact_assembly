@@ -1,6 +1,6 @@
 // import { initialImages } from "../../assets/InitialImages";
 import React, {useEffect, useRef, useState} from "react";
-import {Layer, Stage} from "react-konva";
+import {Layer, Stage, Transformer} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 
 /**
@@ -15,6 +15,9 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	const [selectedIndecies, setSelectedIndecies] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+
+	const trRef = useRef();
+	const selectedElements = selectedIndecies.map((index)=>{return images[index]});
 
 	const maxUndoSteps = 20;
 
@@ -192,6 +195,14 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setSelectedIndecies([...selectedIndecies, index]);
 	};
 
+	useEffect(() => {
+		// we need to attach transformer manually
+		//trRef.current.nodes([]);
+		trRef.current.getLayer().batchDraw();
+	},[selectedIndecies]);
+
+	useEffect()
+
 	/**
 	 * Undoes the last action in the history.
 	 */
@@ -245,6 +256,21 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 							/>
 						);
 					})}
+				<Transformer
+					ref={trRef}
+					boundBoxFunc={(oldBox, newBox) => {
+						// limit resize
+						if (newBox.width < 5 || newBox.height < 5) {
+							return oldBox;
+						}
+						return newBox;
+					}}
+					onDragMove={(e) => {
+						//Moves selected image on top (z-index)
+						e.target.moveToTop();
+					}}
+					resizeEnabled={true}
+				/>
 			</Layer>
 		</Stage>
 	);

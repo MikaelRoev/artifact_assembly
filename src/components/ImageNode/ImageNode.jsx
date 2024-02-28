@@ -50,13 +50,7 @@ const ImageNode = ({
 		} else return null;
 	};
 
-	useEffect(() => {
-		if (isSelected) {
-			// we need to attach transformer manually
-			trRef.current.nodes([imageRef.current]);
-			trRef.current.getLayer().batchDraw();
-		}
-	}, [isSelected]);
+
 
 	useEffect(() => {
 		if (imageSrc) {
