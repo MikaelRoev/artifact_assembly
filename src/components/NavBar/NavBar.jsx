@@ -6,12 +6,13 @@ import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
+
 /**
  * Creates a navigation bar that is at the top of the project page.
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({takeScreenshot, openScoreWindow}) => {
+const NavBar = ({takeScreenshot}) => {
     const {grid, setGrid} = useContext(GridContext);
     const {resize, setResize} = useContext(ResizeContext);
     const {lock, setLock} = useContext(LockContext);
@@ -140,6 +141,16 @@ const NavBar = ({takeScreenshot, openScoreWindow}) => {
             return () => screenshot.removeEventListener("click", handleScreenShot);
         }
     }, [takeScreenshot, handleFileButtonClick]);
+
+    /**
+     * Function to open up the score window for all the images on the canvas.
+     * @returns Void
+     */
+    const openScoreWindow = async () => {
+        document.getElementById("scoreWindow").style.visibility = "visible";
+        handleFileButtonClick()
+    };
+
 
     return (
         <nav className="navbar">

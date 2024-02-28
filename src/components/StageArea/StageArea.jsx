@@ -189,7 +189,7 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	 * @param imageId
 	 */
 	const selectImageId = (imageId) => {
-		setSelectedImageId(Number(imageId));
+		setSelectedImageId(imageId);
 		console.log(selectedImageId);
 	};
 
@@ -225,7 +225,7 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 								shapeProps={image}
 								isSelected={image.id === selectedImageId}
 								onSelect={() => {
-									selectImageId(image.id.toString());
+									selectImageId(image.id);
 								}}
 								onChange={(newAttrs) => {
 									const rects = images.slice();

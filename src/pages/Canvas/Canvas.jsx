@@ -6,8 +6,7 @@ import GridContext from "./Context/GridContext";
 import ResizeContext from "./Context/ResizeContext";
 import LockContext from "./Context/LockContext";
 import ImageContext from "./Context/ImageContext";
-import {dialog} from "@tauri-apps/api";
-import imageNode from "../../components/ImageNode/ImageNode";
+import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 
 /**
  * Creates a project page.
@@ -71,38 +70,15 @@ const Canvas = () => {
         document.body.removeChild(link);
     }
 
-    /**
-     * Function to open up the score window for all the images on the canvas.
-     * @returns Void
-     */
-    const openScoreWindow = async () => {
-        const layer = layerRef.current;
-
-        if (layer) {
-            const imageNodes = layer.getChildren().filter((child) => child.getClassName() === 'Image');
-            const imageData = imageNodes.map((image) => {
-                return {
-                    id: image.name(),
-                    width: image.width().toFixed(0),
-                    height: image.height().toFixed(0),
-                }
-            });
-            const message = imageData.map(data => `ID: ${data.id}, Width: ${data.width}, Height: ${data.height}`).join('\n')
-            await dialog.message(message, {
-                title: "Score Window",
-                type: "info"
-            });
-        }
-    };
-
     return (
         <ImageContext.Provider value={providerValue}>
             <GridContext.Provider value={providerValue}>
                 <ResizeContext.Provider value={providerValue}>
                     <LockContext.Provider value={providerValue}>
                         <div className="stage-container">
-                            <NavBar takeScreenshot={takeScreenshot} openScoreWindow={openScoreWindow} />
+                            <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
                             <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
+                            <ScoreWindow layerRef={layerRef}/>
                         </div>
                     </LockContext.Provider>
                 </ResizeContext.Provider>
