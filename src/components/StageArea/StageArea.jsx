@@ -12,7 +12,7 @@ import ImageNode from "../ImageNode/ImageNode";
  */
 const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
-	const [selectedImageId, setSelectedImageId] = useState(null);
+	const [selectedIndecies, setSelectedIndecies] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
@@ -33,13 +33,13 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 
 	/**
 	 * Sets up and cleans up the delete event listener.
-	 */
+	 *
 	useEffect(() => {
 
 		/**
 	 	* Deletes the selected images if the delete key is pressed.
 	 	* @param e the event.
-		 */
+		 *
 		const handleDeletePressed = (e) => {
 			if (e.key === "Delete" && selectedImageId !== null) {
 				const updatedImages = images.filter(
@@ -55,6 +55,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
 	}, [selectedImageId, images]);
+		*/
 
 	/**
 	 * Updates the uploaded images when an image changes state.
@@ -135,7 +136,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 */
 	const checkDeselect = (e) => {
 		if (e.target === e.currentTarget) {
-			setSelectedImageId(null);
+			setSelectedIndecies([]);
 		}
 	};
 
@@ -184,12 +185,11 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	};
 
 	/**
-	 * Selects an image.
-	 * @param imageId
+	 * Selects an element
+	 * @param index
 	 */
-	const selectImageId = (imageId) => {
-		setSelectedImageId(Number(imageId));
-		console.log(selectedImageId);
+	const selectIndex = (index) => {
+		setSelectedIndecies([...selectedIndecies, index]);
 	};
 
 	/**
@@ -220,9 +220,9 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 								key={image.id} // Updated key prop
 								imageURL={image.imageUrl}
 								shapeProps={image}
-								isSelected={image.id === selectedImageId}
+								isSelected={ selectedIndecies.includes(i) }
 								onSelect={() => {
-									selectImageId(image.id.toString());
+									selectIndex(i);
 								}}
 								onChange={(newAttrs) => {
 									const rects = images.slice();
