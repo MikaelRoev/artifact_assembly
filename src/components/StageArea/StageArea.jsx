@@ -17,7 +17,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	const trRef = useRef();
-	const selectedElements = selectedIndecies.map((index)=>{return images[index]});
+
 
 	const maxUndoSteps = 20;
 
@@ -29,6 +29,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 * Sets the images when the list of uploaded images changes.
 	 */
 	useEffect(() => {
+		const selectedElements = selectedIndecies.map((index)=>{return images[index]});
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
@@ -200,8 +201,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		//trRef.current.nodes([]);
 		trRef.current.getLayer().batchDraw();
 	},[selectedIndecies]);
-
-	useEffect()
 
 	/**
 	 * Undoes the last action in the history.
