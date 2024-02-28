@@ -3,7 +3,6 @@ import {Stage, Layer, Group, Text, Rect} from "react-konva";
 import { useState, useRef } from "react";
 import SelectedGroup from "../SelectedGroup/SelectedGroup";
 import FileHandling from "../FileHandling";
-import Konva from "konva";
 
 
 /**
@@ -13,7 +12,7 @@ import Konva from "konva";
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({ uploadedImages, stageRef}) => {
+const StageArea = ({ uploadedImages, stageRef }) => {
 	const [images, setImages] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);

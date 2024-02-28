@@ -26,6 +26,7 @@ function SelectedGroup({children, selectedGroupRef}) {
             <Transformer
                 ref={trRef}
                 resizeEnabled={resize}
+                keepRatio={true}
             />
         </>
     );
