@@ -1,6 +1,5 @@
-// import { initialImages } from "../../assets/InitialImages";
 import React, {useEffect, useRef, useState} from "react";
-import {Layer, Stage, Transformer} from "react-konva";
+import {Layer, Stage, Transformer, Rect} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 
 /**
@@ -12,12 +11,11 @@ import ImageNode from "../ImageNode/ImageNode";
  */
 const StageArea = ({ uploadedImages, stageRef}) => {
 	const [images, setImages] = useState([]);
-	const [selectedIndecies, setSelectedIndecies] = useState([]);
+	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	const trRef = useRef();
-
 
 	const maxUndoSteps = 20;
 
@@ -29,7 +27,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 * Sets the images when the list of uploaded images changes.
 	 */
 	useEffect(() => {
-		const selectedElements = selectedIndecies.map((index)=>{return images[index]});
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
@@ -140,7 +137,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 */
 	const checkDeselect = (e) => {
 		if (e.target === e.currentTarget) {
-			setSelectedIndecies([]);
+			selectedElements.forEach((element) => element.draggable(false));
+			setSelectedElements([]);
 		}
 	};
 
@@ -191,16 +189,27 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	/**
 	 * Selects an element
 	 * @param index
-	 */
+	 *
 	const selectIndex = (index) => {
 		setSelectedIndecies([...selectedIndecies, index]);
 	};
+		*/
 
 	useEffect(() => {
-		// we need to attach transformer manually
-		//trRef.current.nodes([]);
-		trRef.current.getLayer().batchDraw();
-	},[selectedIndecies]);
+		if (trRef.current && selectedElements.length > 0)
+		trRef.current.nodes(selectedElements);
+		selectedElements.forEach((element) => element.draggable(true));
+	},[selectedElements]);
+
+	const handleElementClick = (e) => {
+		const element = e.target;
+		const index = selectedElements.indexOf(element);
+
+		if (index === -1) {
+			// not already selected
+			setSelectedElements([...selectedElements, element])
+		}
+	}
 
 	/**
 	 * Undoes the last action in the history.
@@ -216,14 +225,14 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		<Stage
 			width={window.innerWidth}
 			height={window.innerHeight}
-			draggable
+			//draggable
 			className="stage"
 			onWheel={zoomStage}
 			onMouseDown={checkDeselect}
 			onTouchStart={checkDeselect}
 			ref={stageRef}>
 			<Layer className="layer">
-				{images.length > 0 &&
+				{/*images.length > 0 &&
 					images.map((image, i) => {
 						return (
 							<ImageNode
@@ -254,8 +263,29 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 								}}
 							/>
 						);
-					})}
-				<Transformer
+					})
+					*/}
+				<Rect
+					x={100}
+					y={100}
+					width={100}
+					height={100}
+					fill={'green'}
+					onClick={(e) => handleElementClick(e)}
+					onTap={(e) => handleElementClick(e)}
+				/>
+				<Rect
+					x={200}
+					y={100}
+					width={100}
+					height={100}
+					fill={'green'}
+					onClick={(e) => handleElementClick(e)}
+					onTap={(e) => handleElementClick(e)}
+				/>
+				{
+					selectedElements.length > 0 &&
+					<Transformer
 					ref={trRef}
 					boundBoxFunc={(oldBox, newBox) => {
 						// limit resize
@@ -268,8 +298,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 						//Moves selected image on top (z-index)
 						e.target.moveToTop();
 					}}
-					resizeEnabled={true}
-				/>
+					resizeEnabled={true}/>
+				}
 			</Layer>
 		</Stage>
 	);
