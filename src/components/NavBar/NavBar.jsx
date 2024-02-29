@@ -12,8 +12,6 @@ import ImageContext from "../../pages/Canvas/Context/ImageContext";
  * @constructor
  */
 const NavBar = ({takeScreenshot}) => {
-    const {grid, setGrid} = useContext(GridContext);
-    const {resize, setResize} = useContext(ResizeContext);
     const {lock, setLock} = useContext(LockContext);
     const {
         images,
@@ -60,7 +58,7 @@ const NavBar = ({takeScreenshot}) => {
                     });
                     const newImage = {
                         imageUrl,
-                        id: Date.now(), // Assign a unique identifier using Date.now()
+                        id: Date.now().toString(), // Assign a unique identifier using Date.now()
                         // Other properties for the `shapeProps` object
                     };
                     newImages.push(newImage);
@@ -76,21 +74,8 @@ const NavBar = ({takeScreenshot}) => {
         handleFileButtonClick()
     };
 
-    const gridOptions = [10, 20, 30, 40, 50];
-    const gridText = grid !== 1 ? `Edit Grid (${grid} x ${grid})` : "Enable Grid";
-
-    const toggleResize = () => {
-        setResize((prevResize) => !prevResize);
-    };
-
     const toggleLock = () => {
         setLock((prevLock) => !prevLock);
-    };
-
-    const changeGrid = () => {
-        const nextGrid =
-            gridOptions[(gridOptions.indexOf(grid) + 1) % gridOptions.length];
-        setGrid(nextGrid);
     };
 
     const toggleFilter = () => {
@@ -181,12 +166,6 @@ const NavBar = ({takeScreenshot}) => {
                         </div>
                     )}
                 </div>
-
-                {/* <p onClick={grid !== 1 ? changeGrid : () => setGrid(10)}>{gridText}</p>
-				{grid !== 1 && <p onClick={() => setGrid(1)}>Disable Grid</p>} */}
-                {/* <p onClick={toggleResize}>
-					{resize ? "Disable Resize" : "Enable Resize"}
-				</p> */}
                 <p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
                 <p onClick={toggleFilter}>
                     {!filter ? "Enable Filter" : "Disable Filter"}

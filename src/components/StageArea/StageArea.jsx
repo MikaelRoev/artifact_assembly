@@ -1,6 +1,7 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Layer, Stage, Transformer, Rect} from "react-konva";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {Layer, Stage, Transformer} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
+import LockContext from "../../pages/Canvas/Context/LockContext";
 
 /**
  * Creates the canvas area in the project page.
@@ -18,6 +19,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 
 	const trRef = useRef();
 
+	const { isLocked } = useContext(LockContext);
+
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
@@ -31,33 +34,30 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
-
-
 	/**
 	 * Sets up and cleans up the delete event listener.
-	 *
+	 */
 	useEffect(() => {
 
 		/**
 	 	* Deletes the selected images if the delete key is pressed.
 	 	* @param e the event.
-		 *
+		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedImageId !== null) {
-				const updatedImages = images.filter(
-					(image) => image.id !== selectedImageId
-				);
-				console.log(`image ${selectedImageId} deleted`);
-				setImages(updatedImages);
-				setSelectedImageId(null);
+			if (e.key === "Delete" && selectedElements.length > 0) {
+				const selectedIds = selectedElements.map((element) => element.getId())
+
+				const newImages = images.filter((image) => !selectedIds.includes(image.id));
+
+				setImages(newImages);
+				setSelectedElements([]); // works
 			}
 		};
 		document.addEventListener("keydown", handleDeletePressed);
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [selectedImageId, images]);
-		*/
+	}, [images, selectedElements]);
 
 	/**
 	 * Updates the uploaded images when an image changes state.
@@ -228,12 +228,12 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		if (trRef.current && selectedElements.length > 0) {
 			trRef.current.nodes(selectedElements);
 			trRef.current.getLayer().batchDraw();
-			selectedElements.forEach((element) => element.draggable(true));
+			selectedElements.forEach((element) => element.draggable(!isLocked));
 		}
-	},[selectedElements]);
+	},[selectedElements, isLocked]);
 
 	/**
-	 * Event handler for element clicking. This will check the selection of the element
+	 * Event handler for element clicking. This will check the selection of the element.
 	 * @param e click event.
 	 */
 	const handleElementClick = (e) => {
@@ -270,24 +270,23 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		<Stage
 			width={window.innerWidth}
 			height={window.innerHeight}
-			//draggable
+			draggable
 			className="stage"
 			onWheel={zoomStage}
 			onMouseDown={checkDeselect}
 			onTouchStart={checkDeselect}
 			ref={stageRef}>
 			<Layer className="layer">
-				{/*images.length > 0 &&
+				{
+					images.length > 0 &&
 					images.map((image, i) => {
 						return (
 							<ImageNode
-								key={image.id} // Updated key prop
+								key={image.id}
+								id={image.id}
 								imageURL={image.imageUrl}
 								shapeProps={image}
-								isSelected={ selectedIndecies.includes(i) }
-								onSelect={() => {
-									selectIndex(i);
-								}}
+								onSelect={(e) => handleElementClick(e)}
 								onChange={(newAttrs) => {
 									const rects = images.slice();
 									rects[i] = newAttrs;
@@ -309,25 +308,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 							/>
 						);
 					})
-					*/}
-				<Rect
-					x={100}
-					y={100}
-					width={100}
-					height={100}
-					fill={'green'}
-					onClick={(e) => handleElementClick(e)}
-					onTap={(e) => handleElementClick(e)}
-				/>
-				<Rect
-					x={200}
-					y={100}
-					width={100}
-					height={100}
-					fill={'green'}
-					onClick={(e) => handleElementClick(e)}
-					onTap={(e) => handleElementClick(e)}
-				/>
+				}
 				{
 					selectedElements.length > 0 &&
 					<Transformer
@@ -343,7 +324,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 						//Moves selected image on top (z-index)
 						e.target.moveToTop();
 					}}
-					resizeEnabled={true}/>
+					resizeEnabled={false}
+					/>
 				}
 			</Layer>
 		</Stage>
