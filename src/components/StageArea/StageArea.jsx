@@ -14,6 +14,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [ctrlPressed, setCtrlPressed] = useState(false);
 
 	const trRef = useRef();
 
@@ -125,6 +126,39 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	}, [history, historyIndex]);
 
 	/**
+	 * Set up and cleans up the deselect check.
+	 */
+	useEffect(() => {
+		/**
+		 * The ctrl key down event handler.
+		 * @param e
+		 */
+		const handleCtrlDown = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(true);
+			}
+		};
+
+		/**
+		 * The ctrl key up event handler.
+		 * @param e
+		 */
+		const handleCtrlUp = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(false);
+			}
+		};
+
+		document.addEventListener('keydown', handleCtrlDown);
+		document.addEventListener('keyup', handleCtrlUp);
+
+		return () => {
+			document.removeEventListener('keydown', handleCtrlDown);
+			document.removeEventListener('keyup', handleCtrlUp);
+		};
+	}, []);
+
+	/**
 	 * Saves the image positions.
 	 */
 	const saveImagePositions = () => {
@@ -132,11 +166,12 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	};
 
 	/**
-	 * Deselects when the mouse clicks on an empty area on the canvas.
+	 * Deselects when the mouse clicks on an empty area on the canvas
+	 * and ctrl key is not pressed.
 	 * @param e the event.
 	 */
 	const checkDeselect = (e) => {
-		if (e.target === e.currentTarget) {
+		if (e.target === e.currentTarget && !ctrlPressed) {
 			selectedElements.forEach((element) => element.draggable(false));
 			setSelectedElements([]);
 		}
@@ -196,18 +231,31 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		*/
 
 	useEffect(() => {
-		if (trRef.current && selectedElements.length > 0)
-		trRef.current.nodes(selectedElements);
-		selectedElements.forEach((element) => element.draggable(true));
+		if (trRef.current && selectedElements.length > 0) {
+			trRef.current.nodes(selectedElements);
+			trRef.current.getLayer().batchDraw();
+			selectedElements.forEach((element) => element.draggable(true));
+		}
 	},[selectedElements]);
 
 	const handleElementClick = (e) => {
 		const element = e.target;
-		const index = selectedElements.indexOf(element);
 
-		if (index === -1) {
+		if (selectedElements.includes(element)) {
+			// already selected
+			if (ctrlPressed) {
+
+			} else {
+
+			}
+		} else {
 			// not already selected
-			setSelectedElements([...selectedElements, element])
+			if (ctrlPressed) {
+				setSelectedElements([...selectedElements, element]);
+			} else {
+				selectedElements.forEach((element) => element.draggable(false));
+				setSelectedElements([element]);
+			}
 		}
 	}
 
