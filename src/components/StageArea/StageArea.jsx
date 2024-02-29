@@ -222,14 +222,8 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	};
 
 	/**
-	 * Selects an element
-	 * @param index
-	 *
-	const selectIndex = (index) => {
-		setSelectedIndecies([...selectedIndecies, index]);
-	};
-		*/
-
+	 * Updates the selected elements.
+	 */
 	useEffect(() => {
 		if (trRef.current && selectedElements.length > 0) {
 			trRef.current.nodes(selectedElements);
@@ -238,24 +232,27 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		}
 	},[selectedElements]);
 
+	/**
+	 * Event handler for element clicking. This will check the selection of the element
+	 * @param e click event.
+	 */
 	const handleElementClick = (e) => {
 		const element = e.target;
+		const index = selectedElements.indexOf(element);
 
-		if (selectedElements.includes(element)) {
-			// already selected
-			if (ctrlPressed) {
-
+		if (ctrlPressed) {
+			if (index !== -1) {
+				// already selected
+				const newSelected = [...selectedElements];
+				newSelected.splice(index, 1);
+				setSelectedElements(newSelected);
 			} else {
-
+				// not already selected
+				setSelectedElements([...selectedElements, element]);
 			}
 		} else {
-			// not already selected
-			if (ctrlPressed) {
-				setSelectedElements([...selectedElements, element]);
-			} else {
-				selectedElements.forEach((element) => element.draggable(false));
-				setSelectedElements([element]);
-			}
+			selectedElements.forEach((element) => element.draggable(false));
+			setSelectedElements([element]);
 		}
 	}
 
