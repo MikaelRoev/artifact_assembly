@@ -222,11 +222,12 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	};
 
 	/**
-	 * Updates the selected elements.
+	 * Updates the transformer to selected elements.
 	 */
 	useEffect(() => {
 		if (trRef.current && selectedElements.length > 0) {
 			trRef.current.nodes(selectedElements);
+			trRef.current.moveToTop();
 			trRef.current.getLayer().batchDraw();
 			selectedElements.forEach((element) => element.draggable(!isLocked));
 		}
@@ -238,6 +239,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 */
 	const handleElementClick = (e) => {
 		const element = e.target;
+		element.moveToTop();
 		const index = selectedElements.indexOf(element);
 
 		if (ctrlPressed) {
@@ -319,10 +321,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 							return oldBox;
 						}
 						return newBox;
-					}}
-					onDragMove={(e) => {
-						//Moves selected image on top (z-index)
-						e.target.moveToTop();
 					}}
 					resizeEnabled={false}
 					/>
