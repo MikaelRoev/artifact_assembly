@@ -72,17 +72,13 @@ const Canvas = () => {
 
     return (
         <ImageContext.Provider value={providerValue}>
-            <GridContext.Provider value={providerValue}>
-                <ResizeContext.Provider value={providerValue}>
-                    <LockContext.Provider value={providerValue}>
-                        <div className="stage-container">
-                            <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
-                            <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
-                            <ScoreWindow layerRef={layerRef}/>
-                        </div>
-                    </LockContext.Provider>
-                </ResizeContext.Provider>
-            </GridContext.Provider>
+            <LockContext.Provider value={providerValue}>
+                <div className="stage-container">
+                    <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
+                    <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
+                    <ScoreWindow layerRef={layerRef}/>
+                </div>
+            </LockContext.Provider>
         </ImageContext.Provider>
     );
 };

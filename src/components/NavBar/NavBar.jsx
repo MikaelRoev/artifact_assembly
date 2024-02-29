@@ -1,8 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
-import GridContext from "../../pages/Canvas/Context/GridContext";
-import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
