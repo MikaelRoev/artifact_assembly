@@ -14,14 +14,15 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [ctrlPressed, setCtrlPressed] = useState(false);
 
 	const trRef = useRef();
 
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
-	const min = 0.001; //zoom out limit
-	const max = 300; //zoom in limit
+	const zoomMin = 0.001; //zoom out limit
+	const zoomMax = 300; //zoom in limit
 
 	/**
 	 * Sets the images when the list of uploaded images changes.
@@ -29,8 +30,6 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	useEffect(() => {
 		setImages(uploadedImages);
 	}, [uploadedImages]);
-
-
 
 	/**
 	 * Sets up and cleans up the delete event listener.
@@ -125,6 +124,39 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	}, [history, historyIndex]);
 
 	/**
+	 * Set up and cleans up the deselect check.
+	 */
+	useEffect(() => {
+		/**
+		 * The ctrl key down event handler.
+		 * @param e
+		 */
+		const handleCtrlDown = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(true);
+			}
+		};
+
+		/**
+		 * The ctrl key up event handler.
+		 * @param e
+		 */
+		const handleCtrlUp = (e) => {
+			if (e.key === 'Control') {
+				setCtrlPressed(false);
+			}
+		};
+
+		document.addEventListener('keydown', handleCtrlDown);
+		document.addEventListener('keyup', handleCtrlUp);
+
+		return () => {
+			document.removeEventListener('keydown', handleCtrlDown);
+			document.removeEventListener('keyup', handleCtrlUp);
+		};
+	}, []);
+
+	/**
 	 * Saves the image positions.
 	 */
 	const saveImagePositions = () => {
@@ -132,14 +164,22 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	};
 
 	/**
-	 * Deselects when the mouse clicks on an empty area on the canvas.
+	 * Deselects when the mouse clicks on an empty area on the canvas
+	 * and ctrl key is not pressed.
 	 * @param e the event.
 	 */
 	const checkDeselect = (e) => {
-		if (e.target === e.currentTarget) {
-			selectedElements.forEach((element) => element.draggable(false));
-			setSelectedElements([]);
+		if (e.target === e.currentTarget && !ctrlPressed) {
+			deselectAll();
 		}
+	};
+
+	/**
+	 * Deselects all selected elements.
+	 */
+	const deselectAll = () => {
+		selectedElements.forEach((element) => element.draggable(false));
+		setSelectedElements([]);
 	};
 
 	/**
@@ -163,7 +203,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		};
 
 		const zoomFactor = event.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
-		const newScale = clamp(oldScale * zoomFactor, min, max);
+		const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
 
 		stage.scale({ x: newScale, y: newScale });
 
@@ -186,28 +226,31 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 		return Math.min(Math.max(value, min), max);
 	};
 
-	/**
-	 * Selects an element
-	 * @param index
-	 *
-	const selectIndex = (index) => {
-		setSelectedIndecies([...selectedIndecies, index]);
-	};
-		*/
 
 	useEffect(() => {
-		if (trRef.current && selectedElements.length > 0)
-		trRef.current.nodes(selectedElements);
-		selectedElements.forEach((element) => element.draggable(true));
+		console.log('update selected')
+		if (trRef.current && selectedElements.length > 0)  {
+			console.log('has tr and selected')
+			trRef.current.nodes(selectedElements); // is this a problem
+			selectedElements.forEach((element) => element.draggable(true));
+		}
 	},[selectedElements]);
 
 	const handleElementClick = (e) => {
 		const element = e.target;
-		const index = selectedElements.indexOf(element);
+		console.log("handleElementClick")
 
-		if (index === -1) {
+		if (selectedElements.includes(element)) { //crash
+			// already selected
+
+		} else {
 			// not already selected
-			setSelectedElements([...selectedElements, element])
+			if (ctrlPressed) {
+				setSelectedElements([...selectedElements, element]);
+			} else {
+				deselectAll();
+				setSelectedElements([element]);
+			}
 		}
 	}
 
