@@ -7,10 +7,11 @@ import LockContext from "../../pages/Canvas/Context/LockContext";
  * Creates the canvas area in the project page.
  * @param uploadedImages is the initial images on the canvas.
  * @param stageRef is the reference for the stage used.
+ * @param layerRef is the reference for the layer inside the stage.
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({ uploadedImages, stageRef}) => {
+const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const [images, setImages] = useState([]);
 	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
@@ -278,9 +279,10 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			onMouseDown={checkDeselect}
 			onTouchStart={checkDeselect}
 			ref={stageRef}>
-			<Layer className="layer">
-				{
-					images.length > 0 &&
+			<Layer
+				className="layer"
+				ref={layerRef}>
+				{images.length > 0 &&
 					images.map((image, i) => {
 						return (
 							<ImageNode

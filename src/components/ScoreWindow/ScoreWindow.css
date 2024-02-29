@@ -1,0 +1,71 @@
+.window {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 250px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
+    background: #fff;
+    visibility: hidden;
+}
+
+.window-content {
+    background: #fff;
+    color: #000;
+    height: calc(100% - 30px);
+    font-family: monospace;
+    padding: 5px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.window-top, .window-top-no-bind {
+    cursor: move;
+    height: 30px;
+    border-bottom: 1px solid rgba(0,0,0,0.5);
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    padding: 5px;
+    background-color: #ddd;
+
+}
+
+.window-top-no-bind {
+    cursor: inherit;
+}
+
+.window-top-left {
+    float: left;
+}
+
+.square {
+    float: right;
+    height: 20px;
+    width: 20px;
+    border: none;
+    margin-right: 6px;
+    box-shadow: 1px 1px 2px #000;
+    position: relative;
+}
+
+.square:before {
+    content: "X";
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+}
+
+.red {
+    cursor: pointer;
+    background-color: red;
+}
+
+#scoreWindow {
+    z-index: 999;
+}

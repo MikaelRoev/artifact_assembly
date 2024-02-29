@@ -1,5 +1,4 @@
-import React from "react";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
@@ -7,6 +6,7 @@ import GridContext from "./Context/GridContext";
 import ResizeContext from "./Context/ResizeContext";
 import LockContext from "./Context/LockContext";
 import ImageContext from "./Context/ImageContext";
+import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 
 /**
  * Creates a project page.
@@ -23,7 +23,8 @@ const Canvas = () => {
     const [hue, setHue] = useState(0);
     const [contrast, setContrast] = useState(0);
     const [luminance, setLuminance] = useState(0);
-    const stageRef = useState(null)
+    const stageRef = useRef(null)
+    const layerRef = useRef(null)
 
     const providerValue = {
         grid,
@@ -75,8 +76,9 @@ const Canvas = () => {
                 <ResizeContext.Provider value={providerValue}>
                     <LockContext.Provider value={providerValue}>
                         <div className="stage-container">
-                            <NavBar takeScreenshot={takeScreenshot}/>
-                            <StageArea uploadedImages={images} stageRef={stageRef}/>
+                            <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
+                            <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
+                            <ScoreWindow layerRef={layerRef}/>
                         </div>
                     </LockContext.Provider>
                 </ResizeContext.Provider>
