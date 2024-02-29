@@ -1,5 +1,5 @@
 // import { initialImages } from "../../assets/InitialImages";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Layer, Stage} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 
@@ -7,10 +7,11 @@ import ImageNode from "../ImageNode/ImageNode";
  * Creates the canvas area in the project page.
  * @param uploadedImages is the initial images on the canvas.
  * @param stageRef is the reference for the stage used.
+ * @param layerRef is the reference for the layer inside the stage.
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({ uploadedImages, stageRef}) => {
+const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const [images, setImages] = useState([]);
 	const [selectedImageId, setSelectedImageId] = useState(null);
 	const [history, setHistory] = useState([]);
@@ -188,7 +189,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 	 * @param imageId
 	 */
 	const selectImageId = (imageId) => {
-		setSelectedImageId(Number(imageId));
+		setSelectedImageId(imageId);
 		console.log(selectedImageId);
 	};
 
@@ -212,7 +213,9 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 			onMouseDown={checkDeselect}
 			onTouchStart={checkDeselect}
 			ref={stageRef}>
-			<Layer className="layer">
+			<Layer
+				className="layer"
+				ref={layerRef}>
 				{images.length > 0 &&
 					images.map((image, i) => {
 						return (
@@ -222,7 +225,7 @@ const StageArea = ({ uploadedImages, stageRef}) => {
 								shapeProps={image}
 								isSelected={image.id === selectedImageId}
 								onSelect={() => {
-									selectImageId(image.id.toString());
+									selectImageId(image.id);
 								}}
 								onChange={(newAttrs) => {
 									const rects = images.slice();

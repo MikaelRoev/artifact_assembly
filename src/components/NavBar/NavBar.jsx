@@ -6,6 +6,7 @@ import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
+
 /**
  * Creates a navigation bar that is at the top of the project page.
  * @returns {Element}
@@ -60,7 +61,8 @@ const NavBar = ({takeScreenshot}) => {
                     });
                     const newImage = {
                         imageUrl,
-                        id: Date.now(), // Assign a unique identifier using Date.now()
+                        id: Date.now().toString(), // Assign a unique identifier using Date.now()
+                        name: file.name,
                         // Other properties for the `shapeProps` object
                     };
                     newImages.push(newImage);
@@ -140,6 +142,16 @@ const NavBar = ({takeScreenshot}) => {
         }
     }, [takeScreenshot, handleFileButtonClick]);
 
+    /**
+     * Function to open up the score window for all the images on the canvas.
+     * @returns Void
+     */
+    const openScoreWindow = async () => {
+        document.getElementById("scoreWindow").style.visibility = "visible";
+        handleFileButtonClick()
+    };
+
+
     return (
         <nav className="navbar">
             <div className="nav-left">
@@ -176,6 +188,9 @@ const NavBar = ({takeScreenshot}) => {
                                         onChange={handleInputChange}
                                     />
                                     <span>%</span>
+                                </li>
+                                <li>
+                                    <span id={"showScoreWindowButton"} onClick={openScoreWindow}>Open score window</span>
                                 </li>
                             </ul>
                         </div>
