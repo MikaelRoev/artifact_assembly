@@ -24,7 +24,6 @@ const Canvas = () => {
     const layerRef = useRef(null)
 
 	const providerValue = {
-		lock,
 		images,
 		filter,
 		saturation,
@@ -36,7 +35,6 @@ const Canvas = () => {
 		setContrast,
 		setLuminance,
 		setFilter,
-		setLock,
 		setImages,
 	};
 
@@ -66,7 +64,7 @@ const Canvas = () => {
 
     return (
         <ImageContext.Provider value={providerValue}>
-            <LockContext.Provider value={providerValue}>
+            <LockContext.Provider value={{lock, setLock}}>
                 <div className="stage-container">
                     <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
                     <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />

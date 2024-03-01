@@ -4,6 +4,7 @@ import ImageNode from "../ImageNode/ImageNode";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import {saveToFile, readFile} from "../FileHandling"
 import {dialog} from "@tauri-apps/api";
+import {ProjectContext} from "../ProjectProvider";
 
 /**
  * Creates the canvas area in the project page.
@@ -19,18 +20,31 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
-	const [projectName, setProjectName] = useState("");
-	const [projectDescription, setProjectDescription] = useState("");
 
 	const trRef = useRef();
 
-	const { isLocked } = useContext(LockContext);
+	const {isLocked} = useContext(LockContext);
+	const {project, setProject} = useContext(ProjectContext);
 
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
+
+	console.log(project);
+
+	/**
+	 * Update the stage according to the project.
+	 */
+	useEffect(() => {
+		const stage = stageRef.current;
+		if (!stage) return;
+		stage.position({ x: project.x, y: project.y });
+		stage.scale({ x: project.zoom, y: project.zoom });
+		stage.batchDraw();
+	}, [project]);
+
 
 	/**
 	 * Sets the images when the list of uploaded images changes.
@@ -198,15 +212,12 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 
 		const zoomFactor = event.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
 		const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
-
-		stage.scale({ x: newScale, y: newScale });
-
-		const newPos = {
+		setProject({
+			...project,
+			zoom: newScale,
 			x: pointer.x - mousePointTo.x * newScale,
 			y: pointer.y - mousePointTo.y * newScale,
-		};
-		stage.position(newPos);
-		stage.batchDraw();
+		});
 	};
 
 	/**
@@ -287,10 +298,9 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 
 	/**
 	 * Opens the "open project"-dialog window
-	 * @param {Konva.Stage} stage of the project.
 	 * @return {Promise<void>} when the dialog window closes.
 	 */
-	const openProjectDialog = async (stage) => {
+	const openProjectDialog = async () => {
 		try {
 			const filePath = await dialog.open({
 				title: "Open Project",
@@ -319,7 +329,10 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 			});
 			if (filePath) {
 				// get the project name from the file path.
-				setProjectName(filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1'));
+				setProject({
+					...project,
+					name: filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1')
+				});
 				await saveToFile(projectToJSON(), filePath);
 				await readFile(filePath);
 			} else {
@@ -336,17 +349,6 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	 * @returns {string} containing the resulting JSON.
 	 */
 	const projectToJSON = ()   => {
-		const stage = stageRef.current;
-
-		const project = {
-			name: projectName,
-			description: projectDescription,
-			x: stage.x(),
-			y: stage.y(),
-			zoom: stage.scaleX(),
-			elements: images
-		};
-
 		return JSON.stringify(project);
 	}
 
@@ -357,17 +359,8 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const jsonToProject = (json) => {
 		try {
 			const project = JSON.parse(json);
-			setProjectName(project.name);
-			setProjectDescription(project.description);
-
-			const stage = stageRef.current;
-			if (stage === null) return;
-
-			// Set stage properties
-			stage.x(project.x);
-			stage.y(project.y);
-			stage.scaleX(project.zoom);
-			stage.scaleY(project.zoom);
+			//setProjectName(project.name);
+			//setProjectDescription(project.description);
 
 			setImages(project.elements)
 		} catch (error) {
@@ -388,8 +381,8 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 			<Layer
 				className="layer"
 				ref={layerRef}>
-				{images.length > 0 &&
-					images.map((image, i) => {
+				{project.elements.length > 0 &&
+					project.elements.map((image, i) => {
 						return (
 							<ImageNode
 								key={image.id}
