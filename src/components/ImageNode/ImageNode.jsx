@@ -40,14 +40,18 @@ const ImageNode = ({
 		} else return null;
 	};
 
-
-
+	/**
+	 * Gets the image
+	 */
 	useEffect(() => {
 		if (imageSrc) {
 			imageRef.current.cache();
 		}
 	}, [imageSrc]);
 
+	/**
+	 * Returns a Konva image
+	 */
 	return (
 		<>
 			<KonvaImage

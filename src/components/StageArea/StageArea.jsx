@@ -19,9 +19,7 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const [ctrlPressed, setCtrlPressed] = useState(false);
 
 	const trRef = useRef();
-
 	const { isLocked } = useContext(LockContext);
-
 	const maxUndoSteps = 20;
 
 	const zoomScale = 1.17; //How much zoom each time
@@ -269,6 +267,10 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 		}
 	};
 
+	/**
+	 * Returns a stage with a layer within.
+	 * Returns an imageNode and a transformer within the layer.
+	 */
 	return (
 		<Stage
 			width={window.innerWidth}
