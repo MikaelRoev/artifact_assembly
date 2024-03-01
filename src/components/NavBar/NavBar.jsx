@@ -55,6 +55,7 @@ const NavBar = ({takeScreenshot}) => {
                         };
                     });
                     const newImage = {
+                        className: 'Image',
                         imageUrl,
                         id: Date.now().toString(), // Assign a unique identifier using Date.now()
                         name: file.name,
@@ -132,7 +133,6 @@ const NavBar = ({takeScreenshot}) => {
         document.getElementById("scoreWindow").style.visibility = "visible";
         handleFileButtonClick()
     };
-
 
     return (
         <nav className="navbar">

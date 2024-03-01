@@ -4,6 +4,7 @@ import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
 import ImageContext from "./Context/ImageContext";
+import LockContext from "./Context/LockContext";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 
 /**

@@ -2,6 +2,8 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Layer, Stage, Transformer} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 import LockContext from "../../pages/Canvas/Context/LockContext";
+import {saveToFile, readFile} from "../FileHandling"
+import {dialog} from "@tauri-apps/api";
 
 /**
  * Creates the canvas area in the project page.
@@ -17,6 +19,8 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
+	const [projectName, setProjectName] = useState("");
+	const [projectDescription, setProjectDescription] = useState("");
 
 	const trRef = useRef();
 
@@ -27,9 +31,6 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
-
-	let projectName = "";
-	let projectDescription = "";
 
 	/**
 	 * Sets the images when the list of uploaded images changes.
@@ -100,7 +101,7 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				saveImagePositions();
+				saveProjectDialog().then(() => console.log("project saved"));
 			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
@@ -284,6 +285,96 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 		setHistory(newHistory);
 	}
 
+	/**
+	 * Opens the "open project"-dialog window
+	 * @param {Konva.Stage} stage of the project.
+	 * @return {Promise<void>} when the dialog window closes.
+	 */
+	const openProjectDialog = async (stage) => {
+		try {
+			const filePath = await dialog.open({
+				title: "Open Project",
+				multiple: false,
+				filters: [{name: 'JSON Files', extensions: ['json']}]
+			});
+			if (filePath) {
+				jsonToProject(await readFile(filePath));
+			} else {
+				console.log('No file selected or operation cancelled.');
+			}
+		} catch (error) {
+			console.error('Error during open project dialog: ', error);
+		}
+	}
+
+
+	/**
+	 * Opens the "save project as"-dialog window.
+	 */
+	const saveProjectDialog = async () => {
+		try {
+			const filePath = await dialog.save({
+				title: 'Save Project As',
+				filters: [{name: 'JSON Files', extensions: ['json']}]
+			});
+			if (filePath) {
+				// get the project name from the file path.
+				setProjectName(filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1'));
+				await saveToFile(projectToJSON(), filePath);
+				await readFile(filePath);
+			} else {
+				console.log('No file selected or operation cancelled.');
+			}
+		} catch (error) {
+			console.error('Error during file save dialog: ', error);
+		}
+	};
+
+
+	/**
+	 * Parses the project into a JSON representation.
+	 * @returns {string} containing the resulting JSON.
+	 */
+	const projectToJSON = ()   => {
+		const stage = stageRef.current;
+
+		const project = {
+			name: projectName,
+			description: projectDescription,
+			x: stage.x(),
+			y: stage.y(),
+			zoom: stage.scaleX(),
+			elements: images
+		};
+
+		return JSON.stringify(project);
+	}
+
+	/**
+	 * Parses a JSON representation of a project into the project.
+	 * @param {string} json representation of the project.
+	 */
+	const jsonToProject = (json) => {
+		try {
+			const project = JSON.parse(json);
+			setProjectName(project.name);
+			setProjectDescription(project.description);
+
+			const stage = stageRef.current;
+			if (stage === null) return;
+
+			// Set stage properties
+			stage.x(project.x);
+			stage.y(project.y);
+			stage.scaleX(project.zoom);
+			stage.scaleY(project.zoom);
+
+			setImages(project.elements)
+		} catch (error) {
+			console.error('Error parsing JSON: ', error);
+		}
+	}
+
 	return (
 		<Stage
 			width={window.innerWidth}
@@ -311,18 +402,7 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 									rects[i] = newAttrs;
 									setImages(rects);
 
-									// Update history
-									const newHistory = history.slice(0, historyIndex + 1);
-									newHistory.push(rects);
-
-									// Enforce the maximum number of undo steps
-									if (newHistory.length > maxUndoSteps) {
-										newHistory.shift(); // Remove the oldest state
-									} else {
-										setHistoryIndex(historyIndex + 1);
-									}
-
-									setHistory(newHistory);
+									updateHistory(rects);
 								}}
 							/>
 						);

@@ -13,7 +13,7 @@ const LandingPage = () => {
 	/**
 	 * Closes the application.
 	 */
-	async function handleClick() {
+	async function handleQuitClick() {
 		await appWindow.close();
 	}
 	return <div className="container">
@@ -24,10 +24,12 @@ const LandingPage = () => {
 
 			<div className="link-buttons-container">
 				<a href="/canvas" className="link-button">
-					Open Canvas
+					New Project
 				</a>
-
-				<p onClick={handleClick} className="link-button secondary">
+				<a className="link-button">
+					Open Project
+				</a>
+				<p onClick={handleQuitClick} className="link-button secondary">
 					Quit
 				</p>
 			</div>
