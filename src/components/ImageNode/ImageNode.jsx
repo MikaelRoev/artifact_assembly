@@ -3,9 +3,7 @@ import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
-import ElementNode from "../ElementNode";
 
 /**
  * Represents a canvas object on the canvas.
@@ -19,27 +17,29 @@ import ElementNode from "../ElementNode";
  */
 const ImageNode = ({
 	shapeProps,
-	isSelected,
 	onSelect,
 	onChange,
 	imageURL,
+	id
 }) => {
 	const imageRef = useRef();
-	const trRef = useRef();
 
 	const [imageSrc] = useImage(imageURL);
 
-	const { resizable } = useContext(ResizeContext);
-	const { filter, hue, saturation, luminance, contrast } = useContext(ImageContext);
+	const imageContext = useContext(ImageContext);
+	const { filter, hue, saturation, luminance, contrast } = imageContext;
 
 	/**
 	 * Handles the filter on the image.
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
 	 */
 	const handleFilter = () => {
-		if (filter !== true) return null;
-		return [Konva.Filters.HSL, Konva.Filters.Contrast];
+		if (filter === true) {
+			return [Konva.Filters.HSL, Konva.Filters.Contrast];
+		} else return null;
 	};
+
+
 
 	useEffect(() => {
 		if (imageSrc) {
@@ -48,13 +48,9 @@ const ImageNode = ({
 	}, [imageSrc]);
 
 	return (
-		<ElementNode
-			isSelected={isSelected}
-			resizable={resizable}
-			onSelect={onSelect}
-			onChange={onChange}
-		>
+		<>
 			<KonvaImage
+				id={id}
 				ref={imageRef}
 				filters={handleFilter()}
 				{...{
@@ -64,6 +60,8 @@ const ImageNode = ({
 					contrast: Number(contrast),
 				}}
 				image={imageSrc}
+				onClick={onSelect}
+				onTap={onSelect}
 				{...shapeProps}
 				onChange={onChange}
 				onDragEnd={(e) => {
@@ -77,9 +75,36 @@ const ImageNode = ({
 					//Moves selected image on top (z-index)
 					e.target.moveToTop();
 				}}
+				onTransformEnd={() => {
+					const node = imageRef.current;
+					const scaleX = node.scaleX();
+					const scaleY = node.scaleY();
+
+					node.scaleX(1);
+					node.scaleY(1);
+					onChange({
+						...shapeProps,
+						x: node.x(),
+						y: node.y(),
+						// set minimal value
+						width: Math.max(5, node.width() * scaleX),
+						height: Math.max(node.height() * scaleY),
+					});
+				}}
+				onMouseEnter={(e) => {
+					// Adds a pointer cursor when hovering over the image
+					const container = e.target.getStage().container();
+					container.style.cursor = "default";
+
+					container.style.cursor = "pointer";
+				}}
+				onMouseLeave={(e) => {
+					const container = e.target.getStage().container();
+					container.style.cursor = "default";
+				}}
 				perfectDrawEnabled={false}
 			/>
-		</ElementNode>
+		</>
 	);
 };
 

@@ -1,11 +1,10 @@
 import React from "react";
-import { useState } from "react";
+import {useRef, useState} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
-import ResizeContext from "./Context/ResizeContext";
-import LockContext from "./Context/LockContext";
 import ImageContext from "./Context/ImageContext";
+import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 
 /**
  * Creates a project page.
@@ -13,18 +12,17 @@ import ImageContext from "./Context/ImageContext";
  * @constructor
  */
 const Canvas = () => {
-	const [resize, setResize] = useState(false);
-	const [lock, setLock] = useState(false);
-	const [images, setImages] = useState([]);
-	const [filter, setFilter] = useState(false);
-	const [saturation, setSaturation] = useState(0);
-	const [hue, setHue] = useState(0);
-	const [contrast, setContrast] = useState(0);
-	const [luminance, setLuminance] = useState(0);
-    const stageRef = useState(null);
+    const [lock, setLock] = useState(false);
+    const [images, setImages] = useState([]);
+    const [filter, setFilter] = useState(false);
+    const [saturation, setSaturation] = useState(0);
+    const [hue, setHue] = useState(0);
+    const [contrast, setContrast] = useState(0);
+    const [luminance, setLuminance] = useState(0);
+    const stageRef = useRef(null)
+    const layerRef = useRef(null)
 
 	const providerValue = {
-		resize,
 		lock,
 		images,
 		filter,
@@ -37,7 +35,6 @@ const Canvas = () => {
 		setContrast,
 		setLuminance,
 		setFilter,
-		setResize,
 		setLock,
 		setImages,
 	};
@@ -66,18 +63,17 @@ const Canvas = () => {
         document.body.removeChild(link);
     }
 
-	return (
-		<ImageContext.Provider value={providerValue}>
-			<ResizeContext.Provider value={providerValue}>
-				<LockContext.Provider value={providerValue}>
-					<div className="stage-container">
-						<NavBar takeScreenshot={takeScreenshot}/>
-						<StageArea uploadedImages={images} stageRef={stageRef}/>
-					</div>
-				</LockContext.Provider>
-			</ResizeContext.Provider>
-		</ImageContext.Provider>
-	);
+    return (
+        <ImageContext.Provider value={providerValue}>
+            <LockContext.Provider value={providerValue}>
+                <div className="stage-container">
+                    <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
+                    <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
+                    <ScoreWindow layerRef={layerRef}/>
+                </div>
+            </LockContext.Provider>
+        </ImageContext.Provider>
+    );
 };
 
 export default Canvas;

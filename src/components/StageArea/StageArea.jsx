@@ -1,36 +1,35 @@
-import React, { useEffect } from "react";
-import {Stage, Layer, Group, Text, Rect} from "react-konva";
-import { useState, useRef } from "react";
-import SelectedGroup from "../SelectedGroup/SelectedGroup";
-import FileHandling from "../FileHandling";
-
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {Layer, Stage, Transformer} from "react-konva";
+import ImageNode from "../ImageNode/ImageNode";
+import LockContext from "../../pages/Canvas/Context/LockContext";
 
 /**
  * Creates the canvas area in the project page.
  * @param uploadedImages is the initial images on the canvas.
  * @param stageRef is the reference for the stage used.
+ * @param layerRef is the reference for the layer inside the stage.
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({ uploadedImages, stageRef }) => {
+const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 	const [images, setImages] = useState([]);
+	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
-	const [elements, setElements] = useState([]);
-	const selectedGroupRef= useRef(null);
+
+	const trRef = useRef();
+
+	const { isLocked } = useContext(LockContext);
 
 	const maxUndoSteps = 20;
+
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
 
 	let projectName = "";
 	let projectDescription = "";
-
-	useEffect(() => {
-		console.log("Render");
-	});
 
 	/**
 	 * Sets the images when the list of uploaded images changes.
@@ -39,28 +38,30 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 		setImages(uploadedImages);
 	}, [uploadedImages]);
 
-
-
 	/**
 	 * Sets up and cleans up the delete event listener.
 	 */
 	useEffect(() => {
 
 		/**
-	 	* Deletes the selected elements if the delete key is pressed.
+	 	* Deletes the selected images if the delete key is pressed.
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedGroupRef.current) {
-				console.log(`elements ${selectedGroupRef.current} deleted`);
-				selectedGroupRef.current.removeChildren();
+			if (e.key === "Delete" && selectedElements.length > 0) {
+				const selectedIds = selectedElements.map((element) => element.getId())
+
+				const newImages = images.filter((image) => !selectedIds.includes(image.id));
+
+				setImages(newImages);
+				setSelectedElements([]); // works
 			}
 		};
 		document.addEventListener("keydown", handleDeletePressed);
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, []);
+	}, [images, selectedElements]);
 
 	/**
 	 * Updates the uploaded images when an image changes state.
@@ -75,6 +76,18 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 		});
 	}, [images, uploadedImages]);
 
+	/**
+	 * If there are any saved images in the local storage, sets the images to the saved images.
+	 * else sets them as the uploaded images,
+	 */
+	useEffect(() => {
+		const savedImages = localStorage.getItem("savedImages");
+		if (savedImages) {
+			setImages(JSON.parse(savedImages));
+		} else {
+			setImages(uploadedImages);
+		}
+	}, [uploadedImages]);
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -87,15 +100,14 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				FileHandling.saveProjectDialog().then(() => {console.log('Project saved!');});
-				FileHandling.openProjectDialog().then(() => {console.log('Project opened!');});
- 			}
+				saveImagePositions();
+			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
 		return () => {
 			document.removeEventListener("keydown", handleSavePressed);
 		};
-	});
+	}, [images]);
 
 	/**
 	 * Sets up and cleans up the undo event listener.
@@ -122,16 +134,6 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 	 */
 	useEffect(() => {
 		/**
-		 * The mouse event handler.
-		 * @param e
-		 */
-		const handleMouseDown = (e) => {
-			if (e.type === 'mousedown' && !ctrlPressed) {
-				handleDeselect();
-			}
-		};
-
-		/**
 		 * The ctrl key down event handler.
 		 * @param e
 		 */
@@ -151,83 +153,27 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 			}
 		};
 
-		document.addEventListener('mousedown', handleMouseDown);
 		document.addEventListener('keydown', handleCtrlDown);
 		document.addEventListener('keyup', handleCtrlUp);
 
 		return () => {
-			document.removeEventListener('mousedown', handleMouseDown);
 			document.removeEventListener('keydown', handleCtrlDown);
 			document.removeEventListener('keyup', handleCtrlUp);
 		};
 	}, []);
 
+
 	/**
-	 * Handles the selecting of en element
-	 * @param element to be selected
+	 * Deselects when the mouse clicks on an empty area on the canvas
+	 * and ctrl key is not pressed.
+	 * @param e the event.
 	 */
-	const handleSelect = (element) => {
-		const selectedGroup = selectedGroupRef.current;
-		console.log("selectedGroup: ", selectedGroup)
-		if (selectedGroup) {
-			console.log(selectedGroup)
-			selectedGroup.add(element);
+	const checkDeselect = (e) => {
+		if (e.target === e.currentTarget && !ctrlPressed) {
+			selectedElements.forEach((element) => element.draggable(false));
+			setSelectedElements([]);
 		}
 	};
-	const handleDeselect = () => {
-		const selectedGroup = selectedGroupRef.current;
-		if (selectedGroup) {
-			setElements([...elements, selectedGroup.getChildren()]);
-			selectedGroup.removeChildren();
-		}
-	};
-
-	// Function to add new Konva node objects
-	useEffect(() => {
-			// Create new Konva node objects
-			const rect = new window.Konva.Rect({
-				x: 20,
-				y: 20,
-				width: 100,
-				height: 50,
-				fill: 'blue',
-			});
-
-			const text = new window.Konva.Text({
-				x: 150,
-				y: 20,
-				text: 'Hello, Konva!',
-				fontSize: 20,
-				fill: 'green',
-			});
-
-			const group = new window.Konva.Group({
-				x: 250,
-				y: 20,
-			});
-
-			const rect1 = new window.Konva.Rect({
-				x: 0,
-				y: 0,
-				width: 50,
-				height: 50,
-				fill: 'red',
-			});
-
-			const rect2 = new window.Konva.Rect({
-				x: 0,
-				y: 60,
-				width: 50,
-				height: 50,
-				fill: 'yellow',
-			});
-
-			group.add(rect1);
-			group.add(rect2);
-
-			// Update state with new Konva node objects
-			setElements([...elements, rect, text, group]);
-	}, []);
 
 	/**
 	 * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
@@ -274,6 +220,43 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 	};
 
 	/**
+	 * Updates the transformer to selected elements.
+	 */
+	useEffect(() => {
+		if (trRef.current && selectedElements.length > 0) {
+			trRef.current.nodes(selectedElements);
+			trRef.current.moveToTop();
+			trRef.current.getLayer().batchDraw();
+			selectedElements.forEach((element) => element.draggable(!isLocked));
+		}
+	},[selectedElements, isLocked]);
+
+	/**
+	 * Event handler for element clicking. This will check the selection of the element.
+	 * @param e click event.
+	 */
+	const handleElementClick = (e) => {
+		const element = e.target;
+		element.moveToTop();
+		const index = selectedElements.indexOf(element);
+
+		if (ctrlPressed) {
+			if (index !== -1) {
+				// already selected
+				const newSelected = [...selectedElements];
+				newSelected.splice(index, 1);
+				setSelectedElements(newSelected);
+			} else {
+				// not already selected
+				setSelectedElements([...selectedElements, element]);
+			}
+		} else {
+			selectedElements.forEach((element) => element.draggable(false));
+			setSelectedElements([element]);
+		}
+	}
+
+	/**
 	 * Undoes the last action in the history.
 	 */
 	const Undo = () => {
@@ -301,134 +284,66 @@ const StageArea = ({ uploadedImages, stageRef }) => {
 		setHistory(newHistory);
 	}
 
-	useEffect(() => {
-		console.log("element is type of ", elements[0] instanceof window.Konva.Node);
-
-		const onSelect = (event, element) => {
-			handleSelect(element);
-			event.target.moveToTop();
-			//TODO: make group move on top
-		}
-
-		const cursorToPointer = (event) => {
-			const container = event.target.getStage().container();
-			container.style.cursor = "pointer";
-		}
-
-		const cursorToDefault = (event) => {
-			const container = event.target.getStage().container();
-			container.style.cursor = "default";
-		}
-
-		// add change update?
-		/*
-        onDragEnd: (e) => {
-            const changes = images.slice();
-            changes[index] = {
-                ...shapeProps,
-                x: e.target.x(),
-                y: e.target.y(),
-            };
-            setImages(changes);
-            updateHistory(changes);
-
-        },
-         */
-		elements.forEach((element) => {
-			element.on('click', (event) => {
-				onSelect(event, element);
-			});
-			element.on('tap', (event) => {
-				onSelect(event, element);
-			});
-			element.on('mouseenter', (event) => {
-				cursorToPointer(event);
-			});
-			element.on('mouseleave', (event) => {
-				cursorToDefault(event);
-			});
-		});
-
-		return () => {
-			elements.forEach((element) => {
-				element.off('click');
-				element.off('tap');
-				element.off('mouseenter');
-				element.off('mouseleave');
-			});
-		}
-	}, [elements]);
-
 	return (
-		<>
-			<Stage
-				className="stage"
-				width={window.innerWidth}
-				height={window.innerHeight}
-				//draggable
-				onWheel={zoomStage}
-				ref={stageRef}>
-				<Layer className="layer">
-					<SelectedGroup selectedGroupRef={selectedGroupRef}>
-						<Rect width={100} height={100} fill="red"/>
-						<Rect width={100} height={100} x={200} y={200} fill="blue"/>
-					</SelectedGroup>
-					{
-							/*
-							<ElementNode
-								key={element.key}
-
-								onSelect={() => {
-									select(element);
-								}}
+		<Stage
+			width={window.innerWidth}
+			height={window.innerHeight}
+			draggable
+			className="stage"
+			onWheel={zoomStage}
+			onMouseDown={checkDeselect}
+			onTouchStart={checkDeselect}
+			ref={stageRef}>
+			<Layer
+				className="layer"
+				ref={layerRef}>
+				{images.length > 0 &&
+					images.map((image, i) => {
+						return (
+							<ImageNode
+								key={image.id}
+								id={image.id}
+								imageURL={image.imageUrl}
+								shapeProps={image}
+								onSelect={(e) => handleElementClick(e)}
 								onChange={(newAttrs) => {
-									const changes = images.slice();
-									changes[index] = newAttrs;
-									setImages(changes);
-									updateHistory(changes);
-								}}
-							>
-								{element}
-							</ElementNode>
-							 */
-					}
+									const rects = images.slice();
+									rects[i] = newAttrs;
+									setImages(rects);
 
-					{/*
-						//SelectedGroup
-						<ElementNode isSelected={true}
-							/*onChange={(newAttrs) => {
-							const changes = images.slice();
-							changes[index] = newAttrs;
-							setImages(changes);
-							updateHistory(changes);
-						}}
-						>
-							<Group ref={selectedGroupRef}/>
-						</ElementNode>
-					*/}
-					{/*images.length > 0 &&
-						images.map((image, i) => {
-							return (
-								<ImageNode
-									key={image.id} // Updated key prop
-									imageURL={image.imageUrl}
-									shapeProps={image}
-									isSelected={image.id === selectedImageId}
-									onSelect={() => {
-										selectImageId(image.id);
-									}}
-									onChange={(newAttrs) => {
-										const changes = images.slice();
-										changes[i] = newAttrs;
-										setImages(changes);
-										updateHistory(changes);
-									}}
-								/>
-							);
-						})*/}
-				</Layer>
-			</Stage>
-		</>
+									// Update history
+									const newHistory = history.slice(0, historyIndex + 1);
+									newHistory.push(rects);
+
+									// Enforce the maximum number of undo steps
+									if (newHistory.length > maxUndoSteps) {
+										newHistory.shift(); // Remove the oldest state
+									} else {
+										setHistoryIndex(historyIndex + 1);
+									}
+
+									setHistory(newHistory);
+								}}
+							/>
+						);
+					})
+				}
+				{
+					selectedElements.length > 0 &&
+					<Transformer
+					ref={trRef}
+					boundBoxFunc={(oldBox, newBox) => {
+						// limit resize
+						if (newBox.width < 5 || newBox.height < 5) {
+							return oldBox;
+						}
+						return newBox;
+					}}
+					resizeEnabled={false}
+					/>
+				}
+			</Layer>
+		</Stage>
 	);
 };
 

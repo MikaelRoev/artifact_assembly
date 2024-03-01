@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
-import ResizeContext from "../../pages/Canvas/Context/ResizeContext";
 import LockContext from "../../pages/Canvas/Context/LockContext";
 import ImageContext from "../../pages/Canvas/Context/ImageContext";
 
@@ -11,22 +10,21 @@ import ImageContext from "../../pages/Canvas/Context/ImageContext";
  * @constructor
  */
 const NavBar = ({takeScreenshot}) => {
-	const { resize, setResize } = useContext(ResizeContext);
-	const { lock, setLock } = useContext(LockContext);
-	const {
-		images,
-		setImages,
-		filter,
-		setFilter,
-		saturation,
-		setSaturation,
-		hue,
-		setHue,
-		contrast,
-		setContrast,
-		luminance,
-		setLuminance,
-	} = useContext(ImageContext);
+    const {lock, setLock} = useContext(LockContext);
+    const {
+        images,
+        setImages,
+        filter,
+        setFilter,
+        saturation,
+        setSaturation,
+        hue,
+        setHue,
+        contrast,
+        setContrast,
+        luminance,
+        setLuminance,
+    } = useContext(ImageContext);
 
     const [isLoading, setIsLoading] = useState(false);
     const [numberValue, setNumberValue] = useState(100);
@@ -58,7 +56,8 @@ const NavBar = ({takeScreenshot}) => {
                     });
                     const newImage = {
                         imageUrl,
-                        id: Date.now(), // Assign a unique identifier using Date.now()
+                        id: Date.now().toString(), // Assign a unique identifier using Date.now()
+                        name: file.name,
                         // Other properties for the `shapeProps` object
                     };
                     newImages.push(newImage);
@@ -74,17 +73,13 @@ const NavBar = ({takeScreenshot}) => {
         handleFileButtonClick()
     };
 
-	const toggleResize = () => {
-		setResize((prevResize) => !prevResize);
-	};
-
     const toggleLock = () => {
         setLock((prevLock) => !prevLock);
     };
 
-	const toggleFilter = () => {
-		setFilter((prevFilter) => !prevFilter);
-	};
+    const toggleFilter = () => {
+        setFilter((prevFilter) => !prevFilter);
+    };
 
     const handleHueChange = (e) => setHue(e.target.value);
     const handleSaturationChange = (e) => setSaturation(e.target.value);
@@ -129,6 +124,15 @@ const NavBar = ({takeScreenshot}) => {
         }
     }, [takeScreenshot, handleFileButtonClick]);
 
+    /**
+     * Function to open up the score window for all the images on the canvas.
+     * @returns Void
+     */
+    const openScoreWindow = async () => {
+        document.getElementById("scoreWindow").style.visibility = "visible";
+        handleFileButtonClick()
+    };
+
 
     return (
         <nav className="navbar">
@@ -167,13 +171,13 @@ const NavBar = ({takeScreenshot}) => {
                                     />
                                     <span>%</span>
                                 </li>
+                                <li>
+                                    <span id={"showScoreWindowButton"} onClick={openScoreWindow}>Open score window</span>
+                                </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <p onClick={toggleResize}>
-					{resize ? "Disable Resize" : "Enable Resize"}
-				</p>
                 <p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
                 <p onClick={toggleFilter}>
                     {!filter ? "Enable Filter" : "Disable Filter"}
