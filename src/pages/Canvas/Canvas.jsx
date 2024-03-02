@@ -3,9 +3,10 @@ import {useRef} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
-import {ImageContextProvider} from "../../contexts/ImageContext";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
+import {ImageContextProvider} from "../../contexts/ImageContext";
 import {LockedContextProvider} from "../../contexts/LockedContext";
+import {FilterContextProvider} from "../../contexts/FilterContext";
 
 /**
  * Creates a project page.
@@ -41,13 +42,15 @@ const Canvas = () => {
 
     return (
         <ImageContextProvider>
-            <LockedContextProvider>
-                <div className="stage-container">
-                    <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
-                    <StageArea stageRef={stageRef} layerRef={layerRef} />
-                    <ScoreWindow layerRef={layerRef}/>
-                </div>
-            </LockedContextProvider>
+            <FilterContextProvider>
+                <LockedContextProvider>
+                    <div className="stage-container">
+                        <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
+                        <StageArea stageRef={stageRef} layerRef={layerRef} />
+                        <ScoreWindow layerRef={layerRef}/>
+                    </div>
+                </LockedContextProvider>
+            </FilterContextProvider>
         </ImageContextProvider>
     );
 };

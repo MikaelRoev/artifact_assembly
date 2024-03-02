@@ -3,6 +3,8 @@ import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
+import FilterContext from "../../contexts/FilterContext";
+import ProjectContext from "../../contexts/ProjectContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -11,9 +13,8 @@ import ImageContext from "../../contexts/ImageContext";
  */
 const NavBar = ({takeScreenshot}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
+    const {images, setImages} = useContext(ImageContext);
     const {
-        images,
-        setImages,
         filter,
         setFilter,
         saturation,
@@ -24,7 +25,7 @@ const NavBar = ({takeScreenshot}) => {
         setContrast,
         luminance,
         setLuminance,
-    } = useContext(ImageContext);
+    } = useContext(FilterContext);
 
     const [isLoading, setIsLoading] = useState(false);
     const [numberValue, setNumberValue] = useState(100);

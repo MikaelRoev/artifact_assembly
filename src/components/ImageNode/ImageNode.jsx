@@ -3,7 +3,7 @@ import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import ImageContext from "../../contexts/ImageContext";
+import FilterContext from "../../contexts/FilterContext";
 
 /**
  * Represents a canvas object on the canvas.
@@ -26,8 +26,7 @@ const ImageNode = ({
 
 	const [imageSrc] = useImage(imageURL);
 
-	const imageContext = useContext(ImageContext);
-	const { filter, hue, saturation, luminance, contrast } = imageContext;
+	const { filter, hue, saturation, luminance, contrast } = useContext(FilterContext);
 
 	/**
 	 * Handles the filter on the image.
