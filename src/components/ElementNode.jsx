@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef} from "react";
 import {Transformer} from "react-konva";
-import LockContext from "../pages/Canvas/Context/LockContext";
+import LockContext from "../contexts/LockedContext";
 import Konva from "konva";
 
 /**

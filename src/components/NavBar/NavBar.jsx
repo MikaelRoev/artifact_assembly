@@ -1,8 +1,8 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
-import LockContext from "../../pages/Canvas/Context/LockContext";
-import ImageContext from "../../pages/Canvas/Context/ImageContext";
+import LockedContext from "../../contexts/LockedContext";
+import ImageContext from "../../contexts/ImageContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -10,7 +10,7 @@ import ImageContext from "../../pages/Canvas/Context/ImageContext";
  * @constructor
  */
 const NavBar = ({takeScreenshot}) => {
-    const {lock, setLock} = useContext(LockContext);
+    const {isLocked, setIsLocked} = useContext(LockedContext);
     const {
         images,
         setImages,
@@ -75,7 +75,7 @@ const NavBar = ({takeScreenshot}) => {
     };
 
     const toggleLock = () => {
-        setLock((prevLock) => !prevLock);
+        setIsLocked((prevLock) => !prevLock);
     };
 
     const toggleFilter = () => {
@@ -178,7 +178,7 @@ const NavBar = ({takeScreenshot}) => {
                         </div>
                     )}
                 </div>
-                <p onClick={toggleLock}>{!lock ? "Lock Canvas" : "Unlock Canvas"}</p>
+                <p onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</p>
                 <p onClick={toggleFilter}>
                     {!filter ? "Enable Filter" : "Disable Filter"}
                 </p>

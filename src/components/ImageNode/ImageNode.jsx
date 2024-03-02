@@ -3,7 +3,7 @@ import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import ImageContext from "../../pages/Canvas/Context/ImageContext";
+import ImageContext from "../../contexts/ImageContext";
 
 /**
  * Represents a canvas object on the canvas.

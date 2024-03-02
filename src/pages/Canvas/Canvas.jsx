@@ -1,11 +1,11 @@
 import React from "react";
-import {useRef, useState} from "react";
+import {useRef} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
-import ImageContext from "./Context/ImageContext";
-import LockContext from "./Context/LockContext";
+import {ImageContextProvider} from "../../contexts/ImageContext";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
+import {LockedContextProvider} from "../../contexts/LockedContext";
 
 /**
  * Creates a project page.
@@ -13,31 +13,8 @@ import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
  * @constructor
  */
 const Canvas = () => {
-    const [lock, setLock] = useState(false);
-    const [images, setImages] = useState([]);
-    const [filter, setFilter] = useState(false);
-    const [saturation, setSaturation] = useState(0);
-    const [hue, setHue] = useState(0);
-    const [contrast, setContrast] = useState(0);
-    const [luminance, setLuminance] = useState(0);
-    const stageRef = useRef(null)
-    const layerRef = useRef(null)
-
-	const providerValue = {
-		images,
-		filter,
-		saturation,
-		hue,
-		contrast,
-		luminance,
-		setSaturation,
-		setHue,
-		setContrast,
-		setLuminance,
-		setFilter,
-		setImages,
-	};
-
+    const stageRef = useRef(null);
+    const layerRef = useRef(null);
 
     /**
      * Function to take the screenshot of the stage in StageArea.
@@ -46,7 +23,7 @@ const Canvas = () => {
     const takeScreenshot = (number) => {
         let dataURL = stageRef.current.toDataURL({pixelRatio: number/100});
         downloadURI(dataURL, "canvas.png");
-    }
+    };
 
     /**
      * Function to download the screenshot taken.
@@ -63,15 +40,15 @@ const Canvas = () => {
     }
 
     return (
-        <ImageContext.Provider value={providerValue}>
-            <LockContext.Provider value={{lock, setLock}}>
+        <ImageContextProvider>
+            <LockedContextProvider>
                 <div className="stage-container">
                     <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
-                    <StageArea uploadedImages={images} stageRef={stageRef} layerRef={layerRef} />
+                    <StageArea stageRef={stageRef} layerRef={layerRef} />
                     <ScoreWindow layerRef={layerRef}/>
                 </div>
-            </LockContext.Provider>
-        </ImageContext.Provider>
+            </LockedContextProvider>
+        </ImageContextProvider>
     );
 };
 

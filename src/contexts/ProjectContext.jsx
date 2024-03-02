@@ -1,6 +1,6 @@
-import {createContext, useContext, useState} from "react";
+import {createContext, useState} from "react";
 
-export const ProjectContext = createContext(null);
+const ProjectContext = createContext(null);
 
 /**
  * Provider for the project context that allows the getting and setting of the current project's information.
@@ -8,7 +8,7 @@ export const ProjectContext = createContext(null);
  * @return {JSX.Element} the provider with the three under it.
  * @constructor
  */
-export const ProjectProvider = ({children}) => {
+export const ProjectContextProvider = ({children}) => {
     const [project, setProject] = useState({
         name: '',
         description: '',
@@ -25,8 +25,4 @@ export const ProjectProvider = ({children}) => {
     )
 }
 
-/**
- * Custom hook for getting the getter and setter of the current project's information.
- * @return {null}
- */
-export const useProjectContext = () => useContext(ProjectContext);
+export default ProjectContext;

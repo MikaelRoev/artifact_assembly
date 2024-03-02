@@ -1,21 +1,21 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Layer, Stage, Transformer} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
-import LockContext from "../../pages/Canvas/Context/LockContext";
+import LockedContext from "../../contexts/LockedContext";
 import {saveToFile, readFile} from "../FileHandling"
 import {dialog} from "@tauri-apps/api";
-import {ProjectContext} from "../ProjectProvider";
+import ProjectContext from "../../contexts/ProjectContext";
+import ImageContext from "../../contexts/ImageContext";
 
 /**
  * Creates the canvas area in the project page.
- * @param uploadedImages is the initial images on the canvas.
  * @param stageRef is the reference for the stage used.
  * @param layerRef is the reference for the layer inside the stage.
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
-	const [images, setImages] = useState([]);
+const StageArea = ({stageRef, layerRef}) => {
+	//const [images, setImages] = useState([]);
 	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
@@ -23,8 +23,9 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 
 	const trRef = useRef();
 
-	const {isLocked} = useContext(LockContext);
+	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
+	const {images, setImages} = useContext(ImageContext);
 
 	const maxUndoSteps = 20;
 
@@ -45,13 +46,6 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 		stage.batchDraw();
 	}, [project]);
 
-
-	/**
-	 * Sets the images when the list of uploaded images changes.
-	 */
-	useEffect(() => {
-		setImages(uploadedImages);
-	}, [uploadedImages]);
 
 	/**
 	 * Sets up and cleans up the delete event listener.
@@ -77,32 +71,6 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
 	}, [images, selectedElements]);
-
-	/**
-	 * Updates the uploaded images when an image changes state.
-	 */
-	useEffect(() => {
-		// Update the uploadedImages prop when the images state changes
-		uploadedImages.forEach((uploadedImage) => {
-			const index = images.findIndex((image) => image.id === uploadedImage.id);
-			if (index >= 0) {
-				uploadedImages[index] = images[index];
-			}
-		});
-	}, [images, uploadedImages]);
-
-	/**
-	 * If there are any saved images in the local storage, sets the images to the saved images.
-	 * else sets them as the uploaded images,
-	 */
-	useEffect(() => {
-		const savedImages = localStorage.getItem("savedImages");
-		if (savedImages) {
-			setImages(JSON.parse(savedImages));
-		} else {
-			setImages(uploadedImages);
-		}
-	}, [uploadedImages]);
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -381,8 +349,8 @@ const StageArea = ({ uploadedImages, stageRef, layerRef}) => {
 			<Layer
 				className="layer"
 				ref={layerRef}>
-				{project.elements.length > 0 &&
-					project.elements.map((image, i) => {
+				{images.length > 0 &&
+					images.map((image, i) => {
 						return (
 							<ImageNode
 								key={image.id}
