@@ -4,16 +4,19 @@ import Canvas from "./pages/Canvas/Canvas";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import "./App.css";
 import {ProjectContextProvider} from "./contexts/ProjectContext";
+import {ImageContextProvider} from "./contexts/ImageContext";
 
 const App = () => {
 	return (
 		<ProjectContextProvider>
-			<BrowserRouter>
-				<Routes>
-					<Route path="/" element={<LandingPage />} />
-					<Route path="/canvas" element={<Canvas />} />
-				</Routes>
-			</BrowserRouter>
+			<ImageContextProvider>
+				<BrowserRouter>
+					<Routes>
+						<Route path="/" element={<LandingPage />} />
+						<Route path="/canvas" element={<Canvas />} />
+					</Routes>
+				</BrowserRouter>
+			</ImageContextProvider>
 		</ProjectContextProvider>
 	);
 };

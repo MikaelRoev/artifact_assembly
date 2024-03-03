@@ -2,8 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Layer, Stage, Transformer} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
-import {saveToFile, readFile} from "../FileHandling"
-import {dialog} from "@tauri-apps/api";
+import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
 
@@ -83,7 +82,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				saveProjectDialog().then(() => console.log("project saved"));
+				saveProjectDialog(project, setProject, images).then(() => console.log("project saved"));
 			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
@@ -262,78 +261,6 @@ const StageArea = ({stageRef, layerRef}) => {
 			setHistoryIndex(historyIndex + 1);
 		}
 		setHistory(newHistory);
-	}
-
-	/**
-	 * Opens the "open project"-dialog window
-	 * @return {Promise<void>} when the dialog window closes.
-	 */
-	const openProjectDialog = async () => {
-		try {
-			const filePath = await dialog.open({
-				title: "Open Project",
-				multiple: false,
-				filters: [{name: 'JSON Files', extensions: ['json']}]
-			});
-			if (filePath) {
-				jsonToProject(await readFile(filePath));
-			} else {
-				console.log('No file selected or operation cancelled.');
-			}
-		} catch (error) {
-			console.error('Error during open project dialog: ', error);
-		}
-	}
-
-
-	/**
-	 * Opens the "save project as"-dialog window.
-	 */
-	const saveProjectDialog = async () => {
-		try {
-			const filePath = await dialog.save({
-				title: 'Save Project As',
-				filters: [{name: 'JSON Files', extensions: ['json']}]
-			});
-			if (filePath) {
-				// get the project name from the file path.
-				setProject({
-					...project,
-					name: filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1')
-				});
-				await saveToFile(projectToJSON(), filePath);
-				await readFile(filePath);
-			} else {
-				console.log('No file selected or operation cancelled.');
-			}
-		} catch (error) {
-			console.error('Error during file save dialog: ', error);
-		}
-	};
-
-
-	/**
-	 * Parses the project into a JSON representation.
-	 * @returns {string} containing the resulting JSON.
-	 */
-	const projectToJSON = ()   => {
-		return JSON.stringify(project);
-	}
-
-	/**
-	 * Parses a JSON representation of a project into the project.
-	 * @param {string} json representation of the project.
-	 */
-	const jsonToProject = (json) => {
-		try {
-			const project = JSON.parse(json);
-			//setProjectName(project.name);
-			//setProjectDescription(project.description);
-
-			setImages(project.elements)
-		} catch (error) {
-			console.error('Error parsing JSON: ', error);
-		}
 	}
 
 	return (

@@ -41,17 +41,15 @@ const Canvas = () => {
     }
 
     return (
-        <ImageContextProvider>
-            <FilterContextProvider>
-                <LockedContextProvider>
-                    <div className="stage-container">
-                        <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
-                        <StageArea stageRef={stageRef} layerRef={layerRef} />
-                        <ScoreWindow layerRef={layerRef}/>
-                    </div>
-                </LockedContextProvider>
-            </FilterContextProvider>
-        </ImageContextProvider>
+        <FilterContextProvider>
+            <LockedContextProvider>
+                <div className="stage-container">
+                    <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
+                    <StageArea stageRef={stageRef} layerRef={layerRef} />
+                    <ScoreWindow layerRef={layerRef}/>
+                </div>
+            </LockedContextProvider>
+        </FilterContextProvider>
     );
 };
 
