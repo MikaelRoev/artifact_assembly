@@ -161,6 +161,14 @@ const NavBar = ({takeScreenshot}) => {
                                     <label htmlFor="file">Load Image</label>
                                 </li>
                                 <li>
+                                    <span
+                                        id={"saveProjectButton"}
+                                        onClick={() => {
+                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                        }}
+                                    >Save project</span>
+                                </li>
+                                <li>
                                     <span className={"screenShotButton"} id={"ssButton"}>Export canvas as image </span>
                                     <input
                                         ref={inputRef}
@@ -175,15 +183,8 @@ const NavBar = ({takeScreenshot}) => {
                                     <span>%</span>
                                 </li>
                                 <li>
-                                    <span id={"showScoreWindowButton"} onClick={openScoreWindow}>Open score window</span>
-                                </li>
-                                <li>
-                                    <span
-                                        id={"saveProjectButton"}
-                                        onClick={() => {
-                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                        }}
-                                    >Save project</span>
+                                    <span id={"showScoreWindowButton"}
+                                          onClick={openScoreWindow}>Open score window</span>
                                 </li>
                             </ul>
                         </div>
