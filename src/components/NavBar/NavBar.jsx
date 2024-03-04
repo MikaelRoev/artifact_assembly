@@ -5,6 +5,7 @@ import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
+import {saveProjectDialog} from "../FileHandling";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -14,6 +15,7 @@ import ProjectContext from "../../contexts/ProjectContext";
 const NavBar = ({takeScreenshot}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
+    const {project, setProject} = useContext(ProjectContext);
     const {
         filter,
         setFilter,
@@ -174,6 +176,14 @@ const NavBar = ({takeScreenshot}) => {
                                 </li>
                                 <li>
                                     <span id={"showScoreWindowButton"} onClick={openScoreWindow}>Open score window</span>
+                                </li>
+                                <li>
+                                    <span
+                                        id={"saveProjectButton"}
+                                        onClick={() => {
+                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                        }}
+                                    >Save project</span>
                                 </li>
                             </ul>
                         </div>
