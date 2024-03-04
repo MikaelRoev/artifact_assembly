@@ -32,7 +32,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
 
-	console.log(project);
+	//console.log(project);
 
 	/**
 	 * Update the stage according to the project.
@@ -263,6 +263,10 @@ const StageArea = ({stageRef, layerRef}) => {
 		setHistory(newHistory);
 	}
 
+	/**
+	 * Returns a stage with a layer within.
+	 * Returns an imageNode and a transformer within the layer.
+	 */
 	return (
 		<Stage
 			width={window.innerWidth}
