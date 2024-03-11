@@ -34,6 +34,14 @@ const NavBar = ({takeScreenshot}) => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const inputRef = useRef(null);
 
+    const offset = 20;
+
+    const isAnyImageAtPosition = (x, y) => {
+        return images.some((image) => {
+            return image.x === x && image.y === y
+        })
+    }
+
 	/**
 	 * Handles uploading of an image.
 	 * @param e
@@ -43,6 +51,9 @@ const NavBar = ({takeScreenshot}) => {
 		setIsLoading(true);
 		const files = e.target.files;
 		const newImages = [];
+
+        let x = 0;
+        let y = 0;
 
         await Promise.all(
             Array.from(files).map(async (file) => {
@@ -57,14 +68,22 @@ const NavBar = ({takeScreenshot}) => {
                             reject(reader.error);
                         };
                     });
+                    while (isAnyImageAtPosition(x, y)) {
+                        x += offset;
+                        y += offset;
+                    }
                     const newImage = {
                         className: 'Image',
                         imageUrl,
                         id: Date.now().toString(), // Assign a unique identifier using Date.now()
                         name: file.name,
+                        x: x,
+                        y: y,
                         // Other properties for the `shapeProps` object
                     };
                     newImages.push(newImage);
+                    x += offset;
+                    y += offset;
                 } catch (error) {
                     console.error(error);
                 }

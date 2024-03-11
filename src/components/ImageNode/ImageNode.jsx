@@ -65,6 +65,8 @@ const ImageNode = ({
 				image={imageSrc}
 				onClick={onSelect}
 				onTap={onSelect}
+				x={shapeProps.x}
+				y={shapeProps.y}
 				{...shapeProps}
 				onChange={onChange}
 				onDragEnd={(e) => {
