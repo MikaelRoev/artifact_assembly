@@ -169,7 +169,7 @@ const NavBar = ({takeScreenshot}) => {
                                     >Save project</span>
                                 </li>
                                 <li>
-                                    <span className={"screenShotButton"} id={"ssButton"}>Export canvas as image </span>
+                                    <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
                                     <input
                                         ref={inputRef}
                                         type={"number"}
@@ -184,7 +184,7 @@ const NavBar = ({takeScreenshot}) => {
                                 </li>
                                 <li>
                                     <span id={"showScoreWindowButton"}
-                                          onClick={openScoreWindow}>Open score window</span>
+                                          onClick={openScoreWindow}>Open similarity metrics window</span>
                                 </li>
                             </ul>
                         </div>

@@ -16,8 +16,8 @@ const ScoreWindow = ({layerRef}) => {
      */
     useEffect(() => {
         /**
-         * Function to make the scorewindow draggable across the window.
-         * @param element the scorewindow.
+         * Function to make the score window draggable across the window.
+         * @param element the score window.
          */
         function makeDraggable(element) {
             // Initiating position variables.
@@ -121,7 +121,7 @@ const ScoreWindow = ({layerRef}) => {
 
     return (<div id="scoreWindow" className="window">
             <div className="window-top">
-                <div className="window-top-left">Score Window</div>
+                <div className="window-top-left">Similarity Metrics Window</div>
                 <button className="square red"></button>
             </div>
             <div className="window-content"></div>
