@@ -19,6 +19,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
+	const [shiftPressed, setShiftPressed] = useState(false);
 
 	const trRef = useRef();
 
@@ -112,35 +113,41 @@ const StageArea = ({stageRef, layerRef}) => {
 	}, [history, historyIndex]);
 
 	/**
-	 * Set up and cleans up the deselect check.
+	 * Set up and cleans up the select key check.
 	 */
 	useEffect(() => {
 		/**
-		 * The ctrl key down event handler.
+		 * The selection keys down event handler.
 		 * @param e
 		 */
-		const handleCtrlDown = (e) => {
+		const handleSelectKeyDown = (e) => {
 			if (e.key === 'Control') {
 				setCtrlPressed(true);
+			}
+			if (e.key === 'Shift') {
+				setShiftPressed(true);
 			}
 		};
 
 		/**
-		 * The ctrl key up event handler.
+		 * The select key up event handler.
 		 * @param e
 		 */
-		const handleCtrlUp = (e) => {
+		const handleSelectKeyUp = (e) => {
 			if (e.key === 'Control') {
 				setCtrlPressed(false);
 			}
+			if (e.key === 'Shift') {
+				setShiftPressed(false);
+			}
 		};
 
-		document.addEventListener('keydown', handleCtrlDown);
-		document.addEventListener('keyup', handleCtrlUp);
+		document.addEventListener('keydown', handleSelectKeyDown);
+		document.addEventListener('keyup', handleSelectKeyUp);
 
 		return () => {
-			document.removeEventListener('keydown', handleCtrlDown);
-			document.removeEventListener('keyup', handleCtrlUp);
+			document.removeEventListener('keydown', handleSelectKeyDown);
+			document.removeEventListener('keyup', handleSelectKeyUp);
 		};
 	}, []);
 
@@ -151,7 +158,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	 * @param e the event.
 	 */
 	const checkDeselect = (e) => {
-		if (e.target === e.currentTarget && !ctrlPressed) {
+		if (e.target === e.currentTarget && !ctrlPressed && !shiftPressed) {
 			selectedElements.forEach((element) => element.draggable(false));
 			setSelectedElements([]);
 		}
@@ -219,7 +226,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		element.moveToTop();
 		const index = selectedElements.indexOf(element);
 
-		if (ctrlPressed) {
+		if (ctrlPressed || shiftPressed) {
 			if (index !== -1) {
 				// already selected
 				const newSelected = [...selectedElements];
