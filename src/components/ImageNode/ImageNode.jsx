@@ -16,7 +16,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
  * @constructor
  */
 const ImageNode = ({
-	shapeProps: imageProps,
+	imageProps,
 	onSelect,
 	onChange
 }) => {
@@ -25,7 +25,7 @@ const ImageNode = ({
 	const [url, setUrl] = useState('');
 	const [image] = useImage(url);
 
-	const { filter, hue, saturation, luminance, contrast } = useContext(FilterContext);
+	const { filter } = useContext(FilterContext);
 
 	/**
 	 * Handles the filter on the image.
@@ -64,10 +64,10 @@ const ImageNode = ({
 			ref={imageRef}
 			filters={handleFilter()}
 			{...{
-				hue: hue,
-				saturation: Number(saturation),
-				luminance: Number(luminance),
-				contrast: Number(contrast),
+				hue: imageProps.hue,
+				saturation: imageProps.saturation,
+				luminance: imageProps.luminance,
+				contrast: imageProps.contrast,
 			}}
 			image={image}
 			onClick={onSelect}

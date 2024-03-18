@@ -5,7 +5,7 @@ import LockedContext from "../../contexts/LockedContext";
 import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
-import selectedElementsContext from "../../contexts/SelectedElementsContext";
+import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 
 /**
  * Creates the canvas area in the project page.
@@ -23,7 +23,7 @@ const StageArea = ({stageRef, layerRef}) => {
 
 	const trRef = useRef();
 
-	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(selectedElementsContext);
+	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
 	const {images, setImages} = useContext(ImageContext);
@@ -58,20 +58,19 @@ const StageArea = ({stageRef, layerRef}) => {
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedElements.length > 0) {
-				const selectedIds = selectedElements.map((element) => element.getId())
-
-				const newImages = images.filter((image) => !selectedIds.includes(image.id));
+			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
+				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
 
 				setImages(newImages);
-				setSelectedElements([]); // works
+				setSelectedElements([]);
+				setSelectedElementsIndex([]);
 			}
 		};
 		document.addEventListener("keydown", handleDeletePressed);
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [images, selectedElements, setImages]);
+	}, [images, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages]);
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -162,6 +161,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		if (e.target === e.currentTarget && !ctrlPressed && !shiftPressed) {
 			selectedElements.forEach((element) => element.draggable(false));
 			setSelectedElements([]);
+			setSelectedElementsIndex([]);
 		}
 	};
 
@@ -221,25 +221,33 @@ const StageArea = ({stageRef, layerRef}) => {
 	/**
 	 * Event handler for element clicking. This will check the selection of the element.
 	 * @param e click event.
+	 * @param index of the element clicked on
 	 */
-	const handleElementClick = (e) => {
+	const handleElementClick = (e, index) => {
 		const element = e.target;
 		element.moveToTop();
-		const index = selectedElements.indexOf(element);
+		const elementIndex = selectedElements.indexOf(element);
+		const indexIndex = selectedElementsIndex.indexOf(index);
 
 		if (ctrlPressed || shiftPressed) {
-			if (index !== -1) {
+			if (elementIndex !== -1) {
 				// already selected
 				const newSelected = [...selectedElements];
-				newSelected.splice(index, 1);
+				newSelected.splice(elementIndex, 1);
 				setSelectedElements(newSelected);
+
+				const newSelectedIndex = [...selectedElementsIndex];
+				newSelected.splice(indexIndex, 1);
+				setSelectedElementsIndex(newSelectedIndex);
 			} else {
 				// not already selected
 				setSelectedElements([...selectedElements, element]);
+				setSelectedElementsIndex([...selectedElementsIndex, index]);
 			}
 		} else {
 			selectedElements.forEach((element) => element.draggable(false));
 			setSelectedElements([element]);
+			setSelectedElementsIndex([index]);
 		}
 	}
 
@@ -294,8 +302,8 @@ const StageArea = ({stageRef, layerRef}) => {
 							<ImageNode
 								key={index}
 								imageURL={image.imageUrl}
-								shapeProps={image}
-								onSelect={(e) => handleElementClick(e)}
+								imageProps={image}
+								onSelect={(e) => handleElementClick(e, index)}
 								onChange={(newAttrs) => {
 									const rects = images.slice();
 									rects[index] = newAttrs;

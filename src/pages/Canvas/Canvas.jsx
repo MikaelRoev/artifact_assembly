@@ -4,10 +4,9 @@ import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
-import {ImageContextProvider} from "../../contexts/ImageContext";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterContextProvider} from "../../contexts/FilterContext";
-import {SelectedElementsContextProvider} from "../../contexts/SelectedElementsContext";
+import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedElementsIndexContext";
 
 /**
  * Creates a project page.
@@ -43,7 +42,7 @@ const Canvas = () => {
 
     return (
         <FilterContextProvider>
-            <SelectedElementsContextProvider>
+            <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
                     <div className="stage-container">
                         <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
@@ -51,7 +50,7 @@ const Canvas = () => {
                         <ScoreWindow layerRef={layerRef}/>
                     </div>
                 </LockedContextProvider>
-            </SelectedElementsContextProvider>
+            </SelectedElementsIndexContextProvider>
         </FilterContextProvider>
     );
 };
