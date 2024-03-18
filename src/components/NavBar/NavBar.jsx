@@ -67,12 +67,6 @@ const NavBar = ({takeScreenshot}) => {
 	 * @returns {Promise<void>}
 	 */
 	const handleImageUpload = async () => {
-        try {
-            await createDir(await appDataDir());
-        } catch (e) {
-            console.log(e);
-        }
-
         setIsLoading(true);
         // open file explorer dialog window
         const result = await open({
