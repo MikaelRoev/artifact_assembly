@@ -113,10 +113,10 @@ const NavBar = ({takeScreenshot}) => {
         setFilter((prevFilter) => !prevFilter);
     };
 
-    const handleHueChange = (e) => setHue(e.target.value);
-    const handleSaturationChange = (e) => setSaturation(e.target.value);
-    const handleLuminanceChange = (e) => setLuminance(e.target.value);
-    const handleContrastChange = (e) => setContrast(e.target.value);
+    const handleHueChange = (e) => setHue(Number(e.target.value));
+    const handleSaturationChange = (e) => setSaturation(Number(e.target.value));
+    const handleLuminanceChange = (e) => setLuminance(Number(e.target.value));
+    const handleContrastChange = (e) => setContrast(Number(e.target.value));
 
     const resetFilter = () => {
         setHue(0);
@@ -215,7 +215,7 @@ const NavBar = ({takeScreenshot}) => {
                         <FilterForm
                             label="Hue"
                             min={0}
-                            max={259}
+                            max={360}
                             step={1}
                             value={hue}
                             onChange={handleHueChange}

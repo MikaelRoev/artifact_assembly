@@ -23,7 +23,8 @@ const ImageNode = ({
 	const imageRef = useRef();
 
 	const [url, setUrl] = useState('');
-	const [image] = useImage(url);
+
+	const [image] = useImage(url, 'Anonymous');
 
 	const { filter, hue, saturation, luminance, contrast } = useContext(FilterContext);
 
@@ -65,9 +66,9 @@ const ImageNode = ({
 			filters={handleFilter()}
 			{...{
 				hue: hue,
-				saturation: Number(saturation),
-				luminance: Number(luminance),
-				contrast: Number(contrast),
+				saturation: saturation,
+				luminance: luminance,
+				contrast: contrast,
 			}}
 			image={image}
 			onClick={onSelect}
