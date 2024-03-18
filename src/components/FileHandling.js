@@ -1,5 +1,6 @@
 import {invoke} from "@tauri-apps/api/tauri";
-import {dialog} from "@tauri-apps/api";
+import {dialog, fs} from "@tauri-apps/api";
+import async from "async";
 
 /**
  * Saves a string into a file.
@@ -80,3 +81,32 @@ export const saveProjectDialog = async (project, setProject, elements) => {
         console.error('Error during file save dialog: ', error);
     }
 };
+
+export const exportCanvasAsImageDialog = async (image) => {
+    try {
+        const base64 = image.split(',')[1];
+        const binary = atob(base64);
+        const len = binary.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        const filePath = await dialog.save({
+            title: 'Export Canvas as image',
+            filters: [{name: 'PNG Images', extensions: ['png']}]
+        });
+        if (filePath) {
+            await fs.writeBinaryFile({
+                path: filePath,
+                contents: bytes
+            }).then(() => {
+                console.log('Image saved successfully to ', filePath);
+            })
+        } else {
+            console.log('No file selected or operation cancelled.');
+        }
+    } catch (error) {
+        console.error('Error during export Canvas as image: ', error);
+    }
+}

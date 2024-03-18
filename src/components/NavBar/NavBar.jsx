@@ -5,14 +5,15 @@ import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import {saveProjectDialog} from "../FileHandling";
+import ExportImageModal from "../ExportImageModal/ExportImageModal"
+import {saveProjectDialog, exportCanvasAsImageDialog} from "../FileHandling";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({takeScreenshot}) => {
+const NavBar = ({takeScreenshot, stageRef, setDialogOpen}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
@@ -33,7 +34,6 @@ const NavBar = ({takeScreenshot}) => {
     const [numberValue, setNumberValue] = useState(100);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const inputRef = useRef(null);
-
     const offset = 20;
 
     const isAnyImageAtPosition = (x, y) => {
@@ -136,7 +136,10 @@ const NavBar = ({takeScreenshot}) => {
      */
     useEffect(() => {
         const handleScreenShot = () => {
-            takeScreenshot(inputRef.current.value);
+            // takeScreenshot(inputRef.current.value);
+            //let image = stageRef.current.toDataURL({pixelRatio: 1});
+            //exportCanvasAsImageDialog(image).then(handleFileButtonClick)
+            setDialogOpen(true)
             handleFileButtonClick()
         }
 
@@ -189,6 +192,7 @@ const NavBar = ({takeScreenshot}) => {
                                 </li>
                                 <li>
                                     <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
+                                    {/*
                                     <input
                                         ref={inputRef}
                                         type={"number"}
@@ -200,6 +204,7 @@ const NavBar = ({takeScreenshot}) => {
                                         onChange={handleInputChange}
                                     />
                                     <span>%</span>
+                                    */}
                                 </li>
                                 <li>
                                     <span id={"showScoreWindowButton"}

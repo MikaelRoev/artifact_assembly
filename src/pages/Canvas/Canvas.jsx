@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {useRef} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
@@ -7,6 +7,8 @@ import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 import {ImageContextProvider} from "../../contexts/ImageContext";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterContextProvider} from "../../contexts/FilterContext";
+import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
+import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 
 /**
  * Creates a project page.
@@ -16,6 +18,7 @@ import {FilterContextProvider} from "../../contexts/FilterContext";
 const Canvas = () => {
     const stageRef = useRef(null);
     const layerRef = useRef(null);
+    const [isDialogOpen, setDialogOpen] = useState(false);
 
     /**
      * Function to take the screenshot of the stage in StageArea.
@@ -40,13 +43,20 @@ const Canvas = () => {
         document.body.removeChild(link);
     }
 
+    function handleSave(number) {
+        let image = stageRef.current.toDataURL({pixelRatio: number});
+        exportCanvasAsImageDialog(image)
+        setDialogOpen(false)
+    }
+
     return (
         <FilterContextProvider>
             <LockedContextProvider>
                 <div className="stage-container">
-                    <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
+                    <NavBar takeScreenshot={takeScreenshot} stageRef={stageRef} setDialogOpen={setDialogOpen} />
                     <StageArea stageRef={stageRef} layerRef={layerRef} />
                     <ScoreWindow layerRef={layerRef}/>
+                    {isDialogOpen && <ExportImageModal onSave={handleSave} onClose={() => setDialogOpen(false)} />}
                 </div>
             </LockedContextProvider>
         </FilterContextProvider>
