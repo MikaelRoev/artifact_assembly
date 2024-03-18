@@ -12,7 +12,17 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "dialog": {
+        "open": true,
+        "save": true
+      },
+      "protocol": {
+        "asset": true
+      },
+      "fs": {
+        "all": true,
+        "scope": ["**"]
+      }
     },
     "bundle": {
       "active": true,
@@ -45,7 +55,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' data: filesystem: *"
     },
     "updater": {
       "active": false

@@ -7,6 +7,8 @@ import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
+import {appDataDir} from "@tauri-apps/api/path";
+import {createDir} from "@tauri-apps/api/fs";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -64,16 +66,22 @@ const NavBar = ({takeScreenshot}) => {
 
 	/**
 	 * Handles uploading of an image.
-	 * @param e
 	 * @returns {Promise<void>}
 	 */
 	const handleImageUpload = async () => {
+        try {
+            await createDir(await appDataDir());
+        } catch (e) {
+            console.log(e);
+        }
+
         setIsLoading(true);
         // open file explorer dialog window
         const result = await open({
             title: "Load Image",
             filters: [{name: 'Images', extensions: ['jpg', 'png']}],
-            multiple: true
+            multiple: true,
+            //defaultPath: await appDataDir()
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
@@ -82,7 +90,6 @@ const NavBar = ({takeScreenshot}) => {
                 const newImage = {
                     className: 'Image',
                     filePath: file,
-                    name: file,
                     x: position.x,
                     y: position.y,
                     // rotation?
@@ -95,54 +102,6 @@ const NavBar = ({takeScreenshot}) => {
             setImages([...images, ...newImages]);
             setIsLoading(false);
         }
-
-        /*
-		const files = e.target.files;
-		const newImages = [];
-
-        let x = 0;
-        let y = 0;
-
-        await Promise.all(
-            Array.from(files).map(async (file) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                try {
-                    const imageUrl = await new Promise((resolve, reject) => {
-                        reader.onload = () => {
-                            resolve(reader.result);
-                        };
-                        reader.onerror = () => {
-                            reject(reader.error);
-                        };
-                    });
-                    while (isAnyImageAtPosition(x, y)) {
-                        x += offset;
-                        y += offset;
-                    }
-                    const newImage = {
-                        className: 'Image',
-                        imageUrl,
-                        id: Date.now().toString(), // Assign a unique identifier using Date.now()
-                        name: file.name,
-                        x: x,
-                        y: y,
-                        // Other properties for the `shapeProps` object
-                    };
-                    newImages.push(newImage);
-                    x += offset;
-                    y += offset;
-                } catch (error) {
-                    console.error(error);
-                }
-            })
-        );
-
-        setImages([...images, ...newImages]);
-        setIsLoading(false);
-        e.target.value = ""; // Clear the input value after the upload is complete
-
-         */
         handleFileButtonClick()
     };
 
