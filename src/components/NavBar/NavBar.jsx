@@ -6,6 +6,9 @@ import ImageContext from "../../contexts/ImageContext";
 import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
+import {open} from "@tauri-apps/api/dialog";
+import {appDataDir} from "@tauri-apps/api/path";
+import {createDir} from "@tauri-apps/api/fs";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -36,63 +39,69 @@ const NavBar = ({takeScreenshot}) => {
 
     const offset = 20;
 
-    const isAnyImageAtPosition = (x, y) => {
+    /**
+     * Checks if there is an image at the position.
+     * @param position {{x: number, y: number}} the position to check.
+     * @return {boolean} true if there are at least one image at the position,
+     * false if there are no images at the position.
+     */
+    const isAnyImageAtPosition = (position) => {
         return images.some((image) => {
-            return image.x === x && image.y === y
+            return image.x === position.x && image.y === position.y
         })
+    }
+
+    /**
+     * Finds the first available position not taken by an image.
+     * @param position {{x: number, y: number}} the starting position to search from.
+     * @return {{x: number, y: number}} the first available position.
+     */
+    const findFirstFreePosition = (position) => {
+        while (isAnyImageAtPosition(position)) {
+            position.x += offset;
+            position.y += offset;
+        }
+        return {x: position.x, y: position.y}
     }
 
 	/**
 	 * Handles uploading of an image.
-	 * @param e
 	 * @returns {Promise<void>}
 	 */
-	const handleImageUpload = async (e) => {
-		setIsLoading(true);
-		const files = e.target.files;
-		const newImages = [];
+	const handleImageUpload = async () => {
+        try {
+            await createDir(await appDataDir());
+        } catch (e) {
+            console.log(e);
+        }
 
-        let x = 0;
-        let y = 0;
-
-        await Promise.all(
-            Array.from(files).map(async (file) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                try {
-                    const imageUrl = await new Promise((resolve, reject) => {
-                        reader.onload = () => {
-                            resolve(reader.result);
-                        };
-                        reader.onerror = () => {
-                            reject(reader.error);
-                        };
-                    });
-                    while (isAnyImageAtPosition(x, y)) {
-                        x += offset;
-                        y += offset;
-                    }
-                    const newImage = {
-                        className: 'Image',
-                        imageUrl,
-                        id: Date.now().toString(), // Assign a unique identifier using Date.now()
-                        name: file.name,
-                        x: x,
-                        y: y,
-                        // Other properties for the `shapeProps` object
-                    };
-                    newImages.push(newImage);
-                    x += offset;
-                    y += offset;
-                } catch (error) {
-                    console.error(error);
-                }
-            })
-        );
-
-        setImages([...images, ...newImages]);
-        setIsLoading(false);
-        e.target.value = ""; // Clear the input value after the upload is complete
+        setIsLoading(true);
+        // open file explorer dialog window
+        const result = await open({
+            title: "Load Image",
+            filters: [{name: 'Images', extensions: ['jpg', 'png']}],
+            multiple: true,
+            //defaultPath: await appDataDir()
+        });
+        if (result?.length > 0) {
+            let position = {x: 0, y: 0};
+            const newImages = result.map((file) => {
+                position = findFirstFreePosition(position);
+                const newImage = {
+                    className: 'Image',
+                    filePath: file,
+                    x: position.x,
+                    y: position.y,
+                    // rotation?
+                    // Other properties for the `shapeProps` object
+                };
+                position.x += offset;
+                position.y += offset;
+                return newImage
+            });
+            setImages([...images, ...newImages]);
+            setIsLoading(false);
+        }
         handleFileButtonClick()
     };
 
@@ -168,24 +177,13 @@ const NavBar = ({takeScreenshot}) => {
                     {dropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
-                                <li>
-                                    <input
-                                        type="file"
-                                        onChange={handleImageUpload}
-                                        multiple
-                                        accept="image/*"
-                                        className="inputfile"
-                                        id="file"
-                                    />
-                                    <label htmlFor="file">Load Image</label>
+                                <li onClick={handleImageUpload}>
+                                    <span id={"loadImageButton"}>Load Image</span>
                                 </li>
-                                <li>
-                                    <span
-                                        id={"saveProjectButton"}
-                                        onClick={() => {
-                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                        }}
-                                    >Save project</span>
+                                <li onClick={() => {
+                                    saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                }}>
+                                    <span id={"saveProjectButton"}>Save project</span>
                                 </li>
                                 <li>
                                     <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
@@ -201,9 +199,8 @@ const NavBar = ({takeScreenshot}) => {
                                     />
                                     <span>%</span>
                                 </li>
-                                <li>
-                                    <span id={"showScoreWindowButton"}
-                                          onClick={openScoreWindow}>Open similarity metrics window</span>
+                                <li onClick={openScoreWindow}>
+                                    <span id={"showScoreWindowButton"}>Open similarity metrics window</span>
                                 </li>
                             </ul>
                         </div>
