@@ -79,6 +79,7 @@ const NavBar = ({takeScreenshot}) => {
                         name: file.name,
                         x: x,
                         y: y,
+                        filterList: []
                         // Other properties for the `shapeProps` object
                     };
                     newImages.push(newImage);
