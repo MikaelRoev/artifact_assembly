@@ -5,6 +5,7 @@ import LockedContext from "../../contexts/LockedContext";
 import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
+import selectedElementsContext from "../../contexts/SelectedElementsContext";
 
 /**
  * Creates the canvas area in the project page.
@@ -15,7 +16,6 @@ import ImageContext from "../../contexts/ImageContext";
  */
 const StageArea = ({stageRef, layerRef}) => {
 	//const [images, setImages] = useState([]);
-	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
@@ -23,6 +23,7 @@ const StageArea = ({stageRef, layerRef}) => {
 
 	const trRef = useRef();
 
+	const {selectedElements, setSelectedElements} = useContext(selectedElementsContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
 	const {images, setImages} = useContext(ImageContext);

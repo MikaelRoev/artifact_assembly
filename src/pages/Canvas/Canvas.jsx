@@ -7,7 +7,7 @@ import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 import {ImageContextProvider} from "../../contexts/ImageContext";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterContextProvider} from "../../contexts/FilterContext";
-import {SelectedElementsContextProvider} from "../../contexts/SelectedElementsContex";
+import {SelectedElementsContextProvider} from "../../contexts/SelectedElementsContext";
 
 /**
  * Creates a project page.
