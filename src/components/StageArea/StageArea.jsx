@@ -15,7 +15,7 @@ import selectedElementsContext from "../../contexts/SelectedElementsContext";
  * @constructor
  */
 const StageArea = ({stageRef, layerRef}) => {
-	//const [images, setImages] = useState([]);
+	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
@@ -23,7 +23,7 @@ const StageArea = ({stageRef, layerRef}) => {
 
 	const trRef = useRef();
 
-	const {selectedElements, setSelectedElements} = useContext(selectedElementsContext);
+	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(selectedElementsContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
 	const {images, setImages} = useContext(ImageContext);
@@ -45,7 +45,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		stage.position({ x: project.x, y: project.y });
 		stage.scale({ x: project.zoom, y: project.zoom });
 		stage.batchDraw();
-	}, [project]);
+	}, [project, stageRef]);
 
 
 	/**
@@ -71,7 +71,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [images, selectedElements]);
+	}, [images, selectedElements, setImages]);
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -91,7 +91,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		return () => {
 			document.removeEventListener("keydown", handleSavePressed);
 		};
-	}, [images]);
+	}, [images, project, setProject]);
 
 	/**
 	 * Sets up and cleans up the undo event listener.
@@ -104,7 +104,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		const handleUndoPressed = (e) => {
 			if (e.ctrlKey && e.key === "z") {
 				e.preventDefault();
-				Undo();
+				undo();
 			}
 		};
 		document.addEventListener("keydown", handleUndoPressed);
@@ -246,7 +246,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	/**
 	 * Undoes the last action in the history.
 	 */
-	const Undo = () => {
+	const undo = () => {
 		if (historyIndex > 0) {
 			setHistoryIndex(historyIndex - 1);
 			setImages(history[historyIndex - 1]);
@@ -289,17 +289,16 @@ const StageArea = ({stageRef, layerRef}) => {
 				className="layer"
 				ref={layerRef}>
 				{images.length > 0 &&
-					images.map((image, i) => {
+					images.map((image, index) => {
 						return (
 							<ImageNode
-								key={image.id}
-								id={image.id}
+								key={index}
 								imageURL={image.imageUrl}
 								shapeProps={image}
 								onSelect={(e) => handleElementClick(e)}
 								onChange={(newAttrs) => {
 									const rects = images.slice();
-									rects[i] = newAttrs;
+									rects[index] = newAttrs;
 									setImages(rects);
 
 									updateHistory(rects);
