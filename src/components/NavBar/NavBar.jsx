@@ -108,7 +108,23 @@ const NavBar = ({takeScreenshot}) => {
         setFilter((prevFilter) => !prevFilter);
     };
 
-    const handleHueChange = (e) => setHue(e.target.value);
+    const handleHueChange = (e) => {
+        // get value from event
+        const value = e.target.value;
+        for (const index in selectedElementsIndex) {
+            if(isNaN(images[index].hue)) images[index].hue = 0;
+            // compute ground value (set value - old value)
+            const groundValue = images[index].hue - hue;
+            // add the value to the ground value
+            images[index].hue = groundValue + value;
+            setImages(images);
+            console.log(groundValue);
+        }
+      setHue(value);
+
+    };
+
+
     const handleSaturationChange = (e) => setSaturation(e.target.value);
     const handleLuminanceChange = (e) => setLuminance(e.target.value);
     const handleContrastChange = (e) => setContrast(e.target.value);
@@ -134,6 +150,13 @@ const NavBar = ({takeScreenshot}) => {
     const handleInputChange = (e) => {
         setNumberValue(parseInt(e.target.value))
     }
+
+    useEffect(()=> {
+        setHue(0);
+        setSaturation(0);
+        setLuminance(0);
+        setContrast(0);
+    }, [selectedElementsIndex]);
 
     /**
      * Effect for handling taking a screenshot of the current stage visible on the screen.
