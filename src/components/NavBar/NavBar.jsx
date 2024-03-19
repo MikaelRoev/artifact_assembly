@@ -122,15 +122,16 @@ const NavBar = ({takeScreenshot}) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
-            if(isNaN(images[index].hue)) images[index].hue = 0;
-            const groundValue = images[index].hue - hue;
+            let imageValue = images[index].hue;
+            if(isNaN(imageValue)) imageValue = 0;
+            const groundValue = imageValue - hue;
             const newValue = groundValue + value;
             if (newValue > hueMax) {
-                images[index].hue = hueMax
+                newImages[index].hue = hueMax
             } else if (newValue < hueMin){
-                images[index].hue = hueMin
+                newImages[index].hue = hueMin
             } else {
-                images[index].hue = newValue
+                newImages[index].hue = newValue
            }
         });
         setImages(newImages);
@@ -143,15 +144,16 @@ const NavBar = ({takeScreenshot}) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
-            if(isNaN(images[index].saturation)) images[index].saturation = 0;
-            const groundValue = images[index].saturation - saturation;
+            let imageValue = images[index].saturation;
+            if(isNaN(imageValue)) imageValue = 0;
+            const groundValue = imageValue - saturation;
             const newValue = groundValue + value;
             if (newValue > saturationMax) {
-                images[index].saturation = saturationMax
+                newImages[index].saturation = saturationMax
             } else if (newValue < saturationMin){
-                images[index].saturation = saturationMin
+                newImages[index].saturation = saturationMin
             } else {
-                images[index].saturation = newValue
+                newImages[index].saturation = newValue
             }
         });
         setImages(newImages);
@@ -163,15 +165,16 @@ const NavBar = ({takeScreenshot}) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
-            if(isNaN(images[index].luminance)) images[index].luminance = 0;
-            const groundValue = images[index].luminance - luminance;
+            let imageValue = images[index].luminance;
+            if(isNaN(imageValue)) imageValue = 0;
+            const groundValue = imageValue - luminance;
             const newValue = groundValue + value;
             if (newValue > luminanceMax) {
-                images[index].luminance = luminanceMax
+                newImages[index].luminance = luminanceMax
             } else if (newValue < luminanceMin){
-                images[index].luminance = luminanceMin
+                newImages[index].luminance = luminanceMin
             } else {
-                images[index].luminance = newValue
+                newImages[index].luminance = newValue
             }
         });
         setImages(newImages);
@@ -183,15 +186,16 @@ const NavBar = ({takeScreenshot}) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
-            if(isNaN(images[index].contrast)) images[index].contrast = 0;
-            const groundValue = images[index].contrast - contrast;
+            let imageValue = images[index].contrast;
+            if(isNaN(imageValue)) imageValue = 0;
+            const groundValue = imageValue - contrast;
             const newValue = groundValue + value;
             if (newValue > contrastMax) {
-                images[index].contrast = contrastMax
+                newImages[index].contrast = contrastMax
             } else if (newValue < contrastMin){
-                images[index].contrast = contrastMin
+                newImages[index].contrast = contrastMin
             } else {
-                images[index].contrast = newValue
+                newImages[index].contrast = newValue
             }
         });
         setImages(newImages);

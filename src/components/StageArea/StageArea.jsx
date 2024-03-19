@@ -34,8 +34,6 @@ const StageArea = ({stageRef, layerRef}) => {
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
 
-	//console.log(project);
-
 	/**
 	 * Update the stage according to the project.
 	 */
