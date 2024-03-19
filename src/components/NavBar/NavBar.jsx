@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
@@ -15,11 +15,8 @@ import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexCo
  * @constructor
  */
 const NavBar = ({setDialogOpen}) => {
-const NavBar = ({takeScreenshot}) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [numberValue, setNumberValue] = useState(100);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const inputRef = useRef(null);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
@@ -224,7 +221,7 @@ const NavBar = ({takeScreenshot}) => {
         setSaturation(0);
         setLuminance(0);
         setContrast(0);
-    }, [selectedElementsIndex]);
+    }, [setHue, setSaturation, setLuminance, setContrast]);
 
     /**
      * Effect for handling exporting an image of the canvas.

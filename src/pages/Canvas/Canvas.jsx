@@ -1,5 +1,4 @@
-import React from "react";
-import {useRef} from "react";
+import React, {useState, useRef} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
