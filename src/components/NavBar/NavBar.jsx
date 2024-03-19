@@ -14,6 +14,7 @@ import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexCo
  * @returns {Element}
  * @constructor
  */
+const NavBar = ({setDialogOpen}) => {
 const NavBar = ({takeScreenshot}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [numberValue, setNumberValue] = useState(100);
@@ -36,7 +37,6 @@ const NavBar = ({takeScreenshot}) => {
         setLuminance,
     } = useContext(FilterContext);
     const {selectedElementsIndex, setSelectedElementsIndex} = useContext(selectedElementsIndexContext);
-
 
     const offset = 20;
     const hueMax = 360;
@@ -217,14 +217,6 @@ const NavBar = ({takeScreenshot}) => {
     }
 
     /**
-     * Constant function to update the number inside the numberinput for scaling the screenshot
-     * @param e
-     */
-    const handleInputChange = (e) => {
-        setNumberValue(parseInt(e.target.value))
-    }
-
-    /**
      * Resets the filter when change in the selected.
      */
     useEffect(() => {
@@ -235,11 +227,11 @@ const NavBar = ({takeScreenshot}) => {
     }, [selectedElementsIndex]);
 
     /**
-     * Effect for handling taking a screenshot of the current stage visible on the screen.
+     * Effect for handling exporting an image of the canvas.
      */
     useEffect(() => {
         const handleScreenShot = () => {
-            takeScreenshot(inputRef.current.value);
+            setDialogOpen(true)
             handleFileButtonClick()
         }
 
@@ -248,7 +240,7 @@ const NavBar = ({takeScreenshot}) => {
             screenshot.addEventListener("click", handleScreenShot, false);
             return () => screenshot.removeEventListener("click", handleScreenShot);
         }
-    }, [takeScreenshot, handleFileButtonClick]);
+    }, [handleFileButtonClick, setDialogOpen]);
 
     /**
      * Function to open up the score window for all the images on the canvas.
@@ -281,17 +273,6 @@ const NavBar = ({takeScreenshot}) => {
                                 </li>
                                 <li>
                                     <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
-                                    <input
-                                        ref={inputRef}
-                                        type={"number"}
-                                        id={"scale"}
-                                        min={100}
-                                        max={1000}
-                                        step={10}
-                                        value={numberValue}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>%</span>
                                 </li>
                                 <li onClick={openScoreWindow}>
                                     <span id={"showScoreWindowButton"}>Open similarity metrics window</span>
