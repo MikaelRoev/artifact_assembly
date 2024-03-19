@@ -39,6 +39,15 @@ const NavBar = ({takeScreenshot}) => {
 
 
     const offset = 20;
+    const hueMax = 360;
+    const hueMin = 0;
+    const saturationMax = 10;
+    const saturationMin = -2;
+    const luminanceMax = 2;
+    const luminanceMin = -2;
+    const contrastMax = 100;
+    const contrastMin = -100;
+
 
     /**
      * Checks if there is an image at the position.
@@ -115,7 +124,14 @@ const NavBar = ({takeScreenshot}) => {
         selectedElementsIndex.forEach((index) => {
             if(isNaN(images[index].hue)) images[index].hue = 0;
             const groundValue = images[index].hue - hue;
-            images[index].hue = groundValue + value;
+            const newValue = groundValue + value;
+            if (newValue > hueMax) {
+                images[index].hue = hueMax
+            } else if (newValue < hueMin){
+                images[index].hue = hueMin
+            } else {
+                images[index].hue = newValue
+           }
         });
         setImages(newImages);
         setHue(value);
@@ -129,7 +145,14 @@ const NavBar = ({takeScreenshot}) => {
         selectedElementsIndex.forEach((index) => {
             if(isNaN(images[index].saturation)) images[index].saturation = 0;
             const groundValue = images[index].saturation - saturation;
-            images[index].saturation = groundValue + value;
+            const newValue = groundValue + value;
+            if (newValue > saturationMax) {
+                images[index].saturation = saturationMax
+            } else if (newValue < saturationMin){
+                images[index].saturation = saturationMin
+            } else {
+                images[index].saturation = newValue
+            }
         });
         setImages(newImages);
         setSaturation(value);
@@ -142,7 +165,14 @@ const NavBar = ({takeScreenshot}) => {
         selectedElementsIndex.forEach((index) => {
             if(isNaN(images[index].luminance)) images[index].luminance = 0;
             const groundValue = images[index].luminance - luminance;
-            images[index].luminance = groundValue + value;
+            const newValue = groundValue + value;
+            if (newValue > luminanceMax) {
+                images[index].luminance = luminanceMax
+            } else if (newValue < luminanceMin){
+                images[index].luminance = luminanceMin
+            } else {
+                images[index].luminance = newValue
+            }
         });
         setImages(newImages);
         setLuminance(value);
@@ -155,7 +185,14 @@ const NavBar = ({takeScreenshot}) => {
         selectedElementsIndex.forEach((index) => {
             if(isNaN(images[index].contrast)) images[index].contrast = 0;
             const groundValue = images[index].contrast - contrast;
-            images[index].contrast = groundValue + value;
+            const newValue = groundValue + value;
+            if (newValue > contrastMax) {
+                images[index].contrast = contrastMax
+            } else if (newValue < contrastMin){
+                images[index].contrast = contrastMin
+            } else {
+                images[index].contrast = newValue
+            }
         });
         setImages(newImages);
         setContrast(value);
