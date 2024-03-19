@@ -111,19 +111,15 @@ const NavBar = ({takeScreenshot}) => {
     const handleHueChange = (e) => {
         // get value from event
         const value = Number(e.target.value);
+        const newImages = [...images];
 
-        for (const index in selectedElementsIndex) {
+        selectedElementsIndex.forEach((index) => {
             if(isNaN(images[index].hue)) images[index].hue = 0;
-
-            // compute ground value (set value - old value)
             const groundValue = images[index].hue - hue;
-
-            // add the value to the ground value
             images[index].hue = groundValue + value;
-            setImages(images);
-            console.log(groundValue);
-        }
-      setHue(value);
+        });
+        setImages(newImages);
+        setHue(value);
 
     };
 
