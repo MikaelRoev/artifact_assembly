@@ -108,7 +108,26 @@ const NavBar = ({takeScreenshot}) => {
         setFilter((prevFilter) => !prevFilter);
     };
 
-    const handleHueChange = (e) => setHue(e.target.value);
+    const handleHueChange = (e) => {
+        // get value from event
+        const value = Number(e.target.value);
+
+        // for each selected
+        for (const index in selectedElementsIndex) {
+            // Check if the image has a hue property if not set it to 0
+            if (isNaN(images[index].hue)) images[index].hue = 0;
+            // compute ground value (image value - old value = ground value)
+            const groundValue = images[index].hue - hue;
+            console.log("ground value", groundValue);
+            // add value to the ground value and set it as image value
+            images[index].hue = groundValue + value;
+            console.log(images[index].hue);
+            setImages(images);
+        }
+        
+        // update value
+        setHue(value);
+    };
     const handleSaturationChange = (e) => setSaturation(e.target.value);
     const handleLuminanceChange = (e) => setLuminance(e.target.value);
     const handleContrastChange = (e) => setContrast(e.target.value);
@@ -134,6 +153,16 @@ const NavBar = ({takeScreenshot}) => {
     const handleInputChange = (e) => {
         setNumberValue(parseInt(e.target.value))
     }
+
+    /**
+     * Resets the filter when change in the selected.
+     */
+    useEffect(() => {
+        setHue(0);
+        setSaturation(0);
+        setLuminance(0);
+        setContrast(0);
+    }, [selectedElementsIndex]);
 
     /**
      * Effect for handling taking a screenshot of the current stage visible on the screen.
