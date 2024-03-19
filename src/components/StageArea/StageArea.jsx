@@ -232,6 +232,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		if (ctrlPressed || shiftPressed) {
 			if (elementIndex !== -1) {
 				// already selected
+				selectedElements[elementIndex].draggable(false);
 				const newSelected = [...selectedElements];
 				newSelected.splice(elementIndex, 1);
 				setSelectedElements(newSelected);
