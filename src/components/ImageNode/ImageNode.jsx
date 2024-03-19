@@ -34,7 +34,7 @@ const ImageNode = ({
 	 */
 	const handleFilter = () => {
 		if (filter === true) {
-			return [Konva.Filters.HSL, Konva.Filters.Contrast];
+			return [Konva.Filters.HSV, Konva.Filters.Contrast];
 		} else return null;
 	};
 
@@ -67,7 +67,8 @@ const ImageNode = ({
 			{...{
 				hue: imageProps.hue,
 				saturation: imageProps.saturation,
-				luminance: imageProps.luminance,
+				value: imageProps.value,
+				//luminance: imageProps.luminance,
 				contrast: imageProps.contrast,
 			}}
 			image={image}

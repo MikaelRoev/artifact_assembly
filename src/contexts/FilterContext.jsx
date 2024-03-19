@@ -13,19 +13,22 @@ export const FilterContextProvider = ({children}) => {
     const [saturation, setSaturation] = useState(0);
     const [hue, setHue] = useState(0);
     const [contrast, setContrast] = useState(0);
-    const [luminance, setLuminance] = useState(0);
+    //const [luminance, setLuminance] = useState(0);
+    const [value, setValue] = useState(0);
 
     const providerValue = {
         filter,
         saturation,
         hue,
         contrast,
-        luminance,
+        //luminance,
+        value,
+        setFilter,
         setSaturation,
         setHue,
         setContrast,
-        setLuminance,
-        setFilter,
+        //setLuminance,
+        setValue
     };
 
     return (

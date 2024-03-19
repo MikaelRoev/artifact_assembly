@@ -30,10 +30,12 @@ const NavBar = ({setDialogOpen}) => {
         setHue,
         contrast,
         setContrast,
-        luminance,
-        setLuminance,
+        //luminance,
+        //setLuminance,
+        value,
+        setValue
     } = useContext(FilterContext);
-    const {selectedElementsIndex, setSelectedElementsIndex} = useContext(selectedElementsIndexContext);
+    const {selectedElementsIndex} = useContext(selectedElementsIndexContext);
 
     const offset = 20;
     const hueMax = 360;
@@ -42,6 +44,8 @@ const NavBar = ({setDialogOpen}) => {
     const saturationMin = -2;
     const luminanceMax = 2;
     const luminanceMin = -2;
+    const valueMax = 2;
+    const valueMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
 
@@ -115,14 +119,14 @@ const NavBar = ({setDialogOpen}) => {
     };
 
     const handleHueChange = (e) => {
-        const value = Number(e.target.value);
+        const hueValue = Number(e.target.value);
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
             let imageValue = images[index].hue;
             if(isNaN(imageValue)) imageValue = 0;
             const groundValue = imageValue - hue;
-            const newValue = groundValue + value;
+            const newValue = groundValue + hueValue;
             if (newValue > hueMax) {
                 newImages[index].hue = hueMax
             } else if (newValue < hueMin){
@@ -132,19 +136,19 @@ const NavBar = ({setDialogOpen}) => {
            }
         });
         setImages(newImages);
-        setHue(value);
+        setHue(hueValue);
     };
 
 
     const handleSaturationChange = (e) => {
-        const value = Number(e.target.value);
+        const saturationValue = Number(e.target.value);
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
             let imageValue = images[index].saturation;
             if(isNaN(imageValue)) imageValue = 0;
             const groundValue = imageValue - saturation;
-            const newValue = groundValue + value;
+            const newValue = groundValue + saturationValue;
             if (newValue > saturationMax) {
                 newImages[index].saturation = saturationMax
             } else if (newValue < saturationMin){
@@ -154,18 +158,19 @@ const NavBar = ({setDialogOpen}) => {
             }
         });
         setImages(newImages);
-        setSaturation(value);
+        setSaturation(saturationValue);
     };
 
+    /*
     const handleLuminanceChange = (e) => {
-        const value = Number(e.target.value);
+        const luminanceValue = Number(e.target.value);
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
             let imageValue = images[index].luminance;
             if(isNaN(imageValue)) imageValue = 0;
             const groundValue = imageValue - luminance;
-            const newValue = groundValue + value;
+            const newValue = groundValue + luminanceValue;
             if (newValue > luminanceMax) {
                 newImages[index].luminance = luminanceMax
             } else if (newValue < luminanceMin){
@@ -175,18 +180,41 @@ const NavBar = ({setDialogOpen}) => {
             }
         });
         setImages(newImages);
-        setLuminance(value);
+        setLuminance(luminanceValue);
+    };
+
+     */
+
+    const handleValueChange = (e) => {
+        const valueValue = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            let imageValue = images[index].value;
+            if(isNaN(imageValue)) imageValue = 0;
+            const groundValue = imageValue - value;
+            const newValue = groundValue + valueValue;
+            if (newValue > valueMax) {
+                newImages[index].value = valueMax
+            } else if (newValue < valueMin){
+                newImages[index].value = valueMin
+            } else {
+                newImages[index].value = newValue
+            }
+        });
+        setImages(newImages);
+        setValue(valueValue);
     };
 
     const handleContrastChange = (e) => {
-        const value = Number(e.target.value);
+        const contrastValue = Number(e.target.value);
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
             let imageValue = images[index].contrast;
             if(isNaN(imageValue)) imageValue = 0;
             const groundValue = imageValue - contrast;
-            const newValue = groundValue + value;
+            const newValue = groundValue + contrastValue;
             if (newValue > contrastMax) {
                 newImages[index].contrast = contrastMax
             } else if (newValue < contrastMin){
@@ -196,13 +224,14 @@ const NavBar = ({setDialogOpen}) => {
             }
         });
         setImages(newImages);
-        setContrast(value);
+        setContrast(contrastValue);
     };
 
     const resetFilter = () => {
         setHue(0);
         setSaturation(0);
-        setLuminance(0);
+        //setLuminance(0);
+        setValue(0);
         setContrast(0);
     };
 
@@ -219,9 +248,10 @@ const NavBar = ({setDialogOpen}) => {
     useEffect(() => {
         setHue(0);
         setSaturation(0);
-        setLuminance(0);
+        //setLuminance(0);
+        setValue(0);
         setContrast(0);
-    }, [setHue, setSaturation, setLuminance, setContrast]);
+    }, [setHue, setSaturation, setValue, setContrast]);
 
     /**
      * Effect for handling exporting an image of the canvas.
@@ -301,12 +331,12 @@ const NavBar = ({setDialogOpen}) => {
                             onChange={handleSaturationChange}
                         />
                         <FilterForm
-                            label="Luminance"
+                            label="Value"
                             min={-2}
                             max={2}
                             step={0.1}
-                            value={luminance}
-                            onChange={handleLuminanceChange}
+                            value={value}
+                            onChange={handleValueChange}
                         />
                         <FilterForm
                             label="Contrast"
