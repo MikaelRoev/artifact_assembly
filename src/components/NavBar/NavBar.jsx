@@ -7,6 +7,7 @@ import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
+import selectedElementsContext from "../../contexts/SelectedElementsContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -14,6 +15,11 @@ import {open} from "@tauri-apps/api/dialog";
  * @constructor
  */
 const NavBar = ({takeScreenshot}) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [numberValue, setNumberValue] = useState(100);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const inputRef = useRef(null);
+
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
@@ -29,11 +35,8 @@ const NavBar = ({takeScreenshot}) => {
         luminance,
         setLuminance,
     } = useContext(FilterContext);
+    const {selectedElements, setSelectedElements} = useContext(selectedElementsContext);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [numberValue, setNumberValue] = useState(100);
-    const [dropdownVisible, setDropdownVisible] = useState(false);
-    const inputRef = useRef(null);
 
     const offset = 20;
 
