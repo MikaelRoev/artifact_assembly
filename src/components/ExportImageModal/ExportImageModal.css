@@ -4,7 +4,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    padding: 20px;
+    padding: 10px;
     z-index: 10000;
     border-radius: 10px;
     border: 1px solid lightgray;
@@ -37,6 +37,9 @@
     border: 2px solid;
     cursor: pointer;
 }
+.infoButton:hover {
+    background-color: lightgrey;
+}
 
 .modalParaDiv {
 }
@@ -52,12 +55,12 @@
 }
 
 .modalInput {
-    width: 10%;
+    width: 15%;
+    text-align: center;
     flex-grow: 0;
     margin-right: auto;
-    border-radius: 10px;
+    border-radius: 5px;
     font-size: 18px;
-
 }
 
 
@@ -69,10 +72,10 @@
 .modalButton {
     margin-left: 10px;
     font-size: 18px;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 .modalButton:hover {
     cursor: pointer;
-    background-color: lightcyan;
+    background-color: lightgrey;
 }

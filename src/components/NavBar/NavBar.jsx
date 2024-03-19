@@ -223,21 +223,14 @@ const NavBar = ({setDialogOpen}) => {
         setContrast(0);
     }, [setHue, setSaturation, setLuminance, setContrast]);
 
-    /**
-     * Effect for handling exporting an image of the canvas.
-     */
-    useEffect(() => {
-        const handleScreenShot = () => {
-            setDialogOpen(true)
-            handleFileButtonClick()
-        }
 
-        const screenshot = document.getElementById("ssButton");
-        if (screenshot) {
-            screenshot.addEventListener("click", handleScreenShot, false);
-            return () => screenshot.removeEventListener("click", handleScreenShot);
-        }
-    }, [handleFileButtonClick, setDialogOpen]);
+    /**
+     * Function to handle exporting an image of the canvas
+     */
+    const handleImageOfCanvasExport = () => {
+        setDialogOpen(true);
+        handleFileButtonClick()
+    }
 
     /**
      * Function to open up the score window for all the images on the canvas.
@@ -253,26 +246,38 @@ const NavBar = ({setDialogOpen}) => {
             <div className="nav-left">
                 <a href="/">Home</a>
                 <div className={"fileDiv"}>
-                    <div className={"fileButton"} onClick={() => handleFileButtonClick()}>
+                    <p className={"fileButton"} onClick={() => handleFileButtonClick()}>
                         File
-                    </div>
+                    </p>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {dropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
-                                <li onClick={handleImageUpload}>
-                                    <span id={"loadImageButton"}>Load Image</span>
-                                </li>
-                                <li onClick={() => {
-                                    saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                }}>
-                                    <span id={"saveProjectButton"}>Save project</span>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleImageUpload}
+                                    >Load Image</button>
                                 </li>
                                 <li>
-                                    <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={() => {
+                                        saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                    }}
+                                    >Save project</button>
                                 </li>
-                                <li onClick={openScoreWindow}>
-                                    <span id={"showScoreWindowButton"}>Open similarity metrics window</span>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleImageOfCanvasExport}
+                                    >Export as image </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={openScoreWindow}
+                                    >Open similarity metrics window</button>
                                 </li>
                             </ul>
                         </div>
