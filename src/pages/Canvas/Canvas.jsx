@@ -4,7 +4,6 @@ import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
-import {ImageContextProvider} from "../../contexts/ImageContext";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterContextProvider} from "../../contexts/FilterContext";
 import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
@@ -21,39 +20,19 @@ const Canvas = () => {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     /**
-     * Function to take the screenshot of the stage in StageArea.
-     * @param number the scaling number of the screenshot. 2 for 2x height and width.
+     * Function to get the canvas as DataURL and send it to
+     * @param number
      */
-    const takeScreenshot = (number) => {
-        let dataURL = stageRef.current.toDataURL({pixelRatio: number/100});
-        downloadURI(dataURL, "canvas.png");
-    };
-
-    /**
-     * Function to download the screenshot taken.
-     * @param uri URI of the image.
-     * @param name Desired filename.
-     */
-    function downloadURI(uri, name) {
-        let link = document.createElement('a');
-        link.download = name;
-        link.href = uri;
-        document.body.appendChild(link);
-        link.click()
-        document.body.removeChild(link);
-    }
-
     function handleSave(number) {
         let image = stageRef.current.toDataURL({pixelRatio: number});
-        exportCanvasAsImageDialog(image)
-        setDialogOpen(false)
+        exportCanvasAsImageDialog(image).then(setDialogOpen(false))
     }
 
     return (
         <FilterContextProvider>
             <LockedContextProvider>
                 <div className="stage-container">
-                    <NavBar takeScreenshot={takeScreenshot} stageRef={stageRef} setDialogOpen={setDialogOpen} />
+                    <NavBar setDialogOpen={setDialogOpen} />
                     <StageArea stageRef={stageRef} layerRef={layerRef} />
                     <ScoreWindow layerRef={layerRef}/>
                     {isDialogOpen && <ExportImageModal onSave={handleSave} onClose={() => setDialogOpen(false)} />}

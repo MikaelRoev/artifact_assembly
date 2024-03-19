@@ -1,19 +1,18 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import ExportImageModal from "../ExportImageModal/ExportImageModal"
-import {saveProjectDialog, exportCanvasAsImageDialog} from "../FileHandling";
+import {saveProjectDialog} from "../FileHandling";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({takeScreenshot, stageRef, setDialogOpen}) => {
+const NavBar = ({setDialogOpen}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
@@ -31,9 +30,7 @@ const NavBar = ({takeScreenshot, stageRef, setDialogOpen}) => {
     } = useContext(FilterContext);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [numberValue, setNumberValue] = useState(100);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const inputRef = useRef(null);
     const offset = 20;
 
     const isAnyImageAtPosition = (x, y) => {
@@ -124,21 +121,10 @@ const NavBar = ({takeScreenshot, stageRef, setDialogOpen}) => {
     }
 
     /**
-     * Constant function to update the number inside the numberinput for scaling the screenshot
-     * @param e
-     */
-    const handleInputChange = (e) => {
-        setNumberValue(parseInt(e.target.value))
-    }
-
-    /**
-     * Effect for handling taking a screenshot of the current stage visible on the screen.
+     * Effect for handling exporting an image of the canvas.
      */
     useEffect(() => {
         const handleScreenShot = () => {
-            // takeScreenshot(inputRef.current.value);
-            //let image = stageRef.current.toDataURL({pixelRatio: 1});
-            //exportCanvasAsImageDialog(image).then(handleFileButtonClick)
             setDialogOpen(true)
             handleFileButtonClick()
         }
@@ -148,7 +134,7 @@ const NavBar = ({takeScreenshot, stageRef, setDialogOpen}) => {
             screenshot.addEventListener("click", handleScreenShot, false);
             return () => screenshot.removeEventListener("click", handleScreenShot);
         }
-    }, [takeScreenshot, handleFileButtonClick]);
+    }, [handleFileButtonClick, setDialogOpen]);
 
     /**
      * Function to open up the score window for all the images on the canvas.
@@ -192,19 +178,6 @@ const NavBar = ({takeScreenshot, stageRef, setDialogOpen}) => {
                                 </li>
                                 <li>
                                     <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
-                                    {/*
-                                    <input
-                                        ref={inputRef}
-                                        type={"number"}
-                                        id={"scale"}
-                                        min={100}
-                                        max={1000}
-                                        step={10}
-                                        value={numberValue}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>%</span>
-                                    */}
                                 </li>
                                 <li>
                                     <span id={"showScoreWindowButton"}
