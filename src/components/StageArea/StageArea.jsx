@@ -238,7 +238,7 @@ const StageArea = ({stageRef, layerRef}) => {
 				setSelectedElements(newSelected);
 
 				const newSelectedIndex = [...selectedElementsIndex];
-				newSelected.splice(indexIndex, 1);
+				newSelectedIndex.splice(indexIndex, 1);
 				setSelectedElementsIndex(newSelectedIndex);
 			} else {
 				// not already selected

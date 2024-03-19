@@ -39,6 +39,15 @@ const NavBar = ({takeScreenshot}) => {
 
 
     const offset = 20;
+    const hueMax = 360;
+    const hueMin = 0;
+    const saturationMax = 10;
+    const saturationMin = -2;
+    const luminanceMax = 2;
+    const luminanceMin = -2;
+    const contrastMax = 100;
+    const contrastMin = -100;
+
 
     /**
      * Checks if there is an image at the position.
@@ -109,28 +118,85 @@ const NavBar = ({takeScreenshot}) => {
     };
 
     const handleHueChange = (e) => {
-        // get value from event
         const value = Number(e.target.value);
+        const newImages = [...images];
 
-        // for each selected
-        for (const index in selectedElementsIndex) {
-            // Check if the image has a hue property if not set it to 0
-            if (isNaN(images[index].hue)) images[index].hue = 0;
-            // compute ground value (image value - old value = ground value)
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].hue)) images[index].hue = 0;
             const groundValue = images[index].hue - hue;
-            console.log("ground value", groundValue);
-            // add value to the ground value and set it as image value
-            images[index].hue = groundValue + value;
-            console.log(images[index].hue);
-            setImages(images);
-        }
-        
-        // update value
+            const newValue = groundValue + value;
+            if (newValue > hueMax) {
+                images[index].hue = hueMax
+            } else if (newValue < hueMin){
+                images[index].hue = hueMin
+            } else {
+                images[index].hue = newValue
+           }
+        });
+        setImages(newImages);
         setHue(value);
     };
-    const handleSaturationChange = (e) => setSaturation(e.target.value);
-    const handleLuminanceChange = (e) => setLuminance(e.target.value);
-    const handleContrastChange = (e) => setContrast(e.target.value);
+
+
+    const handleSaturationChange = (e) => {
+        const value = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].saturation)) images[index].saturation = 0;
+            const groundValue = images[index].saturation - saturation;
+            const newValue = groundValue + value;
+            if (newValue > saturationMax) {
+                images[index].saturation = saturationMax
+            } else if (newValue < saturationMin){
+                images[index].saturation = saturationMin
+            } else {
+                images[index].saturation = newValue
+            }
+        });
+        setImages(newImages);
+        setSaturation(value);
+    };
+
+    const handleLuminanceChange = (e) => {
+        const value = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].luminance)) images[index].luminance = 0;
+            const groundValue = images[index].luminance - luminance;
+            const newValue = groundValue + value;
+            if (newValue > luminanceMax) {
+                images[index].luminance = luminanceMax
+            } else if (newValue < luminanceMin){
+                images[index].luminance = luminanceMin
+            } else {
+                images[index].luminance = newValue
+            }
+        });
+        setImages(newImages);
+        setLuminance(value);
+    };
+
+    const handleContrastChange = (e) => {
+        const value = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].contrast)) images[index].contrast = 0;
+            const groundValue = images[index].contrast - contrast;
+            const newValue = groundValue + value;
+            if (newValue > contrastMax) {
+                images[index].contrast = contrastMax
+            } else if (newValue < contrastMin){
+                images[index].contrast = contrastMin
+            } else {
+                images[index].contrast = newValue
+            }
+        });
+        setImages(newImages);
+        setContrast(value);
+    };
 
     const resetFilter = () => {
         setHue(0);
