@@ -109,7 +109,6 @@ const NavBar = ({takeScreenshot}) => {
     };
 
     const handleHueChange = (e) => {
-        // get value from event
         const value = Number(e.target.value);
         const newImages = [...images];
 
@@ -120,13 +119,47 @@ const NavBar = ({takeScreenshot}) => {
         });
         setImages(newImages);
         setHue(value);
-
     };
 
 
-    const handleSaturationChange = (e) => setSaturation(e.target.value);
-    const handleLuminanceChange = (e) => setLuminance(e.target.value);
-    const handleContrastChange = (e) => setContrast(e.target.value);
+    const handleSaturationChange = (e) => {
+        const value = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].saturation)) images[index].saturation = 0;
+            const groundValue = images[index].saturation - saturation;
+            images[index].saturation = groundValue + value;
+        });
+        setImages(newImages);
+        setSaturation(value);
+    };
+
+    const handleLuminanceChange = (e) => {
+        const value = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].luminance)) images[index].luminance = 0;
+            const groundValue = images[index].luminance - luminance;
+            images[index].luminance = groundValue + value;
+        });
+        setImages(newImages);
+        setLuminance(value);
+    };
+
+    const handleContrastChange = (e) => {
+        const value = Number(e.target.value);
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            if(isNaN(images[index].contrast)) images[index].contrast = 0;
+            const groundValue = images[index].contrast - contrast;
+            images[index].contrast = groundValue + value;
+        });
+        setImages(newImages);
+        setContrast(value);
+    };
 
     const resetFilter = () => {
         setHue(0);
