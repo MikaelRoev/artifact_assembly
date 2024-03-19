@@ -126,13 +126,8 @@ const NavBar = ({takeScreenshot}) => {
             if(isNaN(imageValue)) imageValue = 0;
             const groundValue = imageValue - hue;
             const newValue = groundValue + value;
-            if (newValue > hueMax) {
-                newImages[index].hue = hueMax
-            } else if (newValue < hueMin){
-                newImages[index].hue = hueMin
-            } else {
-                newImages[index].hue = newValue
-           }
+
+            newImages[index].hue = newValue % hueMax;
         });
         setImages(newImages);
         setHue(value);
