@@ -23,7 +23,8 @@ const ImageNode = ({
 	const imageRef = useRef();
 
 	const [url, setUrl] = useState('');
-	const [image] = useImage(url);
+
+	const [image] = useImage(url, 'Anonymous');
 
 	const { filter } = useContext(FilterContext);
 
