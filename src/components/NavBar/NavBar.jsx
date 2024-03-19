@@ -236,7 +236,7 @@ const NavBar = ({takeScreenshot}) => {
                         <FilterForm
                             label="Hue"
                             min={0}
-                            max={259}
+                            max={360}
                             step={1}
                             value={hue}
                             onChange={handleHueChange}
