@@ -7,7 +7,7 @@ import FilterContext from "../../contexts/FilterContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
-import selectedElementsContext from "../../contexts/SelectedElementsContext";
+import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -35,7 +35,7 @@ const NavBar = ({takeScreenshot}) => {
         luminance,
         setLuminance,
     } = useContext(FilterContext);
-    const {selectedElements, setSelectedElements} = useContext(selectedElementsContext);
+    const {selectedElementsIndex, setSelectedElementsIndex} = useContext(selectedElementsIndexContext);
 
 
     const offset = 20;
