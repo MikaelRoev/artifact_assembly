@@ -11,6 +11,7 @@ const FilterForm = ({ label, min, max, step, value, setValue, onChange }) => {
 		<>
 			<p>{label}:</p>
 			<input
+                className={"input-slide-form"}
 				type="range"
 				min={min}
 				max={max}
