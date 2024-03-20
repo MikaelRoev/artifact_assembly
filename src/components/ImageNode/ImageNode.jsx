@@ -2,7 +2,7 @@ import Konva from "konva";
 import { useContext, useRef, useEffect, useState } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import FilterContext from "../../contexts/FilterContext";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 /**
@@ -17,7 +17,8 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 const ImageNode = ({
 	imageProps,
 	onSelect,
-	onChange
+	onChange,
+	onContextMenu
 }) => {
 	const imageRef = useRef();
 
@@ -25,14 +26,14 @@ const ImageNode = ({
 
 	const [image] = useImage(url, 'Anonymous');
 
-	const { filter } = useContext(FilterContext);
+	const { filterEnabled } = useContext(FilterEnabledContext);
 
 	/**
 	 * Handles the filter on the image.
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
 	 */
 	const handleFilter = () => {
-		if (filter === true) {
+		if (filterEnabled === true) {
 			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast];
 		} else return null;
 	};
@@ -66,6 +67,7 @@ const ImageNode = ({
 			filters={handleFilter()}
 			image={image}
 			onClick={onSelect}
+			onContextMenu={onContextMenu}
 			onTap={onSelect}
 			x={imageProps.x}
 			y={imageProps.y}

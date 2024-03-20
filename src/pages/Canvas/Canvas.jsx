@@ -4,10 +4,12 @@ import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 import {LockedContextProvider} from "../../contexts/LockedContext";
-import {FilterContextProvider} from "../../contexts/FilterContext";
+import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
 import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedElementsIndexContext";
 import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
 import {exportCanvasAsImageDialog} from "../../components/FileHandling";
+import FilterWindow from "../../components/FilterWindow/FilterWindow";
+import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 
 /**
  * Creates a project page.
@@ -19,6 +21,7 @@ const Canvas = () => {
     const layerRef = useRef(null);
     const [isScoreWindowOpen, setIsScoreWindowOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
 
     /**
      * Function to get the canvas as DataURL and send it to
@@ -26,22 +29,29 @@ const Canvas = () => {
      */
     function handleSave(number) {
         let image = stageRef.current.toDataURL({pixelRatio: number});
-        exportCanvasAsImageDialog(image).then(setIsDialogOpen(false))
+        exportCanvasAsImageDialog(image).then(() => setIsDialogOpen(false))
     }
 
     return (
-        <FilterContextProvider>
+        <FilterEnabledContextProvider>
             <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
-                    <div className="stage-container">
-                        <NavBar setDialogOpen={setIsDialogOpen} setIsScoreWindowOpen={setIsScoreWindowOpen} />
-                        <StageArea stageRef={stageRef} layerRef={layerRef} />
-                        {isScoreWindowOpen && <ScoreWindow layerRef={layerRef} onClose={() => setIsScoreWindowOpen(false)}/>}
-                        {isDialogOpen && <ExportImageModal onSave={handleSave} onClose={() => setIsDialogOpen(false)} />}
-                    </div>
+                    <ImageFilterContextProvider>
+                        <div className="stage-container">
+                            <NavBar setDialogOpen={setIsDialogOpen} setIsScoreWindowOpen={setIsScoreWindowOpen}/>
+                            <StageArea stageRef={stageRef} layerRef={layerRef}
+                                       setIsFilterWindowOpen={setIsFilterWindowOpen}/>
+                            {isScoreWindowOpen &&
+                                <ScoreWindow layerRef={layerRef} onClose={() => setIsScoreWindowOpen(false)}/>}
+                            {isDialogOpen &&
+                                <ExportImageModal onSave={handleSave} onClose={() => setIsDialogOpen(false)}/>}
+                            {isFilterWindowOpen &&
+                                <FilterWindow onClose={() => setIsFilterWindowOpen(false)}/>}
+                        </div>
+                    </ImageFilterContextProvider>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>
-        </FilterContextProvider>
+        </FilterEnabledContextProvider>
     );
 };
 
