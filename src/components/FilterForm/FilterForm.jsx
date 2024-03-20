@@ -1,10 +1,9 @@
 import React from "react";
 import "./FilterForm.css";
 
-const FilterForm = ({ label, min, max, step, value, setValue, onValueChange }) => {
+const FilterForm = ({ label, min, max, step, value, setValue }) => {
 	const handleReset = () => {
 		setValue(0);
-		onValueChange(0);
 	}
 
 	return (
@@ -17,7 +16,7 @@ const FilterForm = ({ label, min, max, step, value, setValue, onValueChange }) =
 				max={max}
 				step={step}
 				value={value}
-				onChange={(e) => onValueChange(Number(e.target.value))}
+				onChange={(e) => setValue(parseFloat(e.target.value))}
 			/>
 			<input
 				className="input-number-form"
@@ -27,7 +26,7 @@ const FilterForm = ({ label, min, max, step, value, setValue, onValueChange }) =
 				size={3}
 				step={step}
 				value={value}
-				onChange={(e) => onValueChange(Number(e.target.value))}
+				onChange={(e) => setValue(parseFloat(e.target.value))}
 			/>
 			<button onClick={handleReset}>Reset</button>
 		</>

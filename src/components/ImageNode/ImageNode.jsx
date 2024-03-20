@@ -3,7 +3,7 @@ import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import FilterContext from "../../contexts/FilterContext";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 /**
@@ -27,16 +27,14 @@ const ImageNode = ({
 
 	const [image] = useImage(url, 'Anonymous');
 
-	const { filter } = useContext(FilterContext);
-
-	let transformTimer;
+	const { filterEnabled } = useContext(FilterEnabledContext);
 
 	/**
 	 * Handles the filter on the image.
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
 	 */
 	const handleFilter = () => {
-		if (filter === true) {
+		if (filterEnabled === true) {
 			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast];
 		} else return null;
 	};
