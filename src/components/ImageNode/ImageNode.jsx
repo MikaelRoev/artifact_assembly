@@ -18,7 +18,8 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 const ImageNode = ({
 	imageProps,
 	onSelect,
-	onChange
+	onChange,
+	onContextMenu
 }) => {
 	const imageRef = useRef();
 
@@ -75,6 +76,7 @@ const ImageNode = ({
 			}}
 			image={image}
 			onClick={onSelect}
+			onContextMenu={onContextMenu}
 			onTap={onSelect}
 			x={imageProps.x}
 			y={imageProps.y}

@@ -11,10 +11,12 @@ import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexCo
 
 /**
  * Creates a navigation bar that is at the top of the project page.
+ * @param setDialogOpen Boolean for opening the dialog for exporting an image of the canvas.
+ * @param setIsScoreWindowOpen Boolean for opening the similarity metrics window.
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({setDialogOpen}) => {
+const NavBar = ({setDialogOpen, setIsScoreWindowOpen}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [hue, setHue] = useState(0);
@@ -244,8 +246,8 @@ const NavBar = ({setDialogOpen}) => {
      * Function to open up the score window for all the images on the canvas.
      * @returns Void
      */
-    const openScoreWindow = async () => {
-        document.getElementById("scoreWindow").style.visibility = "visible";
+    const handleOpenScoreWindow = async () => {
+        setIsScoreWindowOpen(true);
         handleFileButtonClick()
     };
 
@@ -254,9 +256,9 @@ const NavBar = ({setDialogOpen}) => {
             <div className="nav-left">
                 <a href="/">Home</a>
                 <div className={"fileDiv"}>
-                    <p className={"fileButton"} onClick={() => handleFileButtonClick()}>
+                    <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
-                    </p>
+                    </button>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {dropdownVisible && (
                         <div className={"dropdown"}>
@@ -284,17 +286,17 @@ const NavBar = ({setDialogOpen}) => {
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={openScoreWindow}
+                                        onClick={handleOpenScoreWindow}
                                     >Open similarity metrics window</button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <p onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</p>
-                <p onClick={toggleFilter}>
+                <button className={"navButton"} onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <button className={"navButton"} onClick={toggleFilter}>
                     {!filter ? "Enable Filter" : "Disable Filter"}
-                </p>
+                </button>
                 {!filter ? null : (
                     <form className="filter-form">
                         <FilterForm
@@ -342,7 +344,7 @@ const NavBar = ({setDialogOpen}) => {
                             setValue={setContrast}
                             onValueChange={handleContrastChange}
                         />
-                        <p onClick={resetFilter}>Reset</p>
+                        <button onClick={resetFilter}>Reset</button>
                     </form>
                 )}
             </div>

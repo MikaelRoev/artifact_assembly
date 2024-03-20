@@ -5,10 +5,11 @@ import "./ScoreWindow.css"
 /**
  * Creates a ScoreWindow element.
  * @param layerRef reference to the layer in the stagearea.
+ * @param onClose function reference for closing the window.
  * @returns {Element}
  * @constructor
  */
-const ScoreWindow = ({layerRef}) => {
+const ScoreWindow = ({layerRef, onClose}) => {
 
     /**
      * UseEffect to make the scorewindow draggable on creation.
@@ -65,12 +66,6 @@ const ScoreWindow = ({layerRef}) => {
         }
 
         makeDraggable(document.querySelector('#scoreWindow'));
-
-        document.addEventListener('click', e => {
-            if (e.target.closest('.square.red')) {
-                e.target.closest('.window').style.visibility = 'hidden';
-            }
-        });
     }, []);
 
 
@@ -119,10 +114,98 @@ const ScoreWindow = ({layerRef}) => {
 
     }, [layerRef]);
 
-    return (<div id="scoreWindow" className="window">
+    useEffect(() => {
+        const resizable = document.getElementById('scoreWindow');
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, direction;
+        let distance = 7;
+
+        function initDrag(e) {
+            // Determine if the mouse is near the edges
+            const { left, right, bottom } = resizable.getBoundingClientRect();
+            const nearLeftEdge = Math.abs(e.clientX - left) < distance;
+            const nearRightEdge = Math.abs(e.clientX - right) < distance;
+            const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
+
+            if (nearRightEdge || nearBottomEdge || nearLeftEdge) {
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(resizable).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(resizable).height, 10);
+                direction = {right: nearRightEdge, left: nearLeftEdge, bottom: nearBottomEdge};
+                isResizing = true;
+
+                document.documentElement.addEventListener('mousemove', doDrag, false);
+                document.documentElement.addEventListener('mouseup', stopDrag, false);
+            }
+        }
+
+        function doDrag(e) {
+            if (!isResizing) return;
+
+            let newWidth = startWidth + e.clientX - startX;
+            let newHeight = startHeight + e.clientY - startY;
+
+            if (direction.right) {
+                resizable.style.width = Math.max(100, newWidth) + 'px';
+            }
+            if (direction.bottom) {
+                resizable.style.height = Math.max(100, newHeight) + 'px';
+            }
+            if (direction.left) {
+                const newWidth = Math.max(100, startWidth - (e.clientX - startX));
+                if (newWidth > 400) {
+                    resizable.style.width = newWidth + 'px';
+                    resizable.style.left = e.clientX + 'px';
+                }
+            }
+        }
+
+        function stopDrag() {
+            isResizing = false;
+            document.documentElement.removeEventListener('mousemove', doDrag, false);
+            document.documentElement.removeEventListener('mouseup', stopDrag, false);
+        }
+
+        resizable.addEventListener("mousemove", function(e) {
+            const { left, right, bottom} = resizable.getBoundingClientRect();
+            resizable.style.cursor = getCursor(e, left, right, bottom, distance);
+        }, false)
+
+        resizable.addEventListener('mousedown', initDrag, false);
+
+
+    }, []);
+
+    function getCursor(e, left, right, bottom, distance) {
+        const nearLeftEdge = Math.abs(e.clientX - left) < distance;
+        const nearRightEdge = Math.abs(e.clientX - right) < distance;
+        const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
+
+        if (nearBottomEdge && nearLeftEdge) return 'nesw-resize';
+        if (nearBottomEdge && nearRightEdge) return 'nwse-resize';
+        if (nearRightEdge || nearLeftEdge) return 'ew-resize';
+        if (nearBottomEdge) return 'ns-resize';
+        return 'default';
+    }
+
+    /**
+     * useEffect to prevent right-click on the similarity metrics window
+     */
+    useEffect(() => {
+        let window = document.querySelector('#scoreWindow');
+        if (window) {
+            window.addEventListener('contextmenu', (event) => {
+                event.preventDefault();
+            })
+        }
+    }, []);
+
+    return (
+        <div id="scoreWindow" className="window">
             <div className="window-top">
                 <div className="window-top-left">Similarity Metrics Window</div>
-                <button className="square red"></button>
+                <button className="square exit" onClick={onClose}></button>
             </div>
             <div className="window-content"></div>
         </div>)
