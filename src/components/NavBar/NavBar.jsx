@@ -17,24 +17,15 @@ import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexCo
 const NavBar = ({setDialogOpen}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [hue, setHue] = useState(0);
+    const [saturation, setSaturation] = useState(0);
+    const [value, setValue] = useState(0);
+    const [contrast, setContrast] = useState(0);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {
-        filter,
-        setFilter,
-        saturation,
-        setSaturation,
-        hue,
-        setHue,
-        contrast,
-        setContrast,
-        //luminance,
-        //setLuminance,
-        value,
-        setValue
-    } = useContext(FilterContext);
+    const {filter, setFilter} = useContext(FilterContext);
     const {selectedElementsIndex} = useContext(selectedElementsIndexContext);
 
     const offset = 20;
@@ -42,8 +33,6 @@ const NavBar = ({setDialogOpen}) => {
     const hueMin = 0;
     const saturationMax = 10;
     const saturationMin = -2;
-    const luminanceMax = 2;
-    const luminanceMin = -2;
     const valueMax = 2;
     const valueMin = -2;
     const contrastMax = 100;
@@ -118,8 +107,7 @@ const NavBar = ({setDialogOpen}) => {
         setFilter((prevFilter) => !prevFilter);
     };
 
-    const handleHueChange = (e) => {
-        const hueValue = Number(e.target.value);
+    const handleHueChange = (hueValue) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
@@ -127,21 +115,14 @@ const NavBar = ({setDialogOpen}) => {
             if(isNaN(imageValue)) imageValue = 0;
             const groundValue = imageValue - hue;
             const newValue = groundValue + hueValue;
-            if (newValue > hueMax) {
-                newImages[index].hue = hueMax
-            } else if (newValue < hueMin){
-                newImages[index].hue = hueMin
-            } else {
-                newImages[index].hue = newValue
-           }
+            newImages[index].hue = newValue % 360;
         });
         setImages(newImages);
         setHue(hueValue);
     };
 
 
-    const handleSaturationChange = (e) => {
-        const saturationValue = Number(e.target.value);
+    const handleSaturationChange = (saturationValue) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
@@ -161,32 +142,7 @@ const NavBar = ({setDialogOpen}) => {
         setSaturation(saturationValue);
     };
 
-    /*
-    const handleLuminanceChange = (e) => {
-        const luminanceValue = Number(e.target.value);
-        const newImages = [...images];
-
-        selectedElementsIndex.forEach((index) => {
-            let imageValue = images[index].luminance;
-            if(isNaN(imageValue)) imageValue = 0;
-            const groundValue = imageValue - luminance;
-            const newValue = groundValue + luminanceValue;
-            if (newValue > luminanceMax) {
-                newImages[index].luminance = luminanceMax
-            } else if (newValue < luminanceMin){
-                newImages[index].luminance = luminanceMin
-            } else {
-                newImages[index].luminance = newValue
-            }
-        });
-        setImages(newImages);
-        setLuminance(luminanceValue);
-    };
-
-     */
-
-    const handleValueChange = (e) => {
-        const valueValue = Number(e.target.value);
+    const handleValueChange = (valueValue) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
@@ -206,8 +162,7 @@ const NavBar = ({setDialogOpen}) => {
         setValue(valueValue);
     };
 
-    const handleContrastChange = (e) => {
-        const contrastValue = Number(e.target.value);
+    const handleContrastChange = (contrastValue) => {
         const newImages = [...images];
 
         selectedElementsIndex.forEach((index) => {
@@ -230,7 +185,6 @@ const NavBar = ({setDialogOpen}) => {
     const resetFilter = () => {
         setHue(0);
         setSaturation(0);
-        //setLuminance(0);
         setValue(0);
         setContrast(0);
     };
@@ -248,10 +202,9 @@ const NavBar = ({setDialogOpen}) => {
     useEffect(() => {
         setHue(0);
         setSaturation(0);
-        //setLuminance(0);
         setValue(0);
         setContrast(0);
-    }, [setHue, setSaturation, setValue, setContrast]);
+    }, [setHue, setSaturation, setValue, setContrast, selectedElementsIndex]);
 
     /**
      * Effect for handling exporting an image of the canvas.
@@ -320,6 +273,7 @@ const NavBar = ({setDialogOpen}) => {
                             max={360}
                             step={1}
                             value={hue}
+                            setValue={setHue}
                             onChange={handleHueChange}
                         />
                         <FilterForm
@@ -328,6 +282,7 @@ const NavBar = ({setDialogOpen}) => {
                             max={10}
                             step={0.5}
                             value={saturation}
+                            setValue={setSaturation}
                             onChange={handleSaturationChange}
                         />
                         <FilterForm
@@ -336,6 +291,7 @@ const NavBar = ({setDialogOpen}) => {
                             max={2}
                             step={0.1}
                             value={value}
+                            setValue={setValue}
                             onChange={handleValueChange}
                         />
                         <FilterForm
@@ -344,6 +300,7 @@ const NavBar = ({setDialogOpen}) => {
                             max={100}
                             step={1}
                             value={contrast}
+                            setValue={setContrast}
                             onChange={handleContrastChange}
                         />
                         <p onClick={resetFilter}>Reset</p>

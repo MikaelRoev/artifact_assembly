@@ -10,29 +10,9 @@ const FilterContext = createContext(null);
  */
 export const FilterContextProvider = ({children}) => {
     const [filter, setFilter] = useState(false);
-    const [saturation, setSaturation] = useState(0);
-    const [hue, setHue] = useState(0);
-    const [contrast, setContrast] = useState(0);
-    //const [luminance, setLuminance] = useState(0);
-    const [value, setValue] = useState(0);
-
-    const providerValue = {
-        filter,
-        saturation,
-        hue,
-        contrast,
-        //luminance,
-        value,
-        setFilter,
-        setSaturation,
-        setHue,
-        setContrast,
-        //setLuminance,
-        setValue
-    };
 
     return (
-        <FilterContext.Provider value={providerValue}>
+        <FilterContext.Provider value={{filter, setFilter}}>
             {children}
         </FilterContext.Provider>
     )
