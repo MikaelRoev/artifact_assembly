@@ -29,7 +29,7 @@ const FilterForm = ({ label, min, max, step, value, setValue, onValueChange }) =
 				value={value}
 				onChange={(e) => onValueChange(Number(e.target.value))}
 			/>
-			<p onClick={handleReset}>Reset</p>
+			<button onClick={handleReset}>Reset</button>
 		</>
 	);
 }

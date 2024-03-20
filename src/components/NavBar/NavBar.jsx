@@ -297,7 +297,7 @@ const NavBar = ({setDialogOpen}) => {
                 </p>
                 {!filter ? null : (
                     <form className="filter-form">
-                        {/*<FilterForm
+                        <FilterForm
                             label="Hue"
                             min={hueMin}
                             max={hueMax}
@@ -305,7 +305,7 @@ const NavBar = ({setDialogOpen}) => {
                             value={hue}
                             setValue={setHue}
                             onValueChange={handleHueChange}
-                        />*/}
+                        />
                         <FilterForm
                             label="Saturation"
                             min={saturationMin}
