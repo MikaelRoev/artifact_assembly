@@ -28,6 +28,8 @@ const ImageNode = ({
 
 	const { filter } = useContext(FilterContext);
 
+	let transformTimer;
+
 	/**
 	 * Handles the filter on the image.
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
@@ -89,20 +91,12 @@ const ImageNode = ({
 				//Moves selected image on top (z-index)
 				e.target.moveToTop();
 			}}
-			onTransformEnd={() => {
-				const node = imageRef.current;
-				const scaleX = node.scaleX();
-				const scaleY = node.scaleY();
-
-				node.scaleX(1);
-				node.scaleY(1);
+			onTransformEnd={(e) => {
 				onChange({
 					...imageProps,
-					x: node.x(),
-					y: node.y(),
-					// set minimal value
-					width: Math.max(5, node.width() * scaleX),
-					height: Math.max(node.height() * scaleY),
+					x: e.target.x(),
+					y: e.target.y(),
+					rotation: e.target.rotation(),
 				});
 			}}
 			onMouseEnter={(e) => {
