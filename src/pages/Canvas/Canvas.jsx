@@ -8,6 +8,7 @@ import {FilterContextProvider} from "../../contexts/FilterContext";
 import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedElementsIndexContext";
 import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
 import {exportCanvasAsImageDialog} from "../../components/FileHandling";
+import FilterWindow from "../../components/FilterWindow/FilterWindow";
 
 /**
  * Creates a project page.
@@ -19,6 +20,7 @@ const Canvas = () => {
     const layerRef = useRef(null);
     const [isScoreWindowOpen, setIsScoreWindowOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
 
     /**
      * Function to get the canvas as DataURL and send it to
@@ -35,9 +37,10 @@ const Canvas = () => {
                 <LockedContextProvider>
                     <div className="stage-container">
                         <NavBar setDialogOpen={setIsDialogOpen} setIsScoreWindowOpen={setIsScoreWindowOpen} />
-                        <StageArea stageRef={stageRef} layerRef={layerRef} />
+                        <StageArea stageRef={stageRef} layerRef={layerRef} setIsFilterWindowOpen={setIsFilterWindowOpen} />
                         {isScoreWindowOpen && <ScoreWindow layerRef={layerRef} onClose={() => setIsScoreWindowOpen(false)}/>}
                         {isDialogOpen && <ExportImageModal onSave={handleSave} onClose={() => setIsDialogOpen(false)} />}
+                        {isFilterWindowOpen && <FilterWindow onClose={() => setIsFilterWindowOpen(false)}/>}
                     </div>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>

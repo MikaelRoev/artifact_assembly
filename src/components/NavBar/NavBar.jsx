@@ -11,6 +11,8 @@ import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexCo
 
 /**
  * Creates a navigation bar that is at the top of the project page.
+ * @param setDialogOpen Boolean for opening the dialog for exporting an image of the canvas.
+ * @param setIsScoreWindowOpen Boolean for opening the similarity metrics window.
  * @returns {Element}
  * @constructor
  */

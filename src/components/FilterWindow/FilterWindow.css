@@ -1,4 +1,4 @@
-.window {
+.filterWindow {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -8,10 +8,10 @@
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
     background: #fff;
     user-select: none;
-    z-index: 999;
+    z-index: 998;
 }
 
-.window-content {
+.filterWindowBody {
     background: #fff;
     color: #000;
     height: calc(100% - 30px);
@@ -23,7 +23,7 @@
     flex-grow: 1;
 }
 
-.window-top {
+.filterWindowHeader {
     cursor: move;
     height: 30px;
     border-bottom: 1px solid rgba(0,0,0,0.5);
@@ -34,7 +34,7 @@
     color: #f0f0f0;
 }
 
-.window-top-left {
+.filterWindowTitle  {
     float: left;
 }
 
