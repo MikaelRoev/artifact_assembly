@@ -20,6 +20,7 @@ const NavBar = ({setDialogOpen}) => {
     const [hue, setHue] = useState(0);
     const [saturation, setSaturation] = useState(0);
     const [value, setValue] = useState(0);
+    const [luminance, setLuminance] = useState(0);
     const [contrast, setContrast] = useState(0);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
@@ -35,6 +36,8 @@ const NavBar = ({setDialogOpen}) => {
     const saturationMin = -2;
     const valueMax = 2;
     const valueMin = -2;
+    const luminanceMax = 2;
+    const luminanceMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
 
@@ -162,6 +165,26 @@ const NavBar = ({setDialogOpen}) => {
         setValue(valueValue);
     };
 
+    const handleLuminanceChange = (luminanceValue) => {
+        const newImages = [...images];
+
+        selectedElementsIndex.forEach((index) => {
+            let imageValue = images[index].luminance;
+            if(isNaN(imageValue)) imageValue = 0;
+            const groundValue = imageValue - luminance;
+            const newValue = groundValue + luminanceValue;
+            if (newValue > luminanceMax) {
+                newImages[index].luminance = luminanceMax
+            } else if (newValue < luminanceMin){
+                newImages[index].luminance = luminanceMin
+            } else {
+                newImages[index].luminance = newValue
+            }
+        });
+        setImages(newImages);
+        setLuminance(luminanceValue);
+    };
+
     const handleContrastChange = (contrastValue) => {
         const newImages = [...images];
 
@@ -186,6 +209,7 @@ const NavBar = ({setDialogOpen}) => {
         setHue(0);
         setSaturation(0);
         setValue(0);
+        setLuminance(0);
         setContrast(0);
     };
 
@@ -203,8 +227,9 @@ const NavBar = ({setDialogOpen}) => {
         setHue(0);
         setSaturation(0);
         setValue(0);
+        setLuminance(0);
         setContrast(0);
-    }, [setHue, setSaturation, setValue, setContrast, selectedElementsIndex]);
+    }, [setHue, setSaturation, setValue, setContrast, setLuminance, selectedElementsIndex]);
 
 
     /**
@@ -272,41 +297,50 @@ const NavBar = ({setDialogOpen}) => {
                 </p>
                 {!filter ? null : (
                     <form className="filter-form">
-                        <FilterForm
+                        {/*<FilterForm
                             label="Hue"
-                            min={0}
-                            max={360}
+                            min={hueMin}
+                            max={hueMax}
                             step={1}
                             value={hue}
                             setValue={setHue}
-                            onChange={handleHueChange}
-                        />
+                            onValueChange={handleHueChange}
+                        />*/}
                         <FilterForm
                             label="Saturation"
-                            min={-2}
-                            max={10}
+                            min={saturationMin}
+                            max={saturationMax}
                             step={0.5}
                             value={saturation}
                             setValue={setSaturation}
-                            onChange={handleSaturationChange}
+                            onValueChange={handleSaturationChange}
                         />
                         <FilterForm
                             label="Value"
-                            min={-2}
-                            max={2}
+                            min={valueMin}
+                            max={valueMax}
                             step={0.1}
                             value={value}
                             setValue={setValue}
-                            onChange={handleValueChange}
+                            onValueChange={handleValueChange}
+                        />
+                        <FilterForm
+                            label="Luminance"
+                            min={luminanceMin}
+                            max={luminanceMax}
+                            step={0.1}
+                            value={luminance}
+                            setValue={setLuminance}
+                            onValueChange={handleLuminanceChange}
                         />
                         <FilterForm
                             label="Contrast"
-                            min={-100}
-                            max={100}
+                            min={contrastMin}
+                            max={contrastMax}
                             step={1}
                             value={contrast}
                             setValue={setContrast}
-                            onChange={handleContrastChange}
+                            onValueChange={handleContrastChange}
                         />
                         <p onClick={resetFilter}>Reset</p>
                     </form>
