@@ -59,6 +59,7 @@
 	-webkit-user-select: none; /* Safari */
 	-ms-user-select: none; /* IE 10 and IE 11 */
 	user-select: none; /* Standard syntax */
+	border: none;
 }
 
 .nav-left div {
@@ -83,6 +84,24 @@
 	align-items: center;
 	justify-content: center;
 	margin: 12px;
+}
+.navButton {
+	width: auto;
+	color: #abb2bf;
+	transition: 100ms ease-in;
+	background-color: #202020;
+	cursor: pointer;
+	border-radius: 6px;
+	padding-left: 12px;
+	padding-right: 12px;
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	user-select: none; /* Standard syntax */
+	border: none;
+}
+
+.navButton:hover {
+	background-color: #323842;
 }
 
 .dropdown {
@@ -124,3 +143,4 @@
 	background-color: lightgrey;
 	cursor: pointer;
 }
+

@@ -17,7 +17,8 @@ import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 const Canvas = () => {
     const stageRef = useRef(null);
     const layerRef = useRef(null);
-    const [isDialogOpen, setDialogOpen] = useState(false);
+    const [isScoreWindowOpen, setIsScoreWindowOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     /**
      * Function to get the canvas as DataURL and send it to
@@ -25,7 +26,7 @@ const Canvas = () => {
      */
     function handleSave(number) {
         let image = stageRef.current.toDataURL({pixelRatio: number});
-        exportCanvasAsImageDialog(image).then(setDialogOpen(false))
+        exportCanvasAsImageDialog(image).then(setIsDialogOpen(false))
     }
 
     return (
@@ -33,10 +34,10 @@ const Canvas = () => {
             <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
                     <div className="stage-container">
-                        <NavBar setDialogOpen={setDialogOpen} />
+                        <NavBar setDialogOpen={setIsDialogOpen} setIsScoreWindowOpen={setIsScoreWindowOpen} />
                         <StageArea stageRef={stageRef} layerRef={layerRef} />
-                        <ScoreWindow layerRef={layerRef}/>
-                        {isDialogOpen && <ExportImageModal onSave={handleSave} onClose={() => setDialogOpen(false)} />}
+                        {isScoreWindowOpen && <ScoreWindow layerRef={layerRef} onClose={() => setIsScoreWindowOpen(false)}/>}
+                        {isDialogOpen && <ExportImageModal onSave={handleSave} onClose={() => setIsDialogOpen(false)} />}
                     </div>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>

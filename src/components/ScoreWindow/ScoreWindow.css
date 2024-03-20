@@ -2,12 +2,14 @@
     position: fixed;
     display: flex;
     flex-direction: column;
-    width: 400px;
-    height: 250px;
+    min-width: 400px;
+    min-height: 250px;
     border-radius: 10px;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
     background: #fff;
-    visibility: hidden;
+    user-select: none;
+    resize: both;
+    border: 1px solid black;
 }
 
 .window-content {
@@ -29,7 +31,8 @@
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     padding: 5px;
-    background-color: #ddd;
+    background-color: #202020;
+    color: #f0f0f0;
 
 }
 
@@ -61,7 +64,12 @@
     font-size: 16px;
 }
 
-.red {
+.exit {
+    background-color: #202020;
+    color: #f0f0f0;
+}
+
+.exit:hover {
     cursor: pointer;
     background-color: red;
 }
