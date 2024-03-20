@@ -6,15 +6,17 @@ import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
 import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import ImageFilterContext from "../../contexts/ImageFilterContext";
 
 /**
  * Creates the canvas area in the project page.
  * @param stageRef is the reference for the stage used.
  * @param layerRef is the reference for the layer inside the stage.
+ * @param setIsFilterWindowOpen is the boolean that is used in the canvas.jsx file to set the visibility of the window.
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({stageRef, layerRef}) => {
+const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
@@ -27,6 +29,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
 	const {images, setImages} = useContext(ImageContext);
+	const {setFilterImageIndex} = useContext(ImageFilterContext);
 
 	const maxUndoSteps = 20;
 
@@ -251,6 +254,17 @@ const StageArea = ({stageRef, layerRef}) => {
 	}
 
 	/**
+	 * Handles when an image is right-clicked and opens the filter window.
+	 * @param e right-click event
+	 * @param index {number} the index of the image to add filters to.
+	 */
+	const handleImageContextClick = (e, index) => {
+		e.evt.preventDefault();
+		setIsFilterWindowOpen(true);
+		setFilterImageIndex(index);
+	}
+
+	/**
 	 * Undoes the last action in the history.
 	 */
 	const undo = () => {
@@ -303,6 +317,7 @@ const StageArea = ({stageRef, layerRef}) => {
 								imageURL={image.imageUrl}
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
+								onContextMenu={(e) => handleImageContextClick(e, index)}
 								onChange={(newAttrs) => {
 									const rects = images.slice();
 									rects[index] = newAttrs;

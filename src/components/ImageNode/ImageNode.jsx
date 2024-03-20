@@ -3,7 +3,7 @@ import Konva from "konva";
 import { useContext, useRef, useEffect } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import FilterContext from "../../contexts/FilterContext";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 /**
@@ -18,7 +18,8 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 const ImageNode = ({
 	imageProps,
 	onSelect,
-	onChange
+	onChange,
+	onContextMenu
 }) => {
 	const imageRef = useRef();
 
@@ -26,15 +27,15 @@ const ImageNode = ({
 
 	const [image] = useImage(url, 'Anonymous');
 
-	const { filter } = useContext(FilterContext);
+	const { filterEnabled } = useContext(FilterEnabledContext);
 
 	/**
 	 * Handles the filter on the image.
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
 	 */
 	const handleFilter = () => {
-		if (filter === true) {
-			return [Konva.Filters.HSL, Konva.Filters.Contrast];
+		if (filterEnabled === true) {
+			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast];
 		} else return null;
 	};
 
@@ -67,11 +68,13 @@ const ImageNode = ({
 			{...{
 				hue: imageProps.hue,
 				saturation: imageProps.saturation,
+				value: imageProps.value,
 				luminance: imageProps.luminance,
 				contrast: imageProps.contrast,
 			}}
 			image={image}
 			onClick={onSelect}
+			onContextMenu={onContextMenu}
 			onTap={onSelect}
 			x={imageProps.x}
 			y={imageProps.y}
@@ -88,20 +91,12 @@ const ImageNode = ({
 				//Moves selected image on top (z-index)
 				e.target.moveToTop();
 			}}
-			onTransformEnd={() => {
-				const node = imageRef.current;
-				const scaleX = node.scaleX();
-				const scaleY = node.scaleY();
-
-				node.scaleX(1);
-				node.scaleY(1);
+			onTransformEnd={(e) => {
 				onChange({
 					...imageProps,
-					x: node.x(),
-					y: node.y(),
-					// set minimal value
-					width: Math.max(5, node.width() * scaleX),
-					height: Math.max(node.height() * scaleY),
+					x: e.target.x(),
+					y: e.target.y(),
+					rotation: e.target.rotation(),
 				});
 			}}
 			onMouseEnter={(e) => {

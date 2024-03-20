@@ -5,6 +5,7 @@ import "./ScoreWindow.css"
 /**
  * Creates a ScoreWindow element.
  * @param layerRef reference to the layer in the stagearea.
+ * @param onClose function reference for closing the window.
  * @returns {Element}
  * @constructor
  */
@@ -65,12 +66,6 @@ const ScoreWindow = ({layerRef, onClose}) => {
         }
 
         makeDraggable(document.querySelector('#scoreWindow'));
-
-        document.addEventListener('click', e => {
-            if (e.target.closest('.square.exit')) {
-                e.target.closest('.window').style.visibility = 'hidden';
-            }
-        });
     }, []);
 
 
@@ -123,7 +118,7 @@ const ScoreWindow = ({layerRef, onClose}) => {
         const resizable = document.getElementById('scoreWindow');
         let isResizing = false;
         let startX, startY, startWidth, startHeight, direction;
-        let distance = 5;
+        let distance = 7;
 
         function initDrag(e) {
             // Determine if the mouse is near the edges
@@ -193,6 +188,18 @@ const ScoreWindow = ({layerRef, onClose}) => {
         if (nearBottomEdge) return 'ns-resize';
         return 'default';
     }
+
+    /**
+     * useEffect to prevent right-click on the similarity metrics window
+     */
+    useEffect(() => {
+        let window = document.querySelector('#scoreWindow');
+        if (window) {
+            window.addEventListener('contextmenu', (event) => {
+                event.preventDefault();
+            })
+        }
+    }, []);
 
     return (
         <div id="scoreWindow" className="window">

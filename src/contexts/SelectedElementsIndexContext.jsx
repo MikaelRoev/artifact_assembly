@@ -4,8 +4,8 @@ const SelectedElementsIndexContext = createContext(null);
 
 /**
  * Provider for the select elements index context that allows for getting and setting selected elements indices list.
- * @param children the three that can use the context.
- * @return {JSX.Element} the provider with the three under it.
+ * @param children the tree that can use the context.
+ * @return {JSX.Element} the provider with the tree under it.
  * @constructor
  */
 export const SelectedElementsIndexContextProvider = ({children}) => {

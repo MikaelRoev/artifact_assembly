@@ -4,8 +4,8 @@ const LockedContext = createContext(null);
 
 /**
  * Provider for the locked context that allows for getting and setting locking the stage.
- * @param children the three that can use the context.
- * @return {JSX.Element} the provider with the three under it.
+ * @param children the tree that can use the context.
+ * @return {JSX.Element} the provider with the tree under it.
  * @constructor
  */
 export const LockedContextProvider = ({children}) => {

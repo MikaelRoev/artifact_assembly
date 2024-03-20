@@ -4,8 +4,8 @@ const ProjectContext = createContext(null);
 
 /**
  * Provider for the project context that allows the getting and setting of the current project's information.
- * @param children the three that can use the project context.
- * @return {JSX.Element} the provider with the three under it.
+ * @param children the tree that can use the project context.
+ * @return {JSX.Element} the provider with the tree under it.
  * @constructor
  */
 export const ProjectContextProvider = ({children}) => {
