@@ -1,6 +1,5 @@
-import React, {useState} from "react";
 import Konva from "konva";
-import { useContext, useRef, useEffect } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
 import FilterContext from "../../contexts/FilterContext";
@@ -27,8 +26,6 @@ const ImageNode = ({
 	const [image] = useImage(url, 'Anonymous');
 
 	const { filter } = useContext(FilterContext);
-
-	let transformTimer;
 
 	/**
 	 * Handles the filter on the image.
@@ -64,21 +61,14 @@ const ImageNode = ({
 	 */
 	return (
 		<KonvaImage
+			{...imageProps}
 			ref={imageRef}
 			filters={handleFilter()}
-			{...{
-				hue: imageProps.hue,
-				saturation: imageProps.saturation,
-				value: imageProps.value,
-				luminance: imageProps.luminance,
-				contrast: imageProps.contrast,
-			}}
 			image={image}
 			onClick={onSelect}
 			onTap={onSelect}
 			x={imageProps.x}
 			y={imageProps.y}
-			{...imageProps}
 			onChange={onChange}
 			onDragEnd={(e) => {
 				onChange({

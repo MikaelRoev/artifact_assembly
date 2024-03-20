@@ -95,11 +95,36 @@ const StageArea = ({stageRef, layerRef}) => {
 	 */
 	useEffect(() => {
 		/**
-		 * Undo the last step in the history if ctrl + z is pressed.
+		 * Undoes the last action in the history.
+		 */
+		const undo = () => {
+			if (historyIndex > 0) {
+				const newHistoryIndex = historyIndex - 1;
+				setHistoryIndex(newHistoryIndex);
+				setImages(history[newHistoryIndex]);
+			}
+		};
+
+		/**
+		 * Redoes the last action in the history.
+		 */
+		const redo = () => {
+			const newHistoryIndex = historyIndex + 1;
+			if (newHistoryIndex < history.length) {
+				setHistoryIndex(newHistoryIndex);
+				setImages(history[newHistoryIndex]);
+			}
+		}
+
+		/**
+		 * Key event handler for undo and redo.
 		 * @param e the event.
 		 */
 		const handleUndoPressed = (e) => {
-			if (e.ctrlKey && e.key === "z") {
+			if (e.ctrlKey && e.key === "y") {
+				e.preventDefault();
+				redo();
+			} else if (e.ctrlKey && e.key === "z") {
 				e.preventDefault();
 				undo();
 			}
@@ -108,7 +133,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		return () => {
 			document.removeEventListener("keydown", handleUndoPressed);
 		};
-	}, [history, historyIndex]);
+	}, [history, setHistory, setImages, historyIndex]);
 
 	/**
 	 * Set up and cleans up the select key check.
@@ -251,29 +276,19 @@ const StageArea = ({stageRef, layerRef}) => {
 	}
 
 	/**
-	 * Undoes the last action in the history.
-	 */
-	const undo = () => {
-		if (historyIndex > 0) {
-			setHistoryIndex(historyIndex - 1);
-			setImages(history[historyIndex - 1]);
-		}
-	};
-
-	/**
 	 * Updates the history of the canvas by adding changes.
 	 * @param change the change to be added.
 	 */
 	const updateHistory = (change) => {
-		// Update history
-		const newHistory = history.slice(0, historyIndex + 1);
+		const newHistoryIndex = historyIndex + 1;
+		const newHistory = history.slice(0, newHistoryIndex);
 		newHistory.push(change);
 
 		// Enforce the maximum number of undo steps
 		if (newHistory.length > maxUndoSteps) {
 			newHistory.shift(); // Remove the oldest state
 		} else {
-			setHistoryIndex(historyIndex + 1);
+			setHistoryIndex(newHistoryIndex);
 		}
 		setHistory(newHistory);
 	}
@@ -304,11 +319,10 @@ const StageArea = ({stageRef, layerRef}) => {
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
 								onChange={(newAttrs) => {
-									const rects = images.slice();
-									rects[index] = newAttrs;
-									setImages(rects);
-
-									updateHistory(rects);
+									const newImages = [...images];
+									newImages[index] = newAttrs;
+									updateHistory(newImages);
+									setImages(newImages);
 								}}
 							/>
 						);
