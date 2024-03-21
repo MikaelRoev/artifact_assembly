@@ -1,12 +1,16 @@
-import React from "react";
-import {useRef} from "react";
+import React, {useRef, useContext} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
 import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
 import {LockedContextProvider} from "../../contexts/LockedContext";
-import {FilterContextProvider} from "../../contexts/FilterContext";
+import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
 import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedElementsIndexContext";
+import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
+import {exportCanvasAsImageDialog} from "../../components/FileHandling";
+import FilterWindow from "../../components/FilterWindow/FilterWindow";
+import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates a project page.
@@ -16,42 +20,36 @@ import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedEleme
 const Canvas = () => {
     const stageRef = useRef(null);
     const layerRef = useRef(null);
+    const {isScoreWindowOpen, isDialogOpen, setIsDialogOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
 
     /**
-     * Function to take the screenshot of the stage in StageArea.
-     * @param number the scaling number of the screenshot. 2 for 2x height and width.
+     * Function to get the canvas as DataURL and send it to
+     * @param number
      */
-    const takeScreenshot = (number) => {
-        let dataURL = stageRef.current.toDataURL({pixelRatio: number/100});
-        downloadURI(dataURL, "canvas.png");
-    };
-
-    /**
-     * Function to download the screenshot taken.
-     * @param uri URI of the image.
-     * @param name Desired filename.
-     */
-    function downloadURI(uri, name) {
-        let link = document.createElement('a');
-        link.download = name;
-        link.href = uri;
-        document.body.appendChild(link);
-        link.click()
-        document.body.removeChild(link);
+    function handleSave(number) {
+        let image = stageRef.current.toDataURL({pixelRatio: number});
+        exportCanvasAsImageDialog(image).then(() => setIsDialogOpen(false))
     }
 
     return (
-        <FilterContextProvider>
+        <FilterEnabledContextProvider>
             <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
-                    <div className="stage-container">
-                        <NavBar takeScreenshot={takeScreenshot} layerRef={layerRef} />
-                        <StageArea stageRef={stageRef} layerRef={layerRef} />
-                        <ScoreWindow layerRef={layerRef}/>
-                    </div>
+                    <ImageFilterContextProvider>
+                        <div className="stage-container">
+                            <NavBar/>
+                            <StageArea stageRef={stageRef} layerRef={layerRef}/>
+                            {isScoreWindowOpen &&
+                                <ScoreWindow layerRef={layerRef}/>}
+                            {isDialogOpen &&
+                                <ExportImageModal onSave={handleSave}/>}
+                            {isFilterWindowOpen &&
+                                <FilterWindow/>}
+                        </div>
+                    </ImageFilterContextProvider>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>
-        </FilterContextProvider>
+        </FilterEnabledContextProvider>
     );
 };
 

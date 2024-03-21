@@ -23,8 +23,9 @@
 
 .filter-form {
 	display: flex;
-	align-items: center;
+	flex-direction: row;
 	gap: 0.3rem;
+	width: 0;
 }
 
 .nav-right {
@@ -44,9 +45,7 @@
 }
 
 .nav-left p,
-.nav-left a,
-.nav-left div,
-.nav-left > form > label {
+.nav-left a {
 	width: auto;
 	text-align: left;
 	color: #abb2bf;
@@ -60,30 +59,23 @@
 	-webkit-user-select: none; /* Safari */
 	-ms-user-select: none; /* IE 10 and IE 11 */
 	user-select: none; /* Standard syntax */
+	border: none;
+}
+
+.nav-left div {
+	width: auto;
+	text-align: left;
+	color: #abb2bf;
+	transition: 100ms ease-in;
+	text-decoration: none;
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	user-select: none; /* Standard syntax */
 }
 
 .nav-left p:hover,
-.nav-left a:hover,
-.nav-left div:hover{
+.nav-left a:hover {
 	background-color: #323842;
-}
-
-.inputfile {
-	width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
-}
-
-.inputfile + label {
-	cursor: pointer; /* "hand" cursor */
-	padding-right: 150px;
-}
-
-.filebutton {
-	position: absolute;
 }
 
 .fileDiv {
@@ -91,38 +83,64 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	margin: 12px;
+}
+.navButton {
+	width: auto;
+	color: #abb2bf;
+	transition: 100ms ease-in;
+	background-color: #202020;
+	cursor: pointer;
+	border-radius: 6px;
+	padding-left: 12px;
+	padding-right: 12px;
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	user-select: none; /* Standard syntax */
+	border: none;
 }
 
-.nav-left .dropdown {
+.navButton:hover {
+	background-color: #323842;
+}
+
+.dropdown {
 	position: absolute;
 	top: 100%;
-	background-color: #f9f9f9;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	padding: 0;
-}
-.dropdown:hover {
-	background-color: #f9f9f9;
+	box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	background-color: white;
+
 }
 
 .dropdown ul {
 	width: 100%;
 	list-style-type: none;
-	background-color: #f9f9f9;
 	padding: 0;
 	margin: 0;
 }
 
 .dropdown li {
-	width: inherit;
-	padding: 8px 12px;
+	display: flex;
+	padding: 0;
+	margin: 0;
+}
+
+.dropdown li:last-child {
+	margin-bottom: 5px;
+}
+
+.dropdownButton {
+	text-align: left;
+	flex: 1;
+	border: none;
+	padding-block: 2px;
+	background-color: white;
+}
+
+.dropdownButton:hover {
+	background-color: lightgrey;
 	cursor: pointer;
-	color: black;
 }
 
-.nav-left .dropdown li:hover {
-	background-color: #ddd;
-}
-
-#scale {
-	width: 60px;
-}

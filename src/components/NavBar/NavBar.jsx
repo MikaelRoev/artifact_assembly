@@ -1,53 +1,29 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
-import FilterForm from "../FilterForm/FilterForm";
+import React, {useContext, useState} from "react";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
-import FilterContext from "../../contexts/FilterContext";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
-import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({takeScreenshot}) => {
+const NavBar = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [numberValue, setNumberValue] = useState(100);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const inputRef = useRef(null);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {
-        filter,
-        setFilter,
-        saturation,
-        setSaturation,
-        hue,
-        setHue,
-        contrast,
-        setContrast,
-        luminance,
-        setLuminance,
-    } = useContext(FilterContext);
-    const {selectedElementsIndex, setSelectedElementsIndex} = useContext(selectedElementsIndexContext);
-
+    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
+    const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
 
     const offset = 20;
-    const hueMax = 360;
-    const hueMin = 0;
-    const saturationMax = 10;
-    const saturationMin = -2;
-    const luminanceMax = 2;
-    const luminanceMin = -2;
-    const contrastMax = 100;
-    const contrastMin = -100;
-
 
     /**
      * Checks if there is an image at the position.
@@ -114,94 +90,7 @@ const NavBar = ({takeScreenshot}) => {
     };
 
     const toggleFilter = () => {
-        setFilter((prevFilter) => !prevFilter);
-    };
-
-    const handleHueChange = (e) => {
-        const value = Number(e.target.value);
-        const newImages = [...images];
-
-        selectedElementsIndex.forEach((index) => {
-            let imageValue = images[index].hue;
-            if(isNaN(imageValue)) imageValue = 0;
-            const groundValue = imageValue - hue;
-            const newValue = groundValue + value;
-
-            newImages[index].hue = newValue % hueMax;
-        });
-        setImages(newImages);
-        setHue(value);
-    };
-
-
-    const handleSaturationChange = (e) => {
-        const value = Number(e.target.value);
-        const newImages = [...images];
-
-        selectedElementsIndex.forEach((index) => {
-            let imageValue = images[index].saturation;
-            if(isNaN(imageValue)) imageValue = 0;
-            const groundValue = imageValue - saturation;
-            const newValue = groundValue + value;
-            if (newValue > saturationMax) {
-                newImages[index].saturation = saturationMax
-            } else if (newValue < saturationMin){
-                newImages[index].saturation = saturationMin
-            } else {
-                newImages[index].saturation = newValue
-            }
-        });
-        setImages(newImages);
-        setSaturation(value);
-    };
-
-    const handleLuminanceChange = (e) => {
-        const value = Number(e.target.value);
-        const newImages = [...images];
-
-        selectedElementsIndex.forEach((index) => {
-            let imageValue = images[index].luminance;
-            if(isNaN(imageValue)) imageValue = 0;
-            const groundValue = imageValue - luminance;
-            const newValue = groundValue + value;
-            if (newValue > luminanceMax) {
-                newImages[index].luminance = luminanceMax
-            } else if (newValue < luminanceMin){
-                newImages[index].luminance = luminanceMin
-            } else {
-                newImages[index].luminance = newValue
-            }
-        });
-        setImages(newImages);
-        setLuminance(value);
-    };
-
-    const handleContrastChange = (e) => {
-        const value = Number(e.target.value);
-        const newImages = [...images];
-
-        selectedElementsIndex.forEach((index) => {
-            let imageValue = images[index].contrast;
-            if(isNaN(imageValue)) imageValue = 0;
-            const groundValue = imageValue - contrast;
-            const newValue = groundValue + value;
-            if (newValue > contrastMax) {
-                newImages[index].contrast = contrastMax
-            } else if (newValue < contrastMin){
-                newImages[index].contrast = contrastMin
-            } else {
-                newImages[index].contrast = newValue
-            }
-        });
-        setImages(newImages);
-        setContrast(value);
-    };
-
-    const resetFilter = () => {
-        setHue(0);
-        setSaturation(0);
-        setLuminance(0);
-        setContrast(0);
+        setFilterEnabled((prevFilter) => !prevFilter);
     };
 
     /**
@@ -211,46 +100,23 @@ const NavBar = ({takeScreenshot}) => {
         setDropdownVisible(!dropdownVisible)
     }
 
+
     /**
-     * Constant function to update the number inside the numberinput for scaling the screenshot
-     * @param e
+     * Function to handle exporting an image of the canvas
      */
-    const handleInputChange = (e) => {
-        setNumberValue(parseInt(e.target.value))
+    const handleImageOfCanvasExport = () => {
+        console.log("1")
+        setIsDialogOpen(true);
+        console.log("2")
+        handleFileButtonClick()
     }
-
-    /**
-     * Resets the filter when change in the selected.
-     */
-    useEffect(() => {
-        setHue(0);
-        setSaturation(0);
-        setLuminance(0);
-        setContrast(0);
-    }, [selectedElementsIndex]);
-
-    /**
-     * Effect for handling taking a screenshot of the current stage visible on the screen.
-     */
-    useEffect(() => {
-        const handleScreenShot = () => {
-            takeScreenshot(inputRef.current.value);
-            handleFileButtonClick()
-        }
-
-        const screenshot = document.getElementById("ssButton");
-        if (screenshot) {
-            screenshot.addEventListener("click", handleScreenShot, false);
-            return () => screenshot.removeEventListener("click", handleScreenShot);
-        }
-    }, [takeScreenshot, handleFileButtonClick]);
 
     /**
      * Function to open up the score window for all the images on the canvas.
      * @returns Void
      */
-    const openScoreWindow = async () => {
-        document.getElementById("scoreWindow").style.visibility = "visible";
+    const handleOpenScoreWindow = async () => {
+        setIsScoreWindowOpen(true);
         handleFileButtonClick()
     };
 
@@ -259,83 +125,47 @@ const NavBar = ({takeScreenshot}) => {
             <div className="nav-left">
                 <a href="/">Home</a>
                 <div className={"fileDiv"}>
-                    <div className={"fileButton"} onClick={() => handleFileButtonClick()}>
+                    <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
-                    </div>
+                    </button>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {dropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
-                                <li onClick={handleImageUpload}>
-                                    <span id={"loadImageButton"}>Load Image</span>
-                                </li>
-                                <li onClick={() => {
-                                    saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                }}>
-                                    <span id={"saveProjectButton"}>Save project</span>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleImageUpload}
+                                    >Load Image</button>
                                 </li>
                                 <li>
-                                    <span className={"screenShotButton"} id={"ssButton"}>Export as image </span>
-                                    <input
-                                        ref={inputRef}
-                                        type={"number"}
-                                        id={"scale"}
-                                        min={100}
-                                        max={1000}
-                                        step={10}
-                                        value={numberValue}
-                                        onChange={handleInputChange}
-                                    />
-                                    <span>%</span>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={() => {
+                                        saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                    }}
+                                    >Save project</button>
                                 </li>
-                                <li onClick={openScoreWindow}>
-                                    <span id={"showScoreWindowButton"}>Open similarity metrics window</span>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleImageOfCanvasExport}
+                                    >Export as image </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleOpenScoreWindow}
+                                    >Open similarity metrics window</button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <p onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</p>
-                <p onClick={toggleFilter}>
-                    {!filter ? "Enable Filter" : "Disable Filter"}
-                </p>
-                {!filter ? null : (
-                    <form className="filter-form">
-                        <FilterForm
-                            label="Hue"
-                            min={0}
-                            max={360}
-                            step={1}
-                            value={hue}
-                            onChange={handleHueChange}
-                        />
-                        <FilterForm
-                            label="Saturation"
-                            min={-2}
-                            max={10}
-                            step={0.5}
-                            value={saturation}
-                            onChange={handleSaturationChange}
-                        />
-                        <FilterForm
-                            label="Luminance"
-                            min={-2}
-                            max={2}
-                            step={0.1}
-                            value={luminance}
-                            onChange={handleLuminanceChange}
-                        />
-                        <FilterForm
-                            label="Contrast"
-                            min={-100}
-                            max={100}
-                            step={1}
-                            value={contrast}
-                            onChange={handleContrastChange}
-                        />
-                        <p onClick={resetFilter}>Reset</p>
-                    </form>
-                )}
+                <button className={"navButton"} onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <button className={"navButton"} onClick={toggleFilter}>
+                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
+                </button>
             </div>
             <div className="nav-right">
                 {isLoading && <div className="nav-item-right">Loading images...</div>}

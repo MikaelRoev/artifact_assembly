@@ -1,9 +1,8 @@
-import React, {useState} from "react";
 import Konva from "konva";
-import { useContext, useRef, useEffect } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import { Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import FilterContext from "../../contexts/FilterContext";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 /**
@@ -18,23 +17,24 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 const ImageNode = ({
 	imageProps,
 	onSelect,
-	onChange
+	onChange,
+	onContextMenu
 }) => {
 	const imageRef = useRef();
 
 	const [url, setUrl] = useState('');
 
-	const [image] = useImage(url, 'Anonymous');
+	const [image] = useImage(url);
 
-	const { filter } = useContext(FilterContext);
+	const { filterEnabled } = useContext(FilterEnabledContext);
 
 	/**
 	 * Handles the filter on the image.
 	 * @returns {[(this:Node, imageData: ImageData) => void,(this:Node, imageData: ImageData) => void]|null}
 	 */
 	const handleFilter = () => {
-		if (filter === true) {
-			return [Konva.Filters.HSL, Konva.Filters.Contrast];
+		if (filterEnabled === true) {
+			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast];
 		} else return null;
 	};
 
@@ -62,21 +62,19 @@ const ImageNode = ({
 	 */
 	return (
 		<KonvaImage
+			{...imageProps}
 			ref={imageRef}
 			filters={handleFilter()}
-			{...{
-				hue: imageProps.hue,
-				saturation: imageProps.saturation,
-				luminance: imageProps.luminance,
-				contrast: imageProps.contrast,
-			}}
 			image={image}
 			onClick={onSelect}
 			onTap={onSelect}
+			onContextMenu={onContextMenu}
 			x={imageProps.x}
 			y={imageProps.y}
-			{...imageProps}
-			onChange={onChange}
+			onMouseDown={(e) => {
+				//Moves selected image on top (z-index)
+				e.target.moveToTop();
+			}}
 			onDragEnd={(e) => {
 				onChange({
 					...imageProps,
@@ -84,24 +82,12 @@ const ImageNode = ({
 					y: e.target.y(),
 				});
 			}}
-			onMouseDown={(e) => {
-				//Moves selected image on top (z-index)
-				e.target.moveToTop();
-			}}
-			onTransformEnd={() => {
-				const node = imageRef.current;
-				const scaleX = node.scaleX();
-				const scaleY = node.scaleY();
-
-				node.scaleX(1);
-				node.scaleY(1);
+			onTransformEnd={(e) => {
 				onChange({
 					...imageProps,
-					x: node.x(),
-					y: node.y(),
-					// set minimal value
-					width: Math.max(5, node.width() * scaleX),
-					height: Math.max(node.height() * scaleY),
+					x: e.target.x(),
+					y: e.target.y(),
+					rotation: e.target.rotation(),
 				});
 			}}
 			onMouseEnter={(e) => {

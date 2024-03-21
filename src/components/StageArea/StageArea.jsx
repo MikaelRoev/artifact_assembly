@@ -6,6 +6,8 @@ import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
 import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import ImageFilterContext from "../../contexts/ImageFilterContext";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates the canvas area in the project page.
@@ -16,8 +18,6 @@ import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexCo
  */
 const StageArea = ({stageRef, layerRef}) => {
 	const [selectedElements, setSelectedElements] = useState([]);
-	const [history, setHistory] = useState([]);
-	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
 	const [shiftPressed, setShiftPressed] = useState(false);
 
@@ -26,9 +26,9 @@ const StageArea = ({stageRef, layerRef}) => {
 	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
-	const {images, setImages} = useContext(ImageContext);
-
-	const maxUndoSteps = 20;
+	const {images, setImages, undo, redo} = useContext(ImageContext);
+	const {setFilterImageIndex} = useContext(ImageFilterContext);
+	const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
@@ -58,7 +58,6 @@ const StageArea = ({stageRef, layerRef}) => {
 		const handleDeletePressed = (e) => {
 			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
 				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
-
 				setImages(newImages);
 				setSelectedElements([]);
 				setSelectedElementsIndex([]);
@@ -95,11 +94,14 @@ const StageArea = ({stageRef, layerRef}) => {
 	 */
 	useEffect(() => {
 		/**
-		 * Undo the last step in the history if ctrl + z is pressed.
+		 * Key event handler for undo and redo.
 		 * @param e the event.
 		 */
 		const handleUndoPressed = (e) => {
-			if (e.ctrlKey && e.key === "z") {
+			if (e.ctrlKey && e.key === "y") {
+				e.preventDefault();
+				redo();
+			} else if (e.ctrlKey && e.key === "z") {
 				e.preventDefault();
 				undo();
 			}
@@ -108,7 +110,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		return () => {
 			document.removeEventListener("keydown", handleUndoPressed);
 		};
-	}, [history, historyIndex]);
+	}, [undo, redo]);
 
 	/**
 	 * Set up and cleans up the select key check.
@@ -148,7 +150,6 @@ const StageArea = ({stageRef, layerRef}) => {
 			document.removeEventListener('keyup', handleSelectKeyUp);
 		};
 	}, []);
-
 
 	/**
 	 * Deselects when the mouse clicks on an empty area on the canvas
@@ -251,31 +252,14 @@ const StageArea = ({stageRef, layerRef}) => {
 	}
 
 	/**
-	 * Undoes the last action in the history.
+	 * Handles when an image is right-clicked and opens the filter window.
+	 * @param e right-click event
+	 * @param index {number} the index of the image to add filters to.
 	 */
-	const undo = () => {
-		if (historyIndex > 0) {
-			setHistoryIndex(historyIndex - 1);
-			setImages(history[historyIndex - 1]);
-		}
-	};
-
-	/**
-	 * Updates the history of the canvas by adding changes.
-	 * @param change the change to be added.
-	 */
-	const updateHistory = (change) => {
-		// Update history
-		const newHistory = history.slice(0, historyIndex + 1);
-		newHistory.push(change);
-
-		// Enforce the maximum number of undo steps
-		if (newHistory.length > maxUndoSteps) {
-			newHistory.shift(); // Remove the oldest state
-		} else {
-			setHistoryIndex(historyIndex + 1);
-		}
-		setHistory(newHistory);
+	const handleImageContextClick = (e, index) => {
+		e.evt.preventDefault();
+		setIsFilterWindowOpen(true);
+		setFilterImageIndex(index);
 	}
 
 	/**
@@ -303,12 +287,11 @@ const StageArea = ({stageRef, layerRef}) => {
 								imageURL={image.imageUrl}
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
-								onChange={(newAttrs) => {
-									const rects = images.slice();
-									rects[index] = newAttrs;
-									setImages(rects);
-
-									updateHistory(rects);
+								onContextMenu={(e) => handleImageContextClick(e, index)}
+								onChange={(newImage, overwrite) => {
+									const newImages = [...images];
+									newImages[index] = newImage;
+									setImages(newImages, overwrite);
 								}}
 							/>
 						);

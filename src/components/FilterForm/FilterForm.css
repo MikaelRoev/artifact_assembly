@@ -1,5 +1,38 @@
+.form-group {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.form-group > p {
+	flex: 1;
+	margin: 0 5px;
+}
+
 .input-number-form {
 	color: black;
-	width: 50px;
+	width: 55px;
 	border-radius: 5px;
+	text-align: end;
+	margin-inline: 5px;
+}
+
+.input-number-form::-webkit-inner-spin-button {
+	opacity: 1;
+}
+
+.input-slide-form {
+	width: 200px;
+	margin-inline: 5px;
+}
+
+.resetButton {
+	margin-left: 5px;
+	border-radius: 5px;
+}
+
+.resetButton:hover {
+	cursor: pointer;
+	background-color: lightgrey;
 }
