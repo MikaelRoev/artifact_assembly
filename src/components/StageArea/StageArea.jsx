@@ -4,9 +4,65 @@ import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
-import ImageContext from "../../contexts/ImageContext";
 import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
+
+/**
+ * Hook for handling the state history, undo, and redo.
+ * @param initialState - the first state in the history.
+ * @param maxSteps - of undo or redo actions or max length of the history.
+ * @return {[any[],function(any, boolean): *,function(): *, function(): *]}
+ * getter for the current state, setter for the current state, the undo function, and the redo function.
+ */
+const useHistory = (initialState, maxSteps) => {
+	const [index, setIndex] = useState(0);
+	const [history, setHistory] = useState([initialState]);
+
+	/**
+	 * Updates the state.
+	 * @param action
+	 * @param overwrite
+	 */
+	const setState = (action, overwrite = false) => {
+		// get the new state ether from a function or a variable, implemented similar to useState
+		const newState = typeof action === "function" ? action(history[index]) : action;
+
+		if (overwrite) {
+			// overwrite the current state
+			const newHistory = [...history];
+			newHistory[index] = newState;
+			setHistory(newHistory);
+		} else {
+			const newIndex = index + 1;
+			// remove the history after current state
+			const newHistory = history.slice(0, newIndex);
+			// add new state to the history
+			newHistory.push(newState);
+
+			// Enforce the maximum number of undo steps
+			if (newHistory.length > maxSteps) {
+				// Remove the oldest state
+				newHistory.shift();
+			} else {
+				// increment the index
+				setIndex(newIndex);
+			}
+			setHistory(newHistory);
+		}
+	}
+
+	/**
+	 * Undoes the last action in the history.
+	 */
+	const undo = () => index > 0 && setIndex(prevState => prevState - 1)
+
+	/**
+	 * Redoes the last action in the history.
+	 */
+	const redo = () => index < history.length - 1 && setIndex(prevState => prevState - 1);
+
+	return [history[index], setState, undo, redo];
+}
 
 /**
  * Creates the canvas area in the project page.
@@ -18,8 +74,6 @@ import ImageFilterContext from "../../contexts/ImageFilterContext";
  */
 const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 	const [selectedElements, setSelectedElements] = useState([]);
-	const [history, setHistory] = useState([]);
-	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [ctrlPressed, setCtrlPressed] = useState(false);
 	const [shiftPressed, setShiftPressed] = useState(false);
 
@@ -28,10 +82,9 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
-	const {images, setImages} = useContext(ImageContext);
 	const {setFilterImageIndex} = useContext(ImageFilterContext);
 
-	const maxUndoSteps = 20;
+	const [images, setImages, undo, redo] = useHistory([], 20);
 
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
@@ -61,7 +114,6 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 		const handleDeletePressed = (e) => {
 			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
 				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
-
 				setImages(newImages);
 				setSelectedElements([]);
 				setSelectedElementsIndex([]);
@@ -98,28 +150,6 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 	 */
 	useEffect(() => {
 		/**
-		 * Undoes the last action in the history.
-		 */
-		const undo = () => {
-			if (historyIndex > 0) {
-				const newHistoryIndex = historyIndex - 1;
-				setHistoryIndex(newHistoryIndex);
-				setImages(history[newHistoryIndex]);
-			}
-		};
-
-		/**
-		 * Redoes the last action in the history.
-		 */
-		const redo = () => {
-			const newHistoryIndex = historyIndex + 1;
-			if (newHistoryIndex < history.length) {
-				setHistoryIndex(newHistoryIndex);
-				setImages(history[newHistoryIndex]);
-			}
-		}
-
-		/**
 		 * Key event handler for undo and redo.
 		 * @param e the event.
 		 */
@@ -136,7 +166,7 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 		return () => {
 			document.removeEventListener("keydown", handleUndoPressed);
 		};
-	}, [history, setHistory, setImages, historyIndex]);
+	}, [undo, redo]);
 
 	/**
 	 * Set up and cleans up the select key check.
@@ -290,34 +320,6 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 	}
 
 	/**
-	 * Undoes the last action in the history.
-	 */
-	const undo = () => {
-		if (historyIndex > 0) {
-			setHistoryIndex(historyIndex - 1);
-			setImages(history[historyIndex - 1]);
-		}
-	};
-
-	/**
-	 * Updates the history of the canvas by adding changes.
-	 * @param change the change to be added.
-	 */
-	const updateHistory = (change) => {
-		const newHistoryIndex = historyIndex + 1;
-		const newHistory = history.slice(0, newHistoryIndex);
-		newHistory.push(change);
-
-		// Enforce the maximum number of undo steps
-		if (newHistory.length > maxUndoSteps) {
-			newHistory.shift(); // Remove the oldest state
-		} else {
-			setHistoryIndex(newHistoryIndex);
-		}
-		setHistory(newHistory);
-	}
-
-	/**
 	 * Returns a stage with a layer within.
 	 * Returns an imageNode and a transformer within the layer.
 	 */
@@ -343,10 +345,9 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
 								onContextMenu={(e) => handleImageContextClick(e, index)}
-								onChange={(newAttrs) => {
+								onChange={(newImage) => {
 									const newImages = [...images];
-									newImages[index] = newAttrs;
-									updateHistory(newImages);
+									newImages[index] = newImage;
 									setImages(newImages);
 								}}
 							/>
