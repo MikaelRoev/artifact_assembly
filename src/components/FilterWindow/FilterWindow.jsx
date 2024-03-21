@@ -90,6 +90,9 @@ const FilterWindow = ({onClose}) => {
         }
     }, []);
 
+    /**
+     * Function to reset the filters on an image.
+     */
     const resetFilter = () => {
         const newImages = [...images];
         newImages[filterImageIndex].hue = 0;
@@ -108,72 +111,70 @@ const FilterWindow = ({onClose}) => {
                 <button className={"square exit"} onClick={onClose}></button>
             </div>
             <div className={"filterWindowBody"}>
-                <form className="filter-form">
-                    <FilterForm
-                        label="Hue"
-                        min={hueMin}
-                        max={hueMax}
-                        step={1}
-                        value={isNaN(images[filterImageIndex].hue) ? 0 : images[filterImageIndex].hue}
-                        setValue={(hue) => {
-                            const newImages = [...images];
-                            newImages[filterImageIndex].hue = hue;
-                            setImages(newImages);
-                        }}
-                    />
-                    <FilterForm
-                        label="Saturation"
-                        min={saturationMin}
-                        max={saturationMax}
-                        step={0.5}
-                        value={isNaN(images[filterImageIndex].saturation) ? 0 : images[filterImageIndex].saturation}
-                        setValue={(saturation) => {
-                            const newImages = [...images];
-                            newImages[filterImageIndex].saturation = saturation;
-                            setImages(newImages);
-                        }}
-                    />
-                    <FilterForm
-                        label="Value"
-                        min={valueMin}
-                        max={valueMax}
-                        step={0.1}
-                        value={isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value}
-                        setValue={(value) => {
-                            const newImages = [...images];
-                            newImages[filterImageIndex].value = value;
-                            setImages(newImages);
-                        }}
-                    />
-                    <FilterForm
-                        label="Luminance"
-                        min={luminanceMin}
-                        max={luminanceMax}
-                        step={0.1}
-                        value={isNaN(images[filterImageIndex].luminance) ? 0 : images[filterImageIndex].luminance}
-                        setValue={(luminance) => {
-                            const newImages = [...images];
-                            newImages[filterImageIndex].luminance = luminance;
-                            setImages(newImages);
-                        }}
-                    />
-                    <FilterForm
-                        label="Contrast"
-                        min={contrastMin}
-                        max={contrastMax}
-                        step={1}
-                        value={isNaN(images[filterImageIndex].contrast) ? 0 : images[filterImageIndex].contrast}
-                        setValue={(contrast) => {
-                            const newImages = [...images];
-                            newImages[filterImageIndex].contrast = contrast;
-                            setImages(newImages);
-                        }}
-                    />
-                    <button
-                        className={"resetAll"}
-                        onClick={resetFilter}
-                    >Reset all</button>
-                </form>
+                <FilterForm
+                    label="Hue"
+                    min={hueMin}
+                    max={hueMax}
+                    step={1}
+                    value={isNaN(images[filterImageIndex].hue) ? 0 : images[filterImageIndex].hue}
+                    setValue={(hue) => {
+                        const newImages = [...images];
+                        newImages[filterImageIndex].hue = hue;
+                        setImages(newImages);
+                    }}
+                />
+                <FilterForm
+                    label="Saturation"
+                    min={saturationMin}
+                    max={saturationMax}
+                    step={0.5}
+                    value={isNaN(images[filterImageIndex].saturation) ? 0 : images[filterImageIndex].saturation}
+                    setValue={(saturation) => {
+                        const newImages = [...images];
+                        newImages[filterImageIndex].saturation = saturation;
+                        setImages(newImages);
+                    }}
+                />
+                <FilterForm
+                    label="Value"
+                    min={valueMin}
+                    max={valueMax}
+                    step={0.1}
+                    value={isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value}
+                    setValue={(value) => {
+                        const newImages = [...images];
+                        newImages[filterImageIndex].value = value;
+                        setImages(newImages);
+                    }}
+                />
+                <FilterForm
+                    label="Luminance"
+                    min={luminanceMin}
+                    max={luminanceMax}
+                    step={0.1}
+                    value={isNaN(images[filterImageIndex].luminance) ? 0 : images[filterImageIndex].luminance}
+                    setValue={(luminance) => {
+                        const newImages = [...images];
+                        newImages[filterImageIndex].luminance = luminance;
+                        setImages(newImages);
+                    }}
+                />
+                <FilterForm
+                    label="Contrast"
+                    min={contrastMin}
+                    max={contrastMax}
+                    step={1}
+                    value={isNaN(images[filterImageIndex].contrast) ? 0 : images[filterImageIndex].contrast}
+                    setValue={(contrast) => {
+                        const newImages = [...images];
+                        newImages[filterImageIndex].contrast = contrast;
+                        setImages(newImages);
+                    }}
+                />
+                <button
+                    className={"resetAll"}
+                    onClick={resetFilter}
+                >Reset all</button>
             </div>
         </div>
     )

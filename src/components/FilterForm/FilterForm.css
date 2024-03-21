@@ -29,4 +29,10 @@
 
 .resetButton {
 	margin-left: 5px;
+	border-radius: 5px;
+}
+
+.resetButton:hover {
+	cursor: pointer;
+	background-color: lightgrey;
 }

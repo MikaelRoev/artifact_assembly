@@ -21,7 +21,9 @@
     border-bottom-left-radius: 10px;
     overflow-y: auto;
     display: flex;
+    flex-direction: column;
     width: 100%;
+    gap: 5px;
 }
 
 .filterWindowHeader {
@@ -69,13 +71,13 @@
     background-color: red;
 }
 
-.filter-form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
 .resetAll {
     width: fit-content;
     align-self: center;
+    border-radius: 5px;
+}
+
+.resetAll:hover {
+    cursor: pointer;
+    background-color: lightgrey;
 }
