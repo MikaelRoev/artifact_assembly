@@ -5,17 +5,20 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import "./App.css";
 import {ProjectContextProvider} from "./contexts/ProjectContext";
 import {ImageContextProvider} from "./contexts/ImageContext";
+import {WindowModalOpenContextProvider} from "./contexts/WindowModalOpenContext";
 
 const App = () => {
 	return (
 		<ProjectContextProvider>
 			<ImageContextProvider>
-				<BrowserRouter>
-					<Routes>
-						<Route path="/" element={<LandingPage />} />
-						<Route path="/canvas" element={<Canvas />} />
-					</Routes>
-				</BrowserRouter>
+				<WindowModalOpenContextProvider>
+					<BrowserRouter>
+						<Routes>
+							<Route path="/" element={<LandingPage />} />
+							<Route path="/canvas" element={<Canvas />} />
+						</Routes>
+					</BrowserRouter>
+				</WindowModalOpenContextProvider>
 			</ImageContextProvider>
 		</ProjectContextProvider>
 	);

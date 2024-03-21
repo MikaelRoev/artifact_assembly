@@ -7,7 +7,7 @@ const FilterForm = ({ label, min, max, step, value, setValue }) => {
 	}
 
 	return (
-		<>
+		<div className={"form-group"}>
 			<p>{label}:</p>
 			<input
                 className={"input-slide-form"}
@@ -28,8 +28,11 @@ const FilterForm = ({ label, min, max, step, value, setValue }) => {
 				value={value}
 				onChange={(e) => setValue(parseFloat(e.target.value))}
 			/>
-			<button onClick={handleReset}>Reset</button>
-		</>
+			<button
+				onClick={handleReset}
+				className={"resetButton"}
+			>Reset</button>
+		</div>
 	);
 }
 
