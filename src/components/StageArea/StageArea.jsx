@@ -150,7 +150,6 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 		};
 	}, []);
 
-
 	/**
 	 * Deselects when the mouse clicks on an empty area on the canvas
 	 * and ctrl key is not pressed.
@@ -288,10 +287,10 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
 								onContextMenu={(e) => handleImageContextClick(e, index)}
-								onChange={(newImage) => {
+								onChange={(newImage, overwrite) => {
 									const newImages = [...images];
 									newImages[index] = newImage;
-									setImages(newImages);
+									setImages(newImages, overwrite);
 								}}
 							/>
 						);

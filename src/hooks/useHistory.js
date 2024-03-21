@@ -52,7 +52,7 @@ const useHistory = (initialState, maxSteps) => {
     /**
      * Redoes the last action in the history.
      */
-    const redo = () => index < history.length - 1 && setIndex(prevState => prevState - 1);
+    const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
 
     return [history[index], setState, undo, redo];
 }

@@ -24,7 +24,7 @@ const ImageNode = ({
 
 	const [url, setUrl] = useState('');
 
-	const [image] = useImage(url, 'Anonymous');
+	const [image] = useImage(url);
 
 	const { filterEnabled } = useContext(FilterEnabledContext);
 
@@ -67,21 +67,20 @@ const ImageNode = ({
 			filters={handleFilter()}
 			image={image}
 			onClick={onSelect}
-			onContextMenu={onContextMenu}
 			onTap={onSelect}
+			onContextMenu={onContextMenu}
 			x={imageProps.x}
 			y={imageProps.y}
-			onChange={onChange}
+			onMouseDown={(e) => {
+				//Moves selected image on top (z-index)
+				e.target.moveToTop();
+			}}
 			onDragEnd={(e) => {
 				onChange({
 					...imageProps,
 					x: e.target.x(),
 					y: e.target.y(),
 				});
-			}}
-			onMouseDown={(e) => {
-				//Moves selected image on top (z-index)
-				e.target.moveToTop();
 			}}
 			onTransformEnd={(e) => {
 				onChange({
