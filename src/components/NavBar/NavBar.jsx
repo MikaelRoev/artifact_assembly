@@ -120,6 +120,10 @@ const NavBar = () => {
         handleFileButtonClick()
     };
 
+    const handleLockPiecesTogether=() => {
+
+    }
+
     return (
         <nav className="navbar">
             <div className="nav-left">
@@ -136,33 +140,45 @@ const NavBar = () => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleImageUpload}
-                                    >Load Image</button>
+                                    >Load Image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                        saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                    }}
-                                    >Save project</button>
+                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                        }}
+                                    >Save project
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleImageOfCanvasExport}
-                                    >Export as image </button>
+                                    >Export as image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}
-                                    >Open similarity metrics window</button>
+                                    >Open similarity metrics window
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleLockPiecesTogether}
+                                    >Lock selected pieces together
+                                    </button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <button className={"navButton"} onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <button className={"navButton"}
+                        onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                 <button className={"navButton"} onClick={toggleFilter}>
                     {!filterEnabled ? "Enable Filter" : "Disable Filter"}
                 </button>
