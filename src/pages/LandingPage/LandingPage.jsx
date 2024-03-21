@@ -29,9 +29,11 @@ const LandingPage = () => {
 	 * Opens dialog window and goes to canvas of selected project.
 	 */
 	const handleOpenProjectClick = () => {
-		openProjectDialog(setProject, setImages).then(() => {
-			navigate('/canvas');
-		});
+		openProjectDialog(setProject, setImages)
+			.then(() => navigate('/canvas'))
+			.catch(error => {
+				if (error) console.error('Failed to open project:', error);
+			});
 	};
 
 	return (

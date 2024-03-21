@@ -40,17 +40,16 @@ export const openProjectDialog = async (setProject, setElements) => {
             multiple: false,
             filters: [{name: 'JSON Files', extensions: ['json']}]
         });
-        if (filePath) {
-            const content = await readFile(filePath);
-            let readProject = JSON.parse(content);
-            setElements(readProject.elements);
-            readProject.elements = undefined;
-            setProject(readProject);
-        } else {
-            console.log('No file selected or operation cancelled.');
-        }
+
+        if (!filePath) return Promise.reject(); //no file selected or operation cancelled
+
+        const content = await readFile(filePath);
+        let readProject = JSON.parse(content);
+        setElements(readProject.elements);
+        readProject.elements = undefined;
+        setProject(readProject);
     } catch (error) {
-        console.error('Error during open project dialog: ', error);
+        throw error;
     }
 }
 
@@ -64,18 +63,18 @@ export const saveProjectDialog = async (project, setProject, elements) => {
             title: 'Save Project As',
             filters: [{name: 'JSON Files', extensions: ['json']}]
         });
-        if (filePath) {
-            let newProject = {
-                ...project,
-                // get the project name from the file path.
-                name: filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1')
-            };
-            setProject(newProject);
-            newProject = {...newProject, elements: elements}
-            await saveToFile(JSON.stringify(newProject), filePath);
-        } else {
-            console.log('No file selected or operation cancelled.');
-        }
+
+        if (!filePath) return Promise.reject(); //no file selected or operation cancelled
+
+        let newProject = {
+            ...project,
+            // get the project name from the file path.
+            name: filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1')
+        };
+        setProject(newProject);
+        newProject = {...newProject, elements: elements}
+
+        await saveToFile(JSON.stringify(newProject), filePath);
     } catch (error) {
         console.error('Error during file save dialog: ', error);
     }
@@ -98,15 +97,12 @@ export const exportCanvasAsImageDialog = async (image) => {
         filters: [{name: 'PNG Images', extensions: ['png']}]
     });
     try {
-        if (filePath) {
-            await fs.writeBinaryFile({
-                path: filePath,
-                contents: bytes
-            })
-            console.log('Image saved successfully to ', filePath);
-        } else {
-            console.log('No file selected or operation cancelled.');
-        }
+        if (!filePath) return Promise.reject(); //no file selected or operation cancelled
+        await fs.writeBinaryFile({
+            path: filePath,
+            contents: bytes
+        })
+        console.log('Image saved successfully to ', filePath);
     } catch (error) {
         console.error('Error during export of Canvas as image: ', error);
         alert("The program encountered an error.\n" +
