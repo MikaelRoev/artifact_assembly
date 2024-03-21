@@ -8,7 +8,7 @@ const FilterWindow = ({onClose}) => {
     const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
 
-    const hueMax = 360;
+    const hueMax = 180;
     const hueMin = 0;
     const saturationMax = 10;
     const saturationMin = -2;
@@ -169,7 +169,10 @@ const FilterWindow = ({onClose}) => {
                             setImages(newImages);
                         }}
                     />
-                    <button onClick={resetFilter}>Reset</button>
+                    <button
+                        className={"resetAll"}
+                        onClick={resetFilter}
+                    >Reset all</button>
                 </form>
             </div>
         </div>
