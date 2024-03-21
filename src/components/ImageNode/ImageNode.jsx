@@ -24,7 +24,7 @@ const ImageNode = ({
 
 	const [url, setUrl] = useState('');
 
-	const [image] = useImage(url);
+	const [image] = useImage(url, 'anonymous');
 
 	const { filterEnabled } = useContext(FilterEnabledContext);
 
@@ -71,10 +71,6 @@ const ImageNode = ({
 			onContextMenu={onContextMenu}
 			x={imageProps.x}
 			y={imageProps.y}
-			onMouseDown={(e) => {
-				//Moves selected image on top (z-index)
-				e.target.moveToTop();
-			}}
 			onDragEnd={(e) => {
 				onChange({
 					...imageProps,
@@ -89,6 +85,10 @@ const ImageNode = ({
 					y: e.target.y(),
 					rotation: e.target.rotation(),
 				});
+			}}
+			onMouseDown={(e) => {
+				//Moves selected image on top (z-index)
+				e.target.moveToTop();
 			}}
 			onMouseEnter={(e) => {
 				// Adds a pointer cursor when hovering over the image
