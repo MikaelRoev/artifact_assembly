@@ -5,8 +5,9 @@ import ImageContext from "../../contexts/ImageContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {openProjectDialog, saveProjectDialog} from "../FileHandling";
-import {open} from "@tauri-apps/api/dialog";
+import {ask, open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import {useNavigate} from "react-router-dom";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -22,6 +23,8 @@ const NavBar = () => {
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+
+    const navigate = useNavigate();
 
     const offset = 20;
 
@@ -105,9 +108,7 @@ const NavBar = () => {
      * Function to handle exporting an image of the canvas
      */
     const handleImageOfCanvasExport = () => {
-        console.log("1")
         setIsDialogOpen(true);
-        console.log("2")
         handleFileButtonClick()
     }
 
@@ -123,7 +124,29 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <a href="/">Home</a>
+                <button className={"navButton"}
+                        onClick={() => {
+                            confirm('Are you sure?').then();
+                            //TODO: open dialog save or not
+                            /*ask("You may have unsaved changes. Do you want to save before closing?", {
+                                title: "Save changes?",
+                                type: "warning"
+                            }).then(response => {
+                                if (response === true) {
+                                    // save changes
+                                    saveProjectDialog(project, setProject, images)
+                                        .then(() => navigate("/"))
+                                        .catch(()=>{});
+                                } else if (response === false) {
+                                    // discard changes or canceled
+                                    navigate("/");
+                                } else {
+                                    console.log("HELLO")
+                                }
+                            }).catch(error => console.log(error));
+
+                             */
+                        }}>Home</button>
                 <div className={"fileDiv"}>
                     <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
@@ -139,8 +162,8 @@ const NavBar = () => {
                                             saveProjectDialog(project, setProject, images)
                                                 .then(handleFileButtonClick)
                                                 .catch(()=>{});
-                                        }}
-                                    >Save project
+                                        }}>
+                                        Save project
                                     </button>
                                 </li>
                                 <li>
@@ -150,38 +173,42 @@ const NavBar = () => {
                                             openProjectDialog(setProject, setImages)
                                                 .then(handleFileButtonClick)
                                                 .catch(()=>{});
-                                        }}
-                                    >Open Project
+                                        }}>
+                                        Open Project
                                     </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleImageUpload}
-                                    >Load Image
+                                        onClick={handleImageUpload}>
+                                        Load Image
                                     </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleImageOfCanvasExport}
-                                    >Export As Image
+                                        onClick={handleImageOfCanvasExport}>
+                                        Export As Image
                                     </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleOpenScoreWindow}
-                                    >Open Similarity Metrics Window
+                                        onClick={handleOpenScoreWindow}>
+                                        Open Similarity Metrics Window
                                     </button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <button className={"navButton"}
-                        onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
-                <button className={"navButton"} onClick={toggleFilter}>
+                <button
+                    className={"navButton"}
+                    onClick={toggleLock}>
+                    {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <button
+                    className={"navButton"}
+                    onClick={toggleFilter}>
                     {!filterEnabled ? "Enable Filter" : "Disable Filter"}
                 </button>
             </div>

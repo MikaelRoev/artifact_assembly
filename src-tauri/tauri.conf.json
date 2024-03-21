@@ -15,7 +15,8 @@
       "dialog": {
         "open": true,
         "save": true,
-        "message": true
+        "message": true,
+        "ask": true
       },
       "protocol": {
         "asset": true
