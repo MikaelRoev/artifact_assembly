@@ -25,7 +25,6 @@ const NavBar = ({setDialogOpen, setIsScoreWindowOpen}) => {
 
     const offset = 20;
 
-
     /**
      * Checks if there is an image at the position.
      * @param position {{x: number, y: number}} the position to check.

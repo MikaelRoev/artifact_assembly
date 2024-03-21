@@ -1,4 +1,5 @@
-import {createContext, useState} from "react";
+import {createContext} from "react";
+import useHistory from "../hooks/useHistory";
 
 const ImageContext = createContext(null);
 
@@ -9,10 +10,10 @@ const ImageContext = createContext(null);
  * @constructor
  */
 export const ImageContextProvider = ({children}) => {
-    const [images, setImages] = useState([]);
+    const [images, setImages, undo, redo] = useHistory([], 20);
 
     return (
-        <ImageContext.Provider value={{ images, setImages }}>
+        <ImageContext.Provider value={{ images, setImages, undo, redo }}>
             {children}
         </ImageContext.Provider>
     )
