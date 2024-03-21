@@ -28,7 +28,9 @@ const Canvas = () => {
      */
     function handleSave(number) {
         let image = stageRef.current.toDataURL({pixelRatio: number});
-        exportCanvasAsImageDialog(image).then(() => setIsDialogOpen(false))
+        exportCanvasAsImageDialog(image)
+            .then(() => setIsDialogOpen(false))
+            .catch(() => setIsDialogOpen(false))
     }
 
     return (

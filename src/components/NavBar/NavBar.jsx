@@ -4,7 +4,7 @@ import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import {saveProjectDialog} from "../FileHandling";
+import {openProjectDialog, saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
@@ -135,34 +135,52 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleImageUpload}
-                                    >Load Image</button>
+                                        onClick={() => {
+                                            saveProjectDialog(project, setProject, images)
+                                                .then(handleFileButtonClick)
+                                                .catch(()=>{});
+                                        }}
+                                    >Save project
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                        saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                    }}
-                                    >Save project</button>
+                                            openProjectDialog(setProject, setImages)
+                                                .then(handleFileButtonClick)
+                                                .catch(()=>{});
+                                        }}
+                                    >Open Project
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleImageUpload}
+                                    >Load Image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleImageOfCanvasExport}
-                                    >Export as image </button>
+                                    >Export As Image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}
-                                    >Open similarity metrics window</button>
+                                    >Open Similarity Metrics Window
+                                    </button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <button className={"navButton"} onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <button className={"navButton"}
+                        onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                 <button className={"navButton"} onClick={toggleFilter}>
                     {!filterEnabled ? "Enable Filter" : "Disable Filter"}
                 </button>
