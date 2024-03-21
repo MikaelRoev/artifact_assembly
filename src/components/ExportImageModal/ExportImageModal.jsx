@@ -1,5 +1,6 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import "./ExportImageModal.css"
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Dialog modal that shows up when the export image of canvas button is pressed in the file dropdown menu
@@ -8,16 +9,17 @@ import "./ExportImageModal.css"
  * @returns {JSX.Element}
  * @constructor
  */
-const ExportImageModal = ({onSave, onClose}) => {
+const ExportImageModal = ({onSave}) => {
     const [number, setNumber] = useState(1);
     const [isInfoVisible, setIsInfoVisible] = useState(false);
+    const {setIsDialogOpen} = useContext(WindowModalOpenContext);
 
     /**
      * Function to send number to parent and close the modal.
      */
     const handleSave = () => {
         onSave(number);
-        onClose()
+        setIsDialogOpen(false);
     }
 
     /**
@@ -54,7 +56,7 @@ const ExportImageModal = ({onSave, onClose}) => {
                 />
                 <div className={"modalButtonDiv"}>
                     <button className={"modalButton"} onClick={handleSave}>Open save window</button>
-                    <button className={"modalButton"} onClick={onClose}>Cancel</button>
+                    <button className={"modalButton"} onClick={() => setIsDialogOpen(false)}>Cancel</button>
                 </div>
             </div>
         </div>

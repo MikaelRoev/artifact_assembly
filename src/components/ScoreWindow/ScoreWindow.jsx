@@ -1,15 +1,17 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import "./ScoreWindow.css"
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 
 /**
  * Creates a ScoreWindow element.
  * @param layerRef reference to the layer in the stagearea.
- * @param onClose function reference for closing the window.
  * @returns {Element}
  * @constructor
  */
-const ScoreWindow = ({layerRef, onClose}) => {
+const ScoreWindow = ({layerRef}) => {
+
+    const {setIsScoreWindowOpen} = useContext(WindowModalOpenContext)
 
     /**
      * UseEffect to make the scorewindow draggable on creation.
@@ -205,7 +207,7 @@ const ScoreWindow = ({layerRef, onClose}) => {
         <div id="scoreWindow" className="window">
             <div className="window-top">
                 <div className="window-top-left">Similarity Metrics Window</div>
-                <button className="square exit" onClick={onClose}></button>
+                <button className="square exit" onClick={() => setIsScoreWindowOpen(false)}></button>
             </div>
             <div className="window-content"></div>
         </div>)

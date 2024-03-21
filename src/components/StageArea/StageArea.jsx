@@ -7,16 +7,16 @@ import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
 import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates the canvas area in the project page.
  * @param stageRef is the reference for the stage used.
  * @param layerRef is the reference for the layer inside the stage.
- * @param setIsFilterWindowOpen is the boolean that is used in the canvas.jsx file to set the visibility of the window.
  * @returns {Element}
  * @constructor
  */
-const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
+const StageArea = ({stageRef, layerRef}) => {
 	const [selectedElements, setSelectedElements] = useState([]);
 	const [history, setHistory] = useState([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
@@ -30,6 +30,7 @@ const StageArea = ({stageRef, layerRef, setIsFilterWindowOpen}) => {
 	const {project, setProject} = useContext(ProjectContext);
 	const {images, setImages} = useContext(ImageContext);
 	const {setFilterImageIndex} = useContext(ImageFilterContext);
+	const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
 	const maxUndoSteps = 20;
 

@@ -3,10 +3,17 @@ import React, {useContext, useEffect} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
-const FilterWindow = ({onClose}) => {
+/**
+ * Component representing the window containing the filter for the images.
+ * @returns {Element}
+ * @constructor
+ */
+const FilterWindow = () => {
     const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
+    const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
     const hueMax = 180;
     const hueMin = 0;
@@ -108,7 +115,7 @@ const FilterWindow = ({onClose}) => {
         <div id='filter-window' className={"filterWindow"}>
             <div className={"filterWindowHeader"}>
                 <div className={"filterWindowTitle"}>Filter</div>
-                <button className={"square exit"} onClick={onClose}></button>
+                <button className={"square exit"} onClick={() => setIsFilterWindowOpen(false)}></button>
             </div>
             <div className={"filterWindowBody"}>
                 <FilterForm

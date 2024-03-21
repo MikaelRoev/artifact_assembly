@@ -6,15 +6,14 @@ import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
- * @param setDialogOpen Boolean for opening the dialog for exporting an image of the canvas.
- * @param setIsScoreWindowOpen Boolean for opening the similarity metrics window.
  * @returns {Element}
  * @constructor
  */
-const NavBar = ({setDialogOpen, setIsScoreWindowOpen}) => {
+const NavBar = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
@@ -22,6 +21,7 @@ const NavBar = ({setDialogOpen, setIsScoreWindowOpen}) => {
     const {images, setImages} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
+    const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
 
     const offset = 20;
 
@@ -106,7 +106,9 @@ const NavBar = ({setDialogOpen, setIsScoreWindowOpen}) => {
      * Function to handle exporting an image of the canvas
      */
     const handleImageOfCanvasExport = () => {
-        setDialogOpen(true);
+        console.log("1")
+        setIsDialogOpen(true);
+        console.log("2")
         handleFileButtonClick()
     }
 

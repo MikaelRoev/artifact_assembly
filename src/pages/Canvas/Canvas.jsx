@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react";
+import React, {useRef, useContext} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
@@ -10,6 +10,7 @@ import ExportImageModal from "../../components/ExportImageModal/ExportImageModal
 import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
 import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates a project page.
@@ -19,9 +20,7 @@ import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 const Canvas = () => {
     const stageRef = useRef(null);
     const layerRef = useRef(null);
-    const [isScoreWindowOpen, setIsScoreWindowOpen] = useState(false);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
+    const {isScoreWindowOpen, isDialogOpen, setIsDialogOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
 
     /**
      * Function to get the canvas as DataURL and send it to
@@ -38,15 +37,14 @@ const Canvas = () => {
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
                         <div className="stage-container">
-                            <NavBar setDialogOpen={setIsDialogOpen} setIsScoreWindowOpen={setIsScoreWindowOpen}/>
-                            <StageArea stageRef={stageRef} layerRef={layerRef}
-                                       setIsFilterWindowOpen={setIsFilterWindowOpen}/>
+                            <NavBar/>
+                            <StageArea stageRef={stageRef} layerRef={layerRef}/>
                             {isScoreWindowOpen &&
-                                <ScoreWindow layerRef={layerRef} onClose={() => setIsScoreWindowOpen(false)}/>}
+                                <ScoreWindow layerRef={layerRef}/>}
                             {isDialogOpen &&
-                                <ExportImageModal onSave={handleSave} onClose={() => setIsDialogOpen(false)}/>}
+                                <ExportImageModal onSave={handleSave}/>}
                             {isFilterWindowOpen &&
-                                <FilterWindow onClose={() => setIsFilterWindowOpen(false)}/>}
+                                <FilterWindow/>}
                         </div>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
