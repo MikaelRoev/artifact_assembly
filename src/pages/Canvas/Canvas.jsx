@@ -40,7 +40,7 @@ const Canvas = () => {
                             <NavBar stageRef={stageRef} />
                             <StageArea stageRef={stageRef} layerRef={layerRef}/>
                             {isScoreWindowOpen &&
-                                <ScoreWindow layerRef={layerRef}/>}
+                                <ScoreWindow/>}
                             {isDialogOpen &&
                                 <ExportImageModal onSave={handleSave}/>}
                             {isFilterWindowOpen &&

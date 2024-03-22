@@ -11,7 +11,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
  * @param isSelected
  * @param onSelect
  * @param onChange
- * @returns {Element}
+ * @returns {JSX.Element}
  * @constructor
  */
 const ImageNode = ({
