@@ -71,6 +71,7 @@ const ImageNode = ({
 			onContextMenu={onContextMenu}
 			x={imageProps.x}
 			y={imageProps.y}
+			draggable={false}
 			onDragEnd={(e) => {
 				onChange({
 					...imageProps,
