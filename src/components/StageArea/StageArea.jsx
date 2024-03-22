@@ -290,9 +290,9 @@ const StageArea = ({stageRef, layerRef}) => {
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
 								onContextMenu={(e) => handleImageContextClick(e, index)}
-								onChange={(newImage, overwrite) => {
+								onChange={(newImage) => {
 									newImages[index] = newImage;
-									setImages(newImages, overwrite);
+									setImages(newImages);
 								}}
 							/>
 						);
