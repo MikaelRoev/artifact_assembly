@@ -1,7 +1,7 @@
 import {createContext} from "react";
 import useHistory from "../hooks/useHistory";
 
-const ImageContext = createContext(null);
+const ElementContext = createContext(null);
 
 /**
  * Provider for the image context that allows for getting and setting images.
@@ -9,14 +9,14 @@ const ImageContext = createContext(null);
  * @return {JSX.Element} the provider with the tree under it.
  * @constructor
  */
-export const ImageContextProvider = ({children}) => {
-    const [images, setImages, undo, redo] = useHistory([], 20);
+export const ElementContextProvider = ({children}) => {
+    const [elements, setElements, undo, redo] = useHistory([], 20);
 
     return (
-        <ImageContext.Provider value={{ images, setImages, undo, redo }}>
+        <ElementContext.Provider value={{elements, setElements, undo, redo }}>
             {children}
-        </ImageContext.Provider>
+        </ElementContext.Provider>
     )
 }
 
-export default ImageContext;
+export default ElementContext;

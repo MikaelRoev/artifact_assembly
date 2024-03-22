@@ -1,7 +1,7 @@
 import React, {useContext, useState} from "react";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
@@ -18,7 +18,7 @@ const NavBar = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {images, setImages} = useContext(ImageContext);
+    const {elements, setElements} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
@@ -32,7 +32,7 @@ const NavBar = () => {
      * false if there are no images at the position.
      */
     const isAnyImageAtPosition = (position) => {
-        return images.some((image) => {
+        return elements.some((image) => {
             return image.x === position.x && image.y === position.y
         })
     }
@@ -79,7 +79,7 @@ const NavBar = () => {
                 position.y += offset;
                 return newImage
             });
-            setImages([...images, ...newImages]);
+            setElements([...elements, ...newImages]);
             setIsLoading(false);
         }
         handleFileButtonClick()
@@ -122,6 +122,7 @@ const NavBar = () => {
 
     const handleLockPiecesTogether=() => {
 
+        handleFileButtonClick()
     }
 
     return (
@@ -147,7 +148,7 @@ const NavBar = () => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                            saveProjectDialog(project, setProject, elements).then(handleFileButtonClick);
                                         }}
                                     >Save project
                                     </button>

@@ -4,7 +4,7 @@ import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
@@ -26,7 +26,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
-	const {images, setImages, undo, redo} = useContext(ImageContext);
+	const {elements, setElements, undo, redo} = useContext(ElementContext);
 	const {setFilterImageIndex} = useContext(ImageFilterContext);
 	const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
@@ -57,8 +57,8 @@ const StageArea = ({stageRef, layerRef}) => {
 		 */
 		const handleDeletePressed = (e) => {
 			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
-				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
-				setImages(newImages);
+				const newImages = elements.filter((image, index) => !selectedElementsIndex.includes(index));
+				setElements(newImages);
 				setSelectedElements([]);
 				setSelectedElementsIndex([]);
 			}
@@ -67,7 +67,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [images, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages]);
+	}, [elements, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setElements]);
 
 	/**
 	 * Sets up and cleans up the save event listener.
@@ -80,14 +80,14 @@ const StageArea = ({stageRef, layerRef}) => {
 		const handleSavePressed = (e) => {
 			if (e.ctrlKey && e.key === "s") {
 				e.preventDefault();
-				saveProjectDialog(project, setProject, images).then(() => console.log("project saved"));
+				saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
 			}
 		};
 		document.addEventListener("keydown", handleSavePressed);
 		return () => {
 			document.removeEventListener("keydown", handleSavePressed);
 		};
-	}, [images, project, setProject]);
+	}, [elements, project, setProject]);
 
 	/**
 	 * Sets up and cleans up the undo event listener.
@@ -279,8 +279,8 @@ const StageArea = ({stageRef, layerRef}) => {
 			<Layer
 				className="layer"
 				ref={layerRef}>
-				{images.length > 0 &&
-					images.map((image, index) => {
+				{elements.length > 0 &&
+					elements.map((image, index) => {
 						return (
 							<ImageNode
 								key={index}
@@ -289,9 +289,9 @@ const StageArea = ({stageRef, layerRef}) => {
 								onSelect={(e) => handleElementClick(e, index)}
 								onContextMenu={(e) => handleImageContextClick(e, index)}
 								onChange={(newImage, overwrite) => {
-									const newImages = [...images];
+									const newImages = [...elements];
 									newImages[index] = newImage;
-									setImages(newImages, overwrite);
+									setElements(newImages, overwrite);
 								}}
 							/>
 						);

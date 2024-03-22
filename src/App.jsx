@@ -4,13 +4,13 @@ import Canvas from "./pages/Canvas/Canvas";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import "./App.css";
 import {ProjectContextProvider} from "./contexts/ProjectContext";
-import {ImageContextProvider} from "./contexts/ImageContext";
+import {ElementContextProvider} from "./contexts/ElementContext";
 import {WindowModalOpenContextProvider} from "./contexts/WindowModalOpenContext";
 
 const App = () => {
 	return (
 		<ProjectContextProvider>
-			<ImageContextProvider>
+			<ElementContextProvider>
 				<WindowModalOpenContextProvider>
 					<BrowserRouter>
 						<Routes>
@@ -19,7 +19,7 @@ const App = () => {
 						</Routes>
 					</BrowserRouter>
 				</WindowModalOpenContextProvider>
-			</ImageContextProvider>
+			</ElementContextProvider>
 		</ProjectContextProvider>
 	);
 };

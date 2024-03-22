@@ -4,7 +4,7 @@ import "./LandingPage.css";
 import { appWindow } from "@tauri-apps/api/window";
 import { openProjectDialog } from "../../components/FileHandling";
 import ProjectContext from "../../contexts/ProjectContext";
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -16,7 +16,7 @@ const LandingPage = () => {
 	const navigate = useNavigate()
 
 	const {setProject} = useContext(ProjectContext);
-	const {setImages} = useContext(ImageContext);
+	const {setElements} = useContext(ElementContext);
 
 	/**
 	 * Closes the application.
@@ -29,7 +29,7 @@ const LandingPage = () => {
 	 * Opens dialog window and goes to canvas of selected project.
 	 */
 	const handleOpenProjectClick = () => {
-		openProjectDialog(setProject, setImages).then(() => {
+		openProjectDialog(setProject, setElements).then(() => {
 			navigate('/canvas');
 		});
 	};

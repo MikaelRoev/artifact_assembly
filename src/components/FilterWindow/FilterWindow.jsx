@@ -1,7 +1,7 @@
 import "./FilterWindow.css"
 import React, {useContext, useEffect} from "react";
 import FilterForm from "../FilterForm/FilterForm";
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
@@ -11,7 +11,7 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
  * @constructor
  */
 const FilterWindow = () => {
-    const {images, setImages} = useContext(ImageContext);
+    const {elements, setElements} = useContext(ElementContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
@@ -101,13 +101,13 @@ const FilterWindow = () => {
      * Function to reset the filters on an image.
      */
     const resetFilter = () => {
-        const newImages = [...images];
+        const newImages = [...elements];
         newImages[filterImageIndex].hue = 0;
         newImages[filterImageIndex].saturation = 0;
         newImages[filterImageIndex].value = 0;
         newImages[filterImageIndex].luminance = 0;
         newImages[filterImageIndex].contrast = 0;
-        setImages(newImages);
+        setElements(newImages);
     };
 
 
@@ -123,11 +123,11 @@ const FilterWindow = () => {
                     min={hueMin}
                     max={hueMax}
                     step={1}
-                    value={isNaN(images[filterImageIndex].hue) ? 0 : images[filterImageIndex].hue}
+                    value={isNaN(elements[filterImageIndex].hue) ? 0 : elements[filterImageIndex].hue}
                     setValue={(hue) => {
-                        const newImages = [...images];
+                        const newImages = [...elements];
                         newImages[filterImageIndex].hue = hue;
-                        setImages(newImages);
+                        setElements(newImages);
                     }}
                 />
                 <FilterForm
@@ -135,11 +135,11 @@ const FilterWindow = () => {
                     min={saturationMin}
                     max={saturationMax}
                     step={0.5}
-                    value={isNaN(images[filterImageIndex].saturation) ? 0 : images[filterImageIndex].saturation}
+                    value={isNaN(elements[filterImageIndex].saturation) ? 0 : elements[filterImageIndex].saturation}
                     setValue={(saturation) => {
-                        const newImages = [...images];
+                        const newImages = [...elements];
                         newImages[filterImageIndex].saturation = saturation;
-                        setImages(newImages);
+                        setElements(newImages);
                     }}
                 />
                 <FilterForm
@@ -147,11 +147,11 @@ const FilterWindow = () => {
                     min={valueMin}
                     max={valueMax}
                     step={0.1}
-                    value={isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value}
+                    value={isNaN(elements[filterImageIndex].value) ? 0 : elements[filterImageIndex].value}
                     setValue={(value) => {
-                        const newImages = [...images];
+                        const newImages = [...elements];
                         newImages[filterImageIndex].value = value;
-                        setImages(newImages);
+                        setElements(newImages);
                     }}
                 />
                 <FilterForm
@@ -159,11 +159,11 @@ const FilterWindow = () => {
                     min={luminanceMin}
                     max={luminanceMax}
                     step={0.1}
-                    value={isNaN(images[filterImageIndex].luminance) ? 0 : images[filterImageIndex].luminance}
+                    value={isNaN(elements[filterImageIndex].luminance) ? 0 : elements[filterImageIndex].luminance}
                     setValue={(luminance) => {
-                        const newImages = [...images];
+                        const newImages = [...elements];
                         newImages[filterImageIndex].luminance = luminance;
-                        setImages(newImages);
+                        setElements(newImages);
                     }}
                 />
                 <FilterForm
@@ -171,11 +171,11 @@ const FilterWindow = () => {
                     min={contrastMin}
                     max={contrastMax}
                     step={1}
-                    value={isNaN(images[filterImageIndex].contrast) ? 0 : images[filterImageIndex].contrast}
+                    value={isNaN(elements[filterImageIndex].contrast) ? 0 : elements[filterImageIndex].contrast}
                     setValue={(contrast) => {
-                        const newImages = [...images];
+                        const newImages = [...elements];
                         newImages[filterImageIndex].contrast = contrast;
-                        setImages(newImages);
+                        setElements(newImages);
                     }}
                 />
                 <button
