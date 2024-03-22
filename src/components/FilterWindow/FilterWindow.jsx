@@ -11,7 +11,7 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
  * @constructor
  */
 const FilterWindow = () => {
-    const {images, setImages} = useContext(ImageContext);
+    const {images, setImages, commit} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
@@ -108,6 +108,7 @@ const FilterWindow = () => {
         newImages[filterImageIndex].luminance = 0;
         newImages[filterImageIndex].contrast = 0;
         setImages(newImages);
+        commit();
     };
 
     function checkValidValue(parameter) {
@@ -136,7 +137,15 @@ const FilterWindow = () => {
                         newImages[filterImageIndex].hue = hue;
                         setImages(newImages);
                     }}
+                    onReset={() => {
+                        const newImages = [...images];
+                        newImages[filterImageIndex].hue = 0;
+                        setImages(newImages);
+                        commit();
+                    }}
+                    onSliderEnd={commit}
                 />
+                {/*
                 <FilterForm
                     label="Saturation"
                     min={saturationMin}
@@ -185,6 +194,7 @@ const FilterWindow = () => {
                         setImages(newImages);
                     }}
                 />
+                */}
                 <button
                     className={"resetAll"}
                     onClick={resetFilter}

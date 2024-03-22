@@ -16,7 +16,7 @@ const LandingPage = () => {
 	const navigate = useNavigate()
 
 	const {setProject} = useContext(ProjectContext);
-	const {setImages} = useContext(ImageContext);
+	const {setImages, commit} = useContext(ImageContext);
 
 	/**
 	 * Closes the application.
@@ -29,7 +29,10 @@ const LandingPage = () => {
 	 * Opens dialog window and goes to canvas of selected project.
 	 */
 	const handleOpenProjectClick = () => {
-		openProjectDialog(setProject, setImages).then(() => {
+		openProjectDialog(setProject, (elements) => {
+			setImages(elements);
+			commit();
+		}).then(() => {
 			navigate('/canvas');
 		});
 	};

@@ -18,7 +18,7 @@ const NavBar = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {images, setImages} = useContext(ImageContext);
+    const {images, setImages, commit} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
@@ -80,6 +80,7 @@ const NavBar = () => {
                 return newImage
             });
             setImages([...images, ...newImages]);
+            commit();
             setIsLoading(false);
         }
         handleFileButtonClick()

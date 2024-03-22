@@ -26,7 +26,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
 	const {isLocked} = useContext(LockedContext);
 	const {project, setProject} = useContext(ProjectContext);
-	const {images, setImages, undo, redo} = useContext(ImageContext);
+	const {images, setImages, undo, redo, commit} = useContext(ImageContext);
 	const {setFilterImageIndex} = useContext(ImageFilterContext);
 	const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
@@ -61,6 +61,7 @@ const StageArea = ({stageRef, layerRef}) => {
 			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
 				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
 				setImages(newImages);
+				commit();
 				setSelectedElements([]);
 				setSelectedElementsIndex([]);
 			}
@@ -293,6 +294,7 @@ const StageArea = ({stageRef, layerRef}) => {
 								onChange={(newImage) => {
 									newImages[index] = newImage;
 									setImages(newImages);
+									commit();
 								}}
 							/>
 						);

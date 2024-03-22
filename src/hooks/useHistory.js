@@ -9,52 +9,53 @@ import {useState} from "react";
  */
 const useHistory = (initialState, maxSteps) => {
     const [index, setIndex] = useState(0);
+    const [state, setState] = useState([]);
     const [history, setHistory] = useState([initialState]);
 
     /**
-     * Updates the state.
-     * @param action
-     * @param overwrite
+     * Commits the current state to the history.
      */
-    const setState = (action, overwrite = false) => {
-        // get the new state ether from a function or a variable, implemented similar to useState
-        const newState = typeof action === "function" ? action(history[index]) : action;
+    const commit = () => {
+        const newIndex = index + 1;
+        // remove the history after current state
+        const newHistory = history.slice(0, newIndex);
+        // add new state to the history
+        newHistory.push(state);
 
-        if (overwrite) {
-            // overwrite the current state
-            const newHistory = [...history];
-            newHistory[index] = newState;
-            setHistory(newHistory);
+        // Enforce the maximum number of undo steps
+        if (newHistory.length > maxSteps) {
+            // Remove the oldest state
+            newHistory.shift();
         } else {
-            const newIndex = index + 1;
-            // remove the history after current state
-            const newHistory = history.slice(0, newIndex);
-            // add new state to the history
-            newHistory.push(newState);
-
-            // Enforce the maximum number of undo steps
-            if (newHistory.length > maxSteps) {
-                // Remove the oldest state
-                newHistory.shift();
-            } else {
-                // increment the index
-                setIndex(newIndex);
-            }
-            setHistory(newHistory);
+            // increment the index
+            setIndex(newIndex);
         }
+        console.log("committed: ", newHistory, index);
+        setHistory(newHistory);
     }
 
     /**
      * Undoes the last action in the history.
      */
-    const undo = () => index > 0 && setIndex(prevState => prevState - 1)
+    const undo = () => {
+        console.log(index - 1)
+        if (index > 0) {
+            setIndex(prevState => prevState - 1)
+            setState(history[index - 1])
+        }
+    }
 
     /**
      * Redoes the last action in the history.
      */
-    const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
+    const redo = () => {
+        if (index < history.length - 1) {
+            setIndex(prevState => prevState + 1);
+            setState(history[index + 1])
+        }
+    }
 
-    return [history[index], setState, undo, redo];
+    return [state, setState, undo, redo, commit];
 }
 
 
