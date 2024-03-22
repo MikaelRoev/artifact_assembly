@@ -37,7 +37,7 @@ const Canvas = () => {
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
                         <div className="stage-container">
-                            <NavBar/>
+                            <NavBar stageRef={stageRef} />
                             <StageArea stageRef={stageRef} layerRef={layerRef}/>
                             {isScoreWindowOpen &&
                                 <ScoreWindow layerRef={layerRef}/>}
