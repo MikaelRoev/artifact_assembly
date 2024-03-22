@@ -11,7 +11,7 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
  * @constructor
  */
 const FilterWindow = () => {
-    const {images, setImages, commit} = useContext(ImageContext);
+    const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
@@ -101,14 +101,15 @@ const FilterWindow = () => {
      * Function to reset the filters on an image.
      */
     const resetFilter = () => {
-        const newImages = [...images];
-        newImages[filterImageIndex].hue = 0;
-        newImages[filterImageIndex].saturation = 0;
-        newImages[filterImageIndex].value = 0;
-        newImages[filterImageIndex].luminance = 0;
-        newImages[filterImageIndex].contrast = 0;
-        setImages(newImages);
-        commit();
+        const newImage = images[filterImageIndex];
+        if (!newImage) return;
+        newImage.hue = 0;
+        newImage.saturation = 0;
+        newImage.value = 0;
+        newImage.luminance = 0;
+        newImage.contrast = 0;
+        images[filterImageIndex] = newImage;
+        setImages(images);
     };
 
     function checkValidValue(parameter) {
@@ -132,30 +133,22 @@ const FilterWindow = () => {
                     max={hueMax}
                     step={1}
                     value={checkValidValue("hue")}
-                    setValue={(hue) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].hue = hue;
-                        setImages(newImages);
+                    setValue={(hue, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].hue = hue;
+                        setImages(images, overwrite);
                     }}
-                    onReset={() => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].hue = 0;
-                        setImages(newImages);
-                        commit();
-                    }}
-                    onSliderEnd={commit}
                 />
-                {/*
                 <FilterForm
                     label="Saturation"
                     min={saturationMin}
                     max={saturationMax}
                     step={0.5}
                     value={checkValidValue("saturation")}
-                    setValue={(saturation) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].saturation = saturation;
-                        setImages(newImages);
+                    setValue={(saturation, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].saturation = saturation;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -164,10 +157,10 @@ const FilterWindow = () => {
                     max={valueMax}
                     step={0.1}
                     value={checkValidValue("value")}
-                    setValue={(value) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].value = value;
-                        setImages(newImages);
+                    setValue={(value, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].value = value;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -176,10 +169,10 @@ const FilterWindow = () => {
                     max={luminanceMax}
                     step={0.1}
                     value={checkValidValue("luminance")}
-                    setValue={(luminance) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].luminance = luminance;
-                        setImages(newImages);
+                    setValue={(luminance, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].luminance = luminance;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -188,13 +181,12 @@ const FilterWindow = () => {
                     max={contrastMax}
                     step={1}
                     value={checkValidValue("contrast")}
-                    setValue={(contrast) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].contrast = contrast;
-                        setImages(newImages);
+                    setValue={(contrast, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].contrast = contrast;
+                        setImages(images, overwrite);
                     }}
                 />
-                */}
                 <button
                     className={"resetAll"}
                     onClick={resetFilter}

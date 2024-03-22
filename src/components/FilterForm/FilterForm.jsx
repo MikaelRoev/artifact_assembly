@@ -1,10 +1,13 @@
-import React from "react";
 import "./FilterForm.css";
 
-const FilterForm = ({ label, min, max, step, value, setValue, onStart, onReset }) => {
+const FilterForm = ({ label, min, max, step, value, setValue }) => {
+
+	const handleReset = () => {
+		setValue(0, false);
+	}
 
 	const handleSliderChange = (e) => {
-		setValue(parseFloat(e.target.value));
+		setValue(parseFloat(e.target.value), true);
 	}
 
 	return (
@@ -18,7 +21,6 @@ const FilterForm = ({ label, min, max, step, value, setValue, onStart, onReset }
 				step={step}
 				value={value}
 				onChange={handleSliderChange}
-				onMouseDown={onStart}
 			/>
 			<input
 				className="input-number-form"
@@ -29,10 +31,9 @@ const FilterForm = ({ label, min, max, step, value, setValue, onStart, onReset }
 				step={step}
 				value={value}
 				onChange={handleSliderChange}
-				onMouseDown={onStart}
 			/>
 			<button
-				onClick={onReset}
+				onClick={handleReset}
 				className={"resetButton"}
 			>Reset</button>
 		</div>
