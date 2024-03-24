@@ -18,7 +18,7 @@ const NavBar = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {images, setImages} = useContext(ImageContext);
+    const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
@@ -105,9 +105,7 @@ const NavBar = () => {
      * Function to handle exporting an image of the canvas
      */
     const handleImageOfCanvasExport = () => {
-        console.log("1")
         setIsDialogOpen(true);
-        console.log("2")
         handleFileButtonClick()
     }
 
@@ -136,36 +134,43 @@ const NavBar = () => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleImageUpload}
-                                    >Load Image</button>
+                                    >Load Image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                        saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                    }}
-                                    >Save project</button>
+                                            saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
+                                        }}
+                                    >Save project
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleImageOfCanvasExport}
-                                    >Export as image </button>
+                                    >Export as image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}
-                                    >Open similarity metrics window</button>
+                                    >Open similarity metrics window
+                                    </button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <button className={"navButton"} onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <button className={"navButton"}
+                        onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                 <button className={"navButton"} onClick={toggleFilter}>
                     {!filterEnabled ? "Enable Filter" : "Disable Filter"}
                 </button>
+                <button className={"navButton"} onClick={undo}>Undo</button>
+                <button className={"navButton"} onClick={redo}>Redo</button>
             </div>
             <div className="nav-right">
                 {isLoading && <div className="nav-item-right">Loading images...</div>}
