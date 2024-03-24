@@ -34,6 +34,8 @@ const StageArea = ({stageRef, layerRef}) => {
 	const zoomMin = 0.001; //zoom out limit
 	const zoomMax = 300; //zoom in limit
 
+	let newImages = [...images];
+
 	/**
 	 * Update the stage according to the project.
 	 */
@@ -279,7 +281,7 @@ const StageArea = ({stageRef, layerRef}) => {
 			<Layer
 				className="layer"
 				ref={layerRef}>
-				{images.length > 0 &&
+				{ images.length > 0 &&
 					images.map((image, index) => {
 						return (
 							<ImageNode
@@ -288,10 +290,9 @@ const StageArea = ({stageRef, layerRef}) => {
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}
 								onContextMenu={(e) => handleImageContextClick(e, index)}
-								onChange={(newImage, overwrite) => {
-									const newImages = [...images];
+								onChange={(newImage) => {
 									newImages[index] = newImage;
-									setImages(newImages, overwrite);
+									setImages(newImages);
 								}}
 							/>
 						);

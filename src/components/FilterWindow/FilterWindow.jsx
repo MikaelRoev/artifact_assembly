@@ -101,15 +101,24 @@ const FilterWindow = () => {
      * Function to reset the filters on an image.
      */
     const resetFilter = () => {
-        const newImages = [...images];
-        newImages[filterImageIndex].hue = 0;
-        newImages[filterImageIndex].saturation = 0;
-        newImages[filterImageIndex].value = 0;
-        newImages[filterImageIndex].luminance = 0;
-        newImages[filterImageIndex].contrast = 0;
-        setImages(newImages);
+        const newImage = images[filterImageIndex];
+        if (!newImage) return;
+        newImage.hue = 0;
+        newImage.saturation = 0;
+        newImage.value = 0;
+        newImage.luminance = 0;
+        newImage.contrast = 0;
+        images[filterImageIndex] = newImage;
+        setImages(images);
     };
 
+    function checkValidValue(parameter) {
+        if (!images[filterImageIndex] || isNaN(images[filterImageIndex][parameter])) {
+            return 0;
+        } else {
+            return images[filterImageIndex][parameter];
+        }
+    }
 
     return (
         <div id='filter-window' className={"filterWindow"}>
@@ -123,11 +132,11 @@ const FilterWindow = () => {
                     min={hueMin}
                     max={hueMax}
                     step={1}
-                    value={isNaN(images[filterImageIndex].hue) ? 0 : images[filterImageIndex].hue}
-                    setValue={(hue) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].hue = hue;
-                        setImages(newImages);
+                    value={checkValidValue("hue")}
+                    setValue={(hue, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].hue = hue;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -135,11 +144,11 @@ const FilterWindow = () => {
                     min={saturationMin}
                     max={saturationMax}
                     step={0.5}
-                    value={isNaN(images[filterImageIndex].saturation) ? 0 : images[filterImageIndex].saturation}
-                    setValue={(saturation) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].saturation = saturation;
-                        setImages(newImages);
+                    value={checkValidValue("saturation")}
+                    setValue={(saturation, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].saturation = saturation;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -147,11 +156,11 @@ const FilterWindow = () => {
                     min={valueMin}
                     max={valueMax}
                     step={0.1}
-                    value={isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value}
-                    setValue={(value) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].value = value;
-                        setImages(newImages);
+                    value={checkValidValue("value")}
+                    setValue={(value, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].value = value;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -159,11 +168,11 @@ const FilterWindow = () => {
                     min={luminanceMin}
                     max={luminanceMax}
                     step={0.1}
-                    value={isNaN(images[filterImageIndex].luminance) ? 0 : images[filterImageIndex].luminance}
-                    setValue={(luminance) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].luminance = luminance;
-                        setImages(newImages);
+                    value={checkValidValue("luminance")}
+                    setValue={(luminance, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].luminance = luminance;
+                        setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
@@ -171,11 +180,11 @@ const FilterWindow = () => {
                     min={contrastMin}
                     max={contrastMax}
                     step={1}
-                    value={isNaN(images[filterImageIndex].contrast) ? 0 : images[filterImageIndex].contrast}
-                    setValue={(contrast) => {
-                        const newImages = [...images];
-                        newImages[filterImageIndex].contrast = contrast;
-                        setImages(newImages);
+                    value={checkValidValue("contrast")}
+                    setValue={(contrast, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].contrast = contrast;
+                        setImages(images, overwrite);
                     }}
                 />
                 <button

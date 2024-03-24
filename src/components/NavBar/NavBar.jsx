@@ -19,7 +19,7 @@ const NavBar = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {images, setImages} = useContext(ImageContext);
+    const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
@@ -211,6 +211,8 @@ const NavBar = () => {
                     onClick={toggleFilter}>
                     {!filterEnabled ? "Enable Filter" : "Disable Filter"}
                 </button>
+                <button className={"navButton"} onClick={undo}>Undo</button>
+                <button className={"navButton"} onClick={redo}>Redo</button>
             </div>
             <div className="nav-right">
                 {isLoading && <div className="nav-item-right">Loading images...</div>}
