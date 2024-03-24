@@ -1,15 +1,6 @@
 import "./FilterForm.css";
 
 const FilterForm = ({ label, min, max, step, value, setValue }) => {
-
-	const handleReset = () => {
-		setValue(0, false);
-	}
-
-	const handleSliderChange = (e) => {
-		setValue(parseFloat(e.target.value), true);
-	}
-
 	return (
 		<div className={"form-group"}>
 			<p>{label}:</p>
@@ -20,20 +11,20 @@ const FilterForm = ({ label, min, max, step, value, setValue }) => {
 				max={max}
 				step={step}
 				value={value}
-				onChange={handleSliderChange}
+				onChange={(e) => setValue(parseFloat(e.target.value), true)}
+				onMouseDown={(e) => setValue(parseFloat(e.target.value), false)}
 			/>
 			<input
 				className="input-number-form"
 				type="number"
 				min={min}
 				max={max}
-				size={3}
 				step={step}
 				value={value}
-				onChange={handleSliderChange}
+				onChange={(e) => setValue(parseFloat(e.target.value), false)}
 			/>
 			<button
-				onClick={handleReset}
+				onClick={() => setValue(0, false)}
 				className={"resetButton"}
 			>Reset</button>
 		</div>
