@@ -9,53 +9,55 @@ import {useState} from "react";
  */
 const useHistory = (initialState, maxSteps) => {
     const [index, setIndex] = useState(0);
-    const [state, setState] = useState([]);
     const [history, setHistory] = useState([initialState]);
 
-    /**
-     * Commits the current state to the history.
-     */
-    const commit = () => {
-        const newIndex = index + 1;
-        // remove the history after current state
-        const newHistory = history.slice(0, newIndex);
-        // add new state to the history
-        newHistory.push(state);
+    const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
 
-        // Enforce the maximum number of undo steps
-        if (newHistory.length > maxSteps) {
-            // Remove the oldest state
-            newHistory.shift();
+
+    /**
+     * Updates the state.
+     * @param action
+     * @param overwrite
+     */
+    const setState = (action, overwrite = false) => {
+        // get the new state ether from a function or a variable, implemented similar to useState
+        const newState = typeof action === "function" ? action(deepCopy(history[index])) : action;
+
+        if (overwrite) {
+            // overwrite the current state
+            const newHistory = [...history];
+            newHistory[index] = newState;
+            setHistory(newHistory);
         } else {
-            // increment the index
-            setIndex(newIndex);
+            const newIndex = index + 1;
+            // remove the history after current state
+            const newHistory = history.slice(0, newIndex);
+            // add new state to the history
+            newHistory.push(newState);
+
+            // Enforce the maximum number of undo steps
+            if (newHistory.length > maxSteps) {
+                // Remove the oldest state
+                newHistory.shift();
+            } else {
+                // increment the index
+                setIndex(newIndex);
+            }
+            setHistory(newHistory);
         }
-        console.log("committed: ", newHistory, index);
-        setHistory(newHistory);
     }
 
     /**
      * Undoes the last action in the history.
      */
-    const undo = () => {
-        console.log(index - 1)
-        if (index > 0) {
-            setIndex(prevState => prevState - 1)
-            setState(history[index - 1])
-        }
-    }
+    const undo = () => index > 0 && setIndex(prevState => prevState - 1)
 
     /**
      * Redoes the last action in the history.
      */
-    const redo = () => {
-        if (index < history.length - 1) {
-            setIndex(prevState => prevState + 1);
-            setState(history[index + 1])
-        }
-    }
+    const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
 
-    return [state, setState, undo, redo, commit];
+    return [deepCopy(history[index]), setState, undo, redo];
 }
 
 

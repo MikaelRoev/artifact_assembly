@@ -10,10 +10,10 @@ const ImageContext = createContext(null);
  * @constructor
  */
 export const ImageContextProvider = ({children}) => {
-    const [images, setImages, undo, redo, commit] = useHistory([], 20);
+    const [images, setImages, undo, redo] = useHistory([], 20);
 
     return (
-        <ImageContext.Provider value={{ images, setImages, undo, redo, commit }}>
+        <ImageContext.Provider value={{ images, setImages, undo, redo }}>
             {children}
         </ImageContext.Provider>
     )
