@@ -83,7 +83,6 @@ const ScoreWindow = () => {
         const appendImageData = () => {
             const scoreWindowContent = document.querySelector('.window-content');
             if (images.length > 0) {
-                console.log("none")
                 scoreWindowContent.innerHTML = images.map(data => `ID: ${data.fileName}, Width: ${data.width}, 
                 Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)}`).join('<br>');
 
