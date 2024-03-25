@@ -25,6 +25,8 @@ const FilterWindow = () => {
     const luminanceMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
+    const thresholdMax = 300;
+    const thresholdMin = 0;
 
 
     /**
@@ -108,6 +110,7 @@ const FilterWindow = () => {
         newImage.value = 0;
         newImage.luminance = 0;
         newImage.contrast = 0;
+        newImage.threshold = 0;
         images[filterImageIndex] = newImage;
         setImages(images);
     };
@@ -135,7 +138,7 @@ const FilterWindow = () => {
                     value={checkValidValue("hue")}
                     setValue={(hue, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].hue = hue;
+                        images[filterImageIndex].hue = parseInt(hue);
                         setImages(images, overwrite);
                     }}
                 />
@@ -147,7 +150,7 @@ const FilterWindow = () => {
                     value={checkValidValue("saturation")}
                     setValue={(saturation, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].saturation = saturation;
+                        images[filterImageIndex].saturation = parseFloat(saturation);
                         setImages(images, overwrite);
                     }}
                 />
@@ -159,7 +162,7 @@ const FilterWindow = () => {
                     value={checkValidValue("value")}
                     setValue={(value, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].value = value;
+                        images[filterImageIndex].value = parseFloat(value);
                         setImages(images, overwrite);
                     }}
                 />
@@ -171,7 +174,7 @@ const FilterWindow = () => {
                     value={checkValidValue("luminance")}
                     setValue={(luminance, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].luminance = luminance;
+                        images[filterImageIndex].luminance = parseFloat(luminance);
                         setImages(images, overwrite);
                     }}
                 />
@@ -183,7 +186,19 @@ const FilterWindow = () => {
                     value={checkValidValue("contrast")}
                     setValue={(contrast, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].contrast = contrast;
+                        images[filterImageIndex].contrast = parseFloat(contrast);
+                        setImages(images, overwrite);
+                    }}
+                />
+                <FilterForm
+                    label="Mask Threshold"
+                    min={thresholdMin}
+                    max={thresholdMax}
+                    step={1}
+                    value={checkValidValue("threshold")}
+                    setValue={(threshold, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].threshold = parseInt(threshold);
                         setImages(images, overwrite);
                     }}
                 />

@@ -11,8 +11,8 @@ const FilterForm = ({ label, min, max, step, value, setValue }) => {
 				max={max}
 				step={step}
 				value={value}
-				onChange={(e) => setValue(parseFloat(e.target.value), true)}
-				onMouseDown={(e) => setValue(parseFloat(e.target.value), false)}
+				onChange={(e) => setValue(e.target.value, true)}
+				onMouseDown={(e) => setValue(e.target.value, false)}
 			/>
 			<input
 				className="input-number-form"
@@ -21,7 +21,7 @@ const FilterForm = ({ label, min, max, step, value, setValue }) => {
 				max={max}
 				step={step}
 				value={value}
-				onChange={(e) => setValue(parseFloat(e.target.value), false)}
+				onChange={(e) => setValue(e.target.value, false)}
 			/>
 			<button
 				onClick={() => setValue(0, false)}

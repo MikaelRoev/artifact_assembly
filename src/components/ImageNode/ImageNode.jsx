@@ -34,7 +34,7 @@ const ImageNode = ({
 	 */
 	const handleFilter = () => {
 		if (filterEnabled === true) {
-			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast];
+			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast, Konva.Filters.Mask];
 		} else return null;
 	};
 
