@@ -152,15 +152,18 @@ const NavBar = ({stageRef}) => {
 
         // Calculate the new X and Y values to move the stage to based on the nearest image
         if (nearestImage) {
-            const scale = stage.scaleX();
-            const newX = -nearestImage.x * scale + (stageWidth / 2) - (nearestImage.width * scale / 2);
-            const newY = -nearestImage.y * scale + (stageHeight / 2) - (nearestImage.height * scale / 2);
-
+            const newX = -nearestImage.x + (stageWidth / 2) - (nearestImage.width / 2);
+            const newY = -nearestImage.y + (stageHeight / 2) - (nearestImage.height / 2);
             stage.to({
                 x: newX,
                 y: newY,
+                scaleX: 1,
+                scaleY: 1,
                 duration: 0.5,
-            });
+                onFinish: () => {
+                    project.zoom = 1
+            }
+            })
         }
         handleFileButtonClick();
     }

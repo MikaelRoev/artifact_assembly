@@ -186,6 +186,7 @@ const StageArea = ({stageRef, layerRef}) => {
 
 		const zoomFactor = event.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
 		const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
+		console.log(newScale)
 		setProject({
 			...project,
 			zoom: newScale,
@@ -295,8 +296,10 @@ const StageArea = ({stageRef, layerRef}) => {
 		 * an image that needs its width and height updated.
  		 */
 		if (layerRef.current && images.length > 0) {
-			const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image');
-			if (imageNodes.filter((child) => !child.attrs.width).length !== 0) {
+			const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+				.filter((child) => !child.attrs.width);
+			console.log(imageNodes)
+			if (imageNodes.length !== 0) {
 				setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
 			}
 		}
