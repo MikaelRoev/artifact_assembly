@@ -34,6 +34,13 @@ const LandingPage = () => {
 		});
 	};
 
+	/**
+	 * Opens a new canvas
+	 */
+	const handleNewProjectClick = () => {
+		navigate('/canvas')
+	}
+
 	return (
 		<div className="container">
 			<div className="left-main">
@@ -42,15 +49,15 @@ const LandingPage = () => {
 				</h1>
 
 				<div className="link-buttons-container">
-					<a href="/canvas" className="link-button">
+					<button onClick={handleNewProjectClick} className="link-button">
 						New Project
-					</a>
-					<p onClick={handleOpenProjectClick} className="link-button">
+					</button>
+					<button onClick={handleOpenProjectClick} className="link-button">
 						Open Project
-					</p>
-					<p onClick={handleQuitClick} className="link-button secondary">
+					</button>
+					<button onClick={handleQuitClick} className="link-button secondary">
 						Quit
-					</p>
+					</button>
 				</div>
 			</div>
 			<div className="right-main">
