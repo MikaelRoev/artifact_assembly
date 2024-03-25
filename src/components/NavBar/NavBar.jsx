@@ -5,7 +5,7 @@ import ImageContext from "../../contexts/ImageContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {openProjectDialog, saveProjectDialog} from "../FileHandling";
-import {ask, open} from "@tauri-apps/api/dialog";
+import {confirm, open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {useNavigate} from "react-router-dom";
 
@@ -126,9 +126,8 @@ const NavBar = () => {
             <div className="nav-left">
                 <button className={"navButton"}
                         onClick={() => {
-                            confirm('Are you sure?').then();
                             //TODO: open dialog save or not
-                            /*ask("You may have unsaved changes. Do you want to save before closing?", {
+                            confirm("You may have unsaved changes. Do you want to save before closing?", {
                                 title: "Save changes?",
                                 type: "warning"
                             }).then(response => {
@@ -144,8 +143,6 @@ const NavBar = () => {
                                     console.log("HELLO")
                                 }
                             }).catch(error => console.log(error));
-
-                             */
                         }}>Home</button>
                 <div className={"fileDiv"}>
                     <button className={"navButton"} onClick={handleFileButtonClick}>
