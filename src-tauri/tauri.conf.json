@@ -16,6 +16,7 @@
         "open": true,
         "save": true,
         "message": true,
+        "confirm": true
       },
       "protocol": {
         "asset": true
