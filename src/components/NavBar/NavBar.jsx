@@ -10,10 +10,11 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
+ * @param stageRef Reference to the canvas stage
  * @returns {Element}
  * @constructor
  */
-const NavBar = () => {
+const NavBar = ({stageRef}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
@@ -50,11 +51,11 @@ const NavBar = () => {
         return {x: position.x, y: position.y}
     }
 
-	/**
-	 * Handles uploading of an image.
-	 * @returns {Promise<void>}
-	 */
-	const handleImageUpload = async () => {
+    /**
+     * Handles uploading of an image.
+     * @returns {Promise<void>}
+     */
+    const handleImageUpload = async () => {
         setIsLoading(true);
         // open file explorer dialog window
         const result = await open({
@@ -69,6 +70,7 @@ const NavBar = () => {
                 position = findFirstFreePosition(position);
                 const newImage = {
                     className: 'Image',
+                    fileName: file.split('\\')[file.split('\\').length - 1],
                     filePath: file,
                     x: position.x,
                     y: position.y,
@@ -118,6 +120,54 @@ const NavBar = () => {
         handleFileButtonClick()
     };
 
+    /**
+     * Function to find the work area. Works by finding the nearest image and moving the stage to that image.
+     */
+    const findWorkArea = () => {
+        let nearestImage = null;
+        let shortestDistance = Infinity
+        let stage = stageRef.current
+        const stageWidth = stage.width();
+        const stageHeight = stage.height();
+
+        // Position of the center of the current stage
+        const currentStageCenterX = -stage.x() / stage.scaleX() + stageWidth / 2 / stage.scaleX();
+        const currentStageCenterY = -stage.y() / stage.scaleY() + stageHeight / 2 / stage.scaleY();
+
+        //Finding the closest image
+        images.forEach(image => {
+            const imagePosX = image.x;
+            const imagePosY = image.y;
+
+            const dx = imagePosX - currentStageCenterX;
+            const dy = imagePosY - currentStageCenterY;
+            const distance = Math.sqrt(dx**2 + dy**2);
+
+
+            if (distance < shortestDistance) {
+                nearestImage = image;
+                shortestDistance = distance;
+            }
+        });
+
+        // Calculate the new X and Y values to move the stage to based on the nearest image
+        if (nearestImage) {
+            const newX = -nearestImage.x + (stageWidth / 2) - (nearestImage.width / 2);
+            const newY = -nearestImage.y + (stageHeight / 2) - (nearestImage.height / 2);
+            stage.to({
+                x: newX,
+                y: newY,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 0.5,
+                onFinish: () => {
+                    project.zoom = 1
+            }
+            })
+        }
+        handleFileButtonClick();
+    }
+
     return (
         <nav className="navbar">
             <div className="nav-left">
@@ -134,8 +184,7 @@ const NavBar = () => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleImageUpload}
-                                    >Load Image
-                                    </button>
+                                    >Load Image</button>
                                 </li>
                                 <li>
                                     <button
@@ -143,22 +192,25 @@ const NavBar = () => {
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
                                         }}
-                                    >Save project
-                                    </button>
-                                </li>
-                                <li>
-                                    <button
-                                        className={"dropdownButton"}
-                                        onClick={handleImageOfCanvasExport}
-                                    >Export as image
-                                    </button>
+                                    >Save project</button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}
-                                    >Open similarity metrics window
-                                    </button>
+                                    >Open similarity metrics window</button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleImageOfCanvasExport}
+                                    >Export as image</button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={findWorkArea}
+                                    >Go to work area</button>
                                 </li>
                             </ul>
                         </div>
