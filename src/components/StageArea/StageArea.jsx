@@ -264,6 +264,47 @@ const StageArea = ({stageRef, layerRef}) => {
 		setFilterImageIndex(index);
 	}
 
+
+	/**
+	 * useEffect for updating image dimensions
+	 */
+	useEffect(() => {
+		/**
+		 * Sets the width and height of images that does not have them yet.
+		 * @param imageNodes Image nodes on the canvas.
+		 * @returns {Promise<void>}
+		 */
+		const setImageDimensions = async (imageNodes) => {
+			await new Promise(resolve => setTimeout(resolve, 1000));
+			imageNodes.forEach(imageNode => {
+				if (!imageNode.attrs.width || !imageNode.attrs.height) {
+					images.forEach((image, index) => {
+						if (imageNode.attrs.fileName === image.fileName) {
+							images[index] = {
+								...image,
+								width: imageNode.width(),
+								height: imageNode.height(),
+							}
+
+						}
+					})
+				}
+			})
+		}
+
+		/**
+		 * Checks if it is images on the canvas and only runs the function if there is
+		 * an image that needs its width and height updated.
+ 		 */
+		if (layerRef.current && images.length > 0) {
+			const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+				.filter((child) => !child.attrs.width);
+			if (imageNodes.length !== 0) {
+				setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
+			}
+		}
+	}, [images.length, layerRef, images]);
+
 	/**
 	 * Returns a stage with a layer within.
 	 * Returns an imageNode and a transformer within the layer.
