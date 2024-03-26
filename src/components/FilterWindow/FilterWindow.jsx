@@ -15,7 +15,7 @@ const FilterWindow = () => {
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
-    const hueMax = 180;
+    const hueMax = 179;
     const hueMin = 0;
     const saturationMax = 10;
     const saturationMin = -2;
@@ -25,6 +25,7 @@ const FilterWindow = () => {
     const luminanceMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
+    const root = document.querySelector(':root');
 
 
     /**
@@ -108,6 +109,10 @@ const FilterWindow = () => {
         newImage.value = 0;
         newImage.luminance = 0;
         newImage.contrast = 0;
+        root.style.setProperty("--hue", 0);
+        root.style.setProperty("--saturation", 16.666);
+        root.style.setProperty("--value", 50);
+        root.style.setProperty("--luminance", 50);
         images[filterImageIndex] = newImage;
         setImages(images);
     };
@@ -128,6 +133,7 @@ const FilterWindow = () => {
             </div>
             <div className={"filterWindowBody"}>
                 <FilterForm
+                    id={"filter-hue"}
                     label="Hue"
                     min={hueMin}
                     max={hueMax}
@@ -136,22 +142,26 @@ const FilterWindow = () => {
                     setValue={(hue, overwrite) => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].hue = hue;
+                        root.style.setProperty("--hue", -hue*2);
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-saturation"}
                     label="Saturation"
                     min={saturationMin}
                     max={saturationMax}
-                    step={0.5}
+                    step={0.1}
                     value={checkValidValue("saturation")}
                     setValue={(saturation, overwrite) => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].saturation = saturation;
+                        root.style.setProperty("--saturation", ((saturation-saturationMin)/(saturationMax-saturationMin)) * (100));
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-value"}
                     label="Value"
                     min={valueMin}
                     max={valueMax}
@@ -160,10 +170,12 @@ const FilterWindow = () => {
                     setValue={(value, overwrite) => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].value = value;
+                        root.style.setProperty("--value", ((value - valueMin)*100)/(valueMax-valueMin));
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-luminance"}
                     label="Luminance"
                     min={luminanceMin}
                     max={luminanceMax}
@@ -172,10 +184,12 @@ const FilterWindow = () => {
                     setValue={(luminance, overwrite) => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].luminance = luminance;
+                        root.style.setProperty("--luminance", ((luminance - luminanceMin)*100)/(luminanceMax-luminanceMin));
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-contrast"}
                     label="Contrast"
                     min={contrastMin}
                     max={contrastMax}
