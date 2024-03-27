@@ -1,5 +1,5 @@
 import "./FilterWindow.css"
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
@@ -15,6 +15,8 @@ const FilterWindow = () => {
     const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+    const [isToggled, setIsToggled] = useState(false);
+    console.log(isToggled);
 
     const hueMax = 179;
     const hueMin = 0;
@@ -210,6 +212,7 @@ const FilterWindow = () => {
                     }}
                 />
                 <FilterForm
+                    id={"filter-mask"}
                     label="Mask Threshold"
                     min={thresholdMin}
                     max={thresholdMax}
@@ -223,6 +226,7 @@ const FilterWindow = () => {
                 />
                 <FilterToggle
                     label="hello"
+                    setValue={setIsToggled}
                 />
                 <button
                     className={"resetAll"}

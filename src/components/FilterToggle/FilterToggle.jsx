@@ -1,11 +1,18 @@
 import "./FilterToggle.css"
 
-function FilterToggle() {
+function FilterToggle({ label, setValue, id }) {
     return (
-        <label className="switch">
-            <input type="checkbox"/>
-            <span className="slider"/>
-        </label>
+        <div
+            className="form-group"
+            id={id}>
+            <p>{label}</p>
+            <label
+                className="switch"
+                onMouseDown={()=> setValue(value => !value)}>
+                <input type="checkbox"/>
+                <span className="slider"/>
+            </label>
+        </div>
     );
 }
 
