@@ -45,6 +45,8 @@ const ImageNode = ({
 			if (imageProps.threshold !== undefined && imageProps.threshold !== 0) {
 				filters.push(Konva.Filters.Mask);
 			}
+			if (imageProps.grayscale) filters.push(Konva.Filters.Grayscale);
+			if (imageProps.invert) filters.push(Konva.Filters.Invert);
 			return filters;
 		} else return null;
 	};

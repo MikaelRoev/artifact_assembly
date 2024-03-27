@@ -1,5 +1,5 @@
 import "./FilterWindow.css"
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import FilterForm from "../FilterForm/FilterForm";
 import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
@@ -15,8 +15,6 @@ const FilterWindow = () => {
     const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
-    const [isToggled, setIsToggled] = useState(false);
-    console.log(isToggled);
 
     const hueMax = 179;
     const hueMin = 0;
@@ -225,8 +223,20 @@ const FilterWindow = () => {
                     }}
                 />
                 <FilterToggle
-                    label="hello"
-                    setValue={setIsToggled}
+                    label="Grayscale"
+                    setValue={() => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].grayscale = !images[filterImageIndex].grayscale;
+                        setImages(images);
+                    }}
+                />
+                <FilterToggle
+                    label="Invert"
+                    setValue={() => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].invert = !images[filterImageIndex].invert;
+                        setImages(images);
+                    }}
                 />
                 <button
                     className={"resetAll"}
