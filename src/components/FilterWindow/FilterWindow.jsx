@@ -4,6 +4,7 @@ import FilterForm from "../FilterForm/FilterForm";
 import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import FilterToggle from "../FilterToggle/FilterToggle";
 
 /**
  * Component representing the window containing the filter for the images.
@@ -220,10 +221,14 @@ const FilterWindow = () => {
                         setImages(images, overwrite);
                     }}
                 />
+                <FilterToggle
+                    label="hello"
+                />
                 <button
                     className={"resetAll"}
-                    onClick={resetFilter}
-                >Reset all</button>
+                    onClick={resetFilter}>
+                    Reset all
+                </button>
             </div>
         </div>
     )
