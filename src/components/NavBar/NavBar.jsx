@@ -7,6 +7,7 @@ import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -22,6 +23,7 @@ const NavBar = () => {
     const {project, setProject} = useContext(ProjectContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {selectedElementsIndex} = useContext(selectedElementsIndexContext)
 
     const offset = 20;
 
@@ -120,8 +122,26 @@ const NavBar = () => {
         handleFileButtonClick()
     };
 
-    const handleLockPiecesTogether=() => {
+    const handleLockPiecesTogether = () => {
+        // make a group
+        const newGroup = {
+            className: 'Group',
+            groupElements: []
+        }
+        // get selected elements
+        for (let i= 1; i < selectedElementsIndex.length; i++) {
+            const groupElement = elements[selectedElementsIndex[i]];
+            // add selected elements to group
+            newGroup.groupElements.push(groupElement)
+        }
+        // remove selected elements (as single elements)
+        const newElements = elements.filter((element, index) =>
+            !selectedElementsIndex.includes(index)
+        )
+        // add group to elements
+        setElements([...newElements, newGroup])
 
+        // close file
         handleFileButtonClick()
     }
 
