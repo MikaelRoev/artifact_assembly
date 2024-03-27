@@ -34,7 +34,18 @@ const ImageNode = ({
 	 */
 	const handleFilter = () => {
 		if (filterEnabled === true) {
-			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast, Konva.Filters.Mask];
+			const filters = [];
+			if (
+				(imageProps.hue !== undefined && imageProps.hue !== 0)
+				|| (imageProps.saturation !== undefined && imageProps.saturation !== 0)
+				|| (imageProps.value !== undefined && imageProps.value !== 0)
+			) filters.push(Konva.Filters.HSV);
+			if (imageProps.luminance !== undefined && imageProps.saturation !== 0) filters.push(Konva.Filters.HSL);
+			if (imageProps.contrast !== undefined && imageProps.contrast !== 0) filters.push(Konva.Filters.Contrast);
+			if (imageProps.threshold !== undefined && imageProps.threshold !== 0) {
+				filters.push(Konva.Filters.Mask);
+			}
+			return filters;
 		} else return null;
 	};
 
