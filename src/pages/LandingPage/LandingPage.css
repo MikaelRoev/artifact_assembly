@@ -12,7 +12,7 @@
 	padding: 6rem 3rem;
 }
 
-.left-main p {
+.left-main button {
 	max-width: 750px;
 }
 
@@ -66,6 +66,8 @@
 	color: #313131;
 	text-decoration: none;
 	transition: 100ms ease-in;
+	background-color: transparent;
+	border: none;
 }
 
 .secondary {

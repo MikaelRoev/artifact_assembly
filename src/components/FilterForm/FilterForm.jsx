@@ -1,8 +1,8 @@
 import "./FilterForm.css";
 
-const FilterForm = ({ label, min, max, step, value, setValue }) => {
+const FilterForm = ({ label, min, max, step, value, setValue, id }) => {
 	return (
-		<div className={"form-group"}>
+		<div className={"form-group"} id={id}>
 			<p>{label}:</p>
 			<input
                 className={"input-slide-form"}
