@@ -47,7 +47,6 @@ const ImageNode = ({
 			}
 			if (imageProps.grayscale) filters.push(Konva.Filters.Grayscale);
 			if (imageProps.invert) filters.push(Konva.Filters.Invert);
-			console.log(filters);
 			return filters;
 		} else return null;
 	};

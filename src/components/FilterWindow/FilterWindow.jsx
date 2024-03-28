@@ -26,7 +26,7 @@ const FilterWindow = () => {
     const luminanceMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
-    const thresholdMax = 300;
+    const thresholdMax = 350;
     const thresholdMin = 0;
     const root = document.querySelector(':root');
 
@@ -131,6 +131,63 @@ const FilterWindow = () => {
         setImages(images);
     };
 
+    /**
+     * useEffect to set the sliders and toggles on the filtervindow when changing which fragment to filter.
+     */
+    useEffect(() => {
+        if (images[filterImageIndex]) {
+            const image = images[filterImageIndex];
+            if (image.hue !== undefined) {
+                root.style.setProperty("--hue", -image.hue);
+            } else {
+                root.style.setProperty("--hue", 0);
+            }
+            if (image.saturation !== undefined) {
+                root.style.setProperty("--saturation", ((image.saturation - saturationMin) / (saturationMax - saturationMin)) * (100));
+            } else {
+                root.style.setProperty("--saturation", 16.666);
+            }
+            if (image.value !== undefined) {
+                if (image.invert) {
+                    root.style.setProperty("--value", 100 - (((image.value - valueMin) * 100) / (valueMax - valueMin)));
+                } else {
+                    root.style.setProperty("--value", ((image.value - valueMin) * 100) / (valueMax - valueMin));
+                }
+            } else {
+                root.style.setProperty("--value", 50);
+            }
+            if (image.luminance !== undefined) {
+                if (image.invert) {
+                    root.style.setProperty("--luminance", 100 - (((image.luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin)));
+                } else {
+                    root.style.setProperty("--luminance", ((image.luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
+                }
+            } else {
+                root.style.setProperty("--luminance", 50);
+            }
+            if (image.threshold !== undefined) {
+                if (image.invert) {
+                    root.style.setProperty("--mask", 100 - (((image.threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
+                } else {
+                    root.style.setProperty("--mask", ((image.threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
+                }
+            } else {
+                root.style.setProperty("--mask", 0)
+            }
+            document.getElementById("grayscaleToggle").querySelector('input[name="toggleCheckbox"]').checked = !!image.grayscale;
+            if (image.invert) {
+                root.style.setProperty("--invert-first", 100);
+                root.style.setProperty("--invert-last", 0);
+                document.getElementById("invertToggle").querySelector('input[name="toggleCheckbox"]').checked = true;
+            } else {
+                root.style.setProperty("--invert-first", 0);
+                root.style.setProperty("--invert-last", 100);
+                document.getElementById("invertToggle").querySelector('input[name="toggleCheckbox"]').checked = false;
+            }
+        }
+
+    }, [filterImageIndex]);
+
     function checkValidValue(parameter) {
         if (!images[filterImageIndex] || isNaN(images[filterImageIndex][parameter])) {
             return 0;
@@ -172,7 +229,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         const saturation = parseFloat(sat);
                         images[filterImageIndex].saturation = saturation;
-                        root.style.setProperty("--saturation", ((saturation-saturationMin)/(saturationMax-saturationMin)) * (100));
+                        root.style.setProperty("--saturation", ((saturation - saturationMin) / (saturationMax - saturationMin)) * (100));
                         setImages(images, overwrite);
                     }}
                 />
@@ -188,9 +245,9 @@ const FilterWindow = () => {
                         const value = parseFloat(val);
                         images[filterImageIndex].value = value;
                         if (images[filterImageIndex].invert) {
-                            root.style.setProperty("--value", 100-(((value - valueMin)*100)/(valueMax-valueMin)));
+                            root.style.setProperty("--value", 100 - (((value - valueMin) * 100) / (valueMax - valueMin)));
                         } else {
-                            root.style.setProperty("--value", ((value - valueMin)*100)/(valueMax-valueMin));
+                            root.style.setProperty("--value", ((value - valueMin) * 100) / (valueMax - valueMin));
                         }
                         setImages(images, overwrite);
                     }}
@@ -207,9 +264,9 @@ const FilterWindow = () => {
                         const luminance = parseFloat(lum);
                         images[filterImageIndex].luminance = luminance;
                         if (images[filterImageIndex].invert) {
-                            root.style.setProperty("--luminance", 100-(((luminance - luminanceMin)*100)/(luminanceMax-luminanceMin)));
+                            root.style.setProperty("--luminance", 100 - (((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin)));
                         } else {
-                            root.style.setProperty("--luminance", ((luminance - luminanceMin)*100)/(luminanceMax-luminanceMin));
+                            root.style.setProperty("--luminance", ((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
                         }
                         setImages(images, overwrite);
                     }}
@@ -238,15 +295,16 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].threshold = parseInt(threshold);
                         if (images[filterImageIndex].invert) {
-                            root.style.setProperty("--mask", 100 - (((threshold - thresholdMin)*100)/(thresholdMax-thresholdMin)));
+                            root.style.setProperty("--mask", 100 - (((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
                         } else {
-                            root.style.setProperty("--mask", ((threshold - thresholdMin)*100)/(thresholdMax-thresholdMin));
+                            root.style.setProperty("--mask", ((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
                         }
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterToggle
                     label="Grayscale"
+                    id={"grayscaleToggle"}
                     setValue={() => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].grayscale = !images[filterImageIndex].grayscale;
@@ -255,22 +313,25 @@ const FilterWindow = () => {
                 />
                 <FilterToggle
                     label="Invert"
+                    id={"invertToggle"}
                     setValue={() => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].invert = !images[filterImageIndex].invert;
+                        const value = isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value;
+                        const luminance = isNaN(images[filterImageIndex].luminance) ? 0 : images[filterImageIndex].luminance;
+                        const threshold = isNaN(images[filterImageIndex].threshold) ? 0 : images[filterImageIndex].threshold;
                         if (images[filterImageIndex].invert) {
                             root.style.setProperty("--invert-first", 100);
                             root.style.setProperty("--invert-last", 0);
-                            root.style.setProperty("--value", 100 -(((images[filterImageIndex].value - valueMin)*100)/(valueMax-valueMin)));
-                            console.log(100 -(((images[filterImageIndex].value - valueMin)*100)/(valueMax-valueMin)))
-                            root.style.setProperty("--luminance", 100 - (((images[filterImageIndex].luminance - luminanceMin)*100)/(luminanceMax-luminanceMin)));
-                            root.style.setProperty("--mask", 100 - (((images[filterImageIndex].threshold - thresholdMin)*100)/(thresholdMax-thresholdMin)));
+                            root.style.setProperty("--value", 100 - (((value - valueMin) * 100) / (valueMax - valueMin)));
+                            root.style.setProperty("--luminance", 100 - (((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin)));
+                            root.style.setProperty("--mask", 100 - (((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
                         } else {
                             root.style.setProperty("--invert-first", 0);
                             root.style.setProperty("--invert-last", 100);
-                            root.style.setProperty("--value", ((images[filterImageIndex].value - valueMin)*100)/(valueMax-valueMin));
-                            root.style.setProperty("--luminance", ((images[filterImageIndex].luminance - luminanceMin)*100)/(luminanceMax-luminanceMin));
-                            root.style.setProperty("--mask", ((images[filterImageIndex].threshold - thresholdMin)*100)/(thresholdMax-thresholdMin));
+                            root.style.setProperty("--value", ((value - valueMin) * 100) / (valueMax - valueMin));
+                            root.style.setProperty("--luminance", ((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
+                            root.style.setProperty("--mask", ((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
                         }
                         setImages(images);
                     }}
@@ -282,7 +343,7 @@ const FilterWindow = () => {
                 </button>
             </div>
         </div>
-    )
+    );
 }
 
 export default FilterWindow;
