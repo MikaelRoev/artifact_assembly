@@ -16,7 +16,7 @@ const FilterWindow = () => {
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
-    const hueMax = 179;
+    const hueMax = 359;
     const hueMin = 0;
     const saturationMax = 10;
     const saturationMin = -2;
@@ -115,12 +115,18 @@ const FilterWindow = () => {
         newImage.threshold = 0;
         newImage.grayscale = false;
         newImage.invert = false;
+        const checkboxes = document.querySelectorAll('input[name="toggleCheckbox"]');
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = false;
+        })
         root.style.setProperty("--hue", 0);
         root.style.setProperty("--saturation", 16.666);
         root.style.setProperty("--value", 50);
         root.style.setProperty("--luminance", 50);
         root.style.setProperty("--contrast", 0);
         root.style.setProperty("--mask", 0)
+        root.style.setProperty("--invert-first", 0);
+        root.style.setProperty("--invert-last", 100);
         images[filterImageIndex] = newImage;
         setImages(images);
     };
@@ -151,7 +157,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         const hue = parseInt(hu);
                         images[filterImageIndex].hue = hue;
-                        root.style.setProperty("--hue", -hue*2);
+                        root.style.setProperty("--hue", -hue);
                         setImages(images, overwrite);
                     }}
                 />
@@ -175,7 +181,7 @@ const FilterWindow = () => {
                     label="Value"
                     min={valueMin}
                     max={valueMax}
-                    step={0.1}
+                    step={0.05}
                     value={checkValidValue("value")}
                     setValue={(val, overwrite) => {
                         if (!images[filterImageIndex]) return;
@@ -194,7 +200,7 @@ const FilterWindow = () => {
                     label="Luminance"
                     min={luminanceMin}
                     max={luminanceMax}
-                    step={0.1}
+                    step={0.05}
                     value={checkValidValue("luminance")}
                     setValue={(lum, overwrite) => {
                         if (!images[filterImageIndex]) return;
@@ -232,7 +238,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].threshold = parseInt(threshold);
                         if (images[filterImageIndex].invert) {
-                            root.style.setProperty("--mask", 100 - ((threshold - thresholdMin)*100)/(thresholdMax-thresholdMin));
+                            root.style.setProperty("--mask", 100 - (((threshold - thresholdMin)*100)/(thresholdMax-thresholdMin)));
                         } else {
                             root.style.setProperty("--mask", ((threshold - thresholdMin)*100)/(thresholdMax-thresholdMin));
                         }
@@ -258,13 +264,13 @@ const FilterWindow = () => {
                             root.style.setProperty("--value", 100 -(((images[filterImageIndex].value - valueMin)*100)/(valueMax-valueMin)));
                             console.log(100 -(((images[filterImageIndex].value - valueMin)*100)/(valueMax-valueMin)))
                             root.style.setProperty("--luminance", 100 - (((images[filterImageIndex].luminance - luminanceMin)*100)/(luminanceMax-luminanceMin)));
-                            root.style.setProperty("--mask", 100 - images[filterImageIndex].threshold);
+                            root.style.setProperty("--mask", 100 - (((images[filterImageIndex].threshold - thresholdMin)*100)/(thresholdMax-thresholdMin)));
                         } else {
                             root.style.setProperty("--invert-first", 0);
                             root.style.setProperty("--invert-last", 100);
                             root.style.setProperty("--value", ((images[filterImageIndex].value - valueMin)*100)/(valueMax-valueMin));
                             root.style.setProperty("--luminance", ((images[filterImageIndex].luminance - luminanceMin)*100)/(luminanceMax-luminanceMin));
-                            root.style.setProperty("--mask", images[filterImageIndex].threshold);
+                            root.style.setProperty("--mask", ((images[filterImageIndex].threshold - thresholdMin)*100)/(thresholdMax-thresholdMin));
                         }
                         setImages(images);
                     }}

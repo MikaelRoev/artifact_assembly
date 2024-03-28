@@ -9,8 +9,8 @@ function FilterToggle({ label, setValue, id }) {
             <label
                 className="switch"
                 onMouseDown={()=> setValue(value => !value)}>
-                <input type="checkbox"/>
-                <span className="slider"/>
+                <input type="checkbox" name={"toggleCheckbox"}/>
+                <span className="slider rounded"/>
             </label>
         </div>
     );
