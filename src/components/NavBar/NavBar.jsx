@@ -16,7 +16,8 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
  */
 const NavBar = ({stageRef}) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
+    const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
@@ -87,8 +88,9 @@ const NavBar = ({stageRef}) => {
         handleFileButtonClick()
     };
 
-    const toggleLock = () => {
+    const handleLockCanvasClick = () => {
         setIsLocked((prevLock) => !prevLock);
+        handleToolsButtonClick();
     };
 
     const toggleFilter = () => {
@@ -99,7 +101,14 @@ const NavBar = ({stageRef}) => {
      * Constant function to set the visibility of the file dropdown menu.
      */
     const handleFileButtonClick = () => {
-        setDropdownVisible(!dropdownVisible)
+        setFileDropdownVisible(!fileDropdownVisible)
+    }
+
+    /**
+     * Constant function to set the visibility of the tools dropdown menu.
+     */
+    const handleToolsButtonClick = () => {
+        setToolsDropdownVisible(!toolsDropdownVisible)
     }
 
 
@@ -117,7 +126,7 @@ const NavBar = ({stageRef}) => {
      */
     const handleOpenScoreWindow = async () => {
         setIsScoreWindowOpen(true);
-        handleFileButtonClick()
+        handleToolsButtonClick()
     };
 
     /**
@@ -141,7 +150,7 @@ const NavBar = ({stageRef}) => {
 
             const dx = imagePosX - currentStageCenterX;
             const dy = imagePosY - currentStageCenterY;
-            const distance = Math.sqrt(dx**2 + dy**2);
+            const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
 
             if (distance < shortestDistance) {
@@ -162,64 +171,88 @@ const NavBar = ({stageRef}) => {
                 duration: 0.5,
                 onFinish: () => {
                     project.zoom = 1
-            }
+                }
             })
         }
-        handleFileButtonClick();
+        handleToolsButtonClick();
     }
 
     return (
         <nav className="navbar">
             <div className="nav-left">
                 <a href="/">Home</a>
+                {/* TODO: move home button */}
                 <div className={"fileDiv"}>
+                    {/* TODO: make a tool dropdown menu*/}
                     <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
                     </button>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
-                    {dropdownVisible && (
+                    {fileDropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleImageUpload}
-                                    >Load Image</button>
+                                        onClick={handleImageUpload}>
+                                        Load Image
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, images).then(handleFileButtonClick);
-                                        }}
-                                    >Save project</button>
+                                        }}>
+                                        Save project
+                                    </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleOpenScoreWindow}
-                                    >Open similarity metrics window</button>
-                                </li>
-                                <li>
-                                    <button
-                                        className={"dropdownButton"}
-                                        onClick={handleImageOfCanvasExport}
-                                    >Export as image</button>
-                                </li>
-                                <li>
-                                    <button
-                                        className={"dropdownButton"}
-                                        onClick={findWorkArea}
-                                    >Go to work area</button>
+                                        onClick={handleImageOfCanvasExport}>
+                                        Export as image
+                                    </button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <button className={"navButton"}
-                        onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                <div className={"fileDiv"}>
+                    {/* TODO: make a tool dropdown menu*/}
+                    <button className={"navButton"} onClick={handleToolsButtonClick}>
+                        Tools
+                    </button>
+                    {toolsDropdownVisible && (
+                        <div className={"dropdown"}>
+                            <ul>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleOpenScoreWindow}>
+                                        Open similarity metrics window
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={findWorkArea}>
+                                        Go to work area
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleLockCanvasClick}>
+                                        {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
+                </div>
                 <button className={"navButton"} onClick={toggleFilter}>
                     {!filterEnabled ? "Enable Filter" : "Disable Filter"}
+                    {/* TODO: default enabled, move to filter window, check box*/}
                 </button>
                 <button className={"navButton"} onClick={undo}>Undo</button>
                 <button className={"navButton"} onClick={redo}>Redo</button>
