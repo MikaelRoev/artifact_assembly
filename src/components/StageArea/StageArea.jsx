@@ -58,7 +58,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
+			if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0) {
 				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
 				setImages(newImages);
 				setSelectedElements([]);
