@@ -351,6 +351,7 @@ const StageArea = ({stageRef, layerRef}) => {
 						return newBox;
 					}}
 					resizeEnabled={false}
+					rotateEnabled={!isLocked}
 					/>
 				}
 			</Layer>
