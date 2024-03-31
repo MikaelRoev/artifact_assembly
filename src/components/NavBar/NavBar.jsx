@@ -25,7 +25,7 @@ const NavBar = ({stageRef}) => {
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
 
-    const offset = 20;
+    const offset = 50;
 
     /**
      * Checks if there is an image at the position.
