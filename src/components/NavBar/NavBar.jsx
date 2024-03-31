@@ -2,7 +2,6 @@ import React, {useContext, useState} from "react";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
-import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
@@ -22,7 +21,6 @@ const NavBar = ({stageRef}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
 
     const offset = 50;
@@ -91,10 +89,6 @@ const NavBar = ({stageRef}) => {
     const handleLockCanvasClick = () => {
         setIsLocked((prevLock) => !prevLock);
         handleToolsButtonClick();
-    };
-
-    const toggleFilter = () => {
-        setFilterEnabled((prevFilter) => !prevFilter);
     };
 
     /**
@@ -250,10 +244,6 @@ const NavBar = ({stageRef}) => {
                         </div>
                     )}
                 </div>
-                <button className={"navButton"} onClick={toggleFilter}>
-                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
-                    {/* TODO: default enabled, move to filter window, check box*/}
-                </button>
                 <button className={"navButton"} onClick={undo}>Undo</button>
                 <button className={"navButton"} onClick={redo}>Redo</button>
             </div>

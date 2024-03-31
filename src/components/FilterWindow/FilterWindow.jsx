@@ -5,6 +5,7 @@ import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import FilterToggle from "../FilterToggle/FilterToggle";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 
 /**
  * Component representing the window containing the filter for the images.
@@ -15,6 +16,7 @@ const FilterWindow = () => {
     const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
 
     const hueMax = 179;
     const hueMin = 0;
@@ -147,7 +149,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         const hue = parseInt(value);
                         images[filterImageIndex].hue = hue;
-                        root.style.setProperty("--hue", -hue*2);
+                        root.style.setProperty("--hue", -hue * 2);
                         setImages(images, overwrite);
                     }}
                 />
@@ -162,7 +164,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         const saturation = parseFloat(value);
                         images[filterImageIndex].saturation = saturation;
-                        root.style.setProperty("--saturation", ((saturation-saturationMin)/(saturationMax-saturationMin)) * (100));
+                        root.style.setProperty("--saturation", ((saturation - saturationMin) / (saturationMax - saturationMin)) * (100));
                         setImages(images, overwrite);
                     }}
                 />
@@ -177,7 +179,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         const value = parseFloat(val);
                         images[filterImageIndex].value = value;
-                        root.style.setProperty("--value", ((value - valueMin)*100)/(valueMax-valueMin));
+                        root.style.setProperty("--value", ((value - valueMin) * 100) / (valueMax - valueMin));
                         setImages(images, overwrite);
                     }}
                 />
@@ -192,7 +194,7 @@ const FilterWindow = () => {
                         if (!images[filterImageIndex]) return;
                         const luminance = parseFloat(value);
                         images[filterImageIndex].luminance = luminance;
-                        root.style.setProperty("--luminance", ((luminance - luminanceMin)*100)/(luminanceMax-luminanceMin));
+                        root.style.setProperty("--luminance", ((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
                         setImages(images, overwrite);
                     }}
                 />
@@ -242,6 +244,13 @@ const FilterWindow = () => {
                     className={"resetAll"}
                     onClick={resetFilter}>
                     Reset all
+                </button>
+                <button
+                    className={"resetAll"}
+                    onClick={() => {
+                        setFilterEnabled((prevFilter) => !prevFilter);
+                    }}>
+                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
                 </button>
             </div>
         </div>
