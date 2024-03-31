@@ -99,8 +99,8 @@ const StageArea = ({stageRef, layerRef}) => {
 		 * Key event handler for undo and redo.
 		 * @param e the event.
 		 */
-		const handleUndoPressed = (e) => {
-			if (e.ctrlKey && e.key === "y") {
+		const handleUndoRedoPressed = (e) => {
+			if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
 				e.preventDefault();
 				redo();
 			} else if (e.ctrlKey && e.key === "z") {
@@ -108,9 +108,9 @@ const StageArea = ({stageRef, layerRef}) => {
 				undo();
 			}
 		};
-		document.addEventListener("keydown", handleUndoPressed);
+		document.addEventListener("keydown", handleUndoRedoPressed);
 		return () => {
-			document.removeEventListener("keydown", handleUndoPressed);
+			document.removeEventListener("keydown", handleUndoRedoPressed);
 		};
 	}, [undo, redo]);
 
