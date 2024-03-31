@@ -27,19 +27,7 @@ function GroupNode() {
     }
 
     return (<Group ref={groupRef} draggable={true} >
-        <Rect
-            x={100}
-            y={150}
-            width={30}
-            height={30}
-            fill="red"
-        />
-        <Rect
-            x={150}
-            y={200}
-            width={30}
-            height={30}
-            fill="green"/>
+
     </Group>);
 
 }
