@@ -4,6 +4,8 @@ import FilterForm from "../FilterForm/FilterForm";
 import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import FilterToggle from "../FilterToggle/FilterToggle";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 
 /**
  * Component representing the window containing the filter for the images.
@@ -14,8 +16,9 @@ const FilterWindow = () => {
     const {images, setImages} = useContext(ImageContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
 
-    const hueMax = 180;
+    const hueMax = 179;
     const hueMin = 0;
     const saturationMax = 10;
     const saturationMin = -2;
@@ -25,6 +28,9 @@ const FilterWindow = () => {
     const luminanceMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
+    const thresholdMax = 300;
+    const thresholdMin = 0;
+    const root = document.querySelector(':root');
 
 
     /**
@@ -108,6 +114,11 @@ const FilterWindow = () => {
         newImage.value = 0;
         newImage.luminance = 0;
         newImage.contrast = 0;
+        newImage.threshold = 0;
+        root.style.setProperty("--hue", 0);
+        root.style.setProperty("--saturation", 16.666);
+        root.style.setProperty("--value", 50);
+        root.style.setProperty("--luminance", 50);
         images[filterImageIndex] = newImage;
         setImages(images);
     };
@@ -128,54 +139,67 @@ const FilterWindow = () => {
             </div>
             <div className={"filterWindowBody"}>
                 <FilterForm
+                    id={"filter-hue"}
                     label="Hue"
                     min={hueMin}
                     max={hueMax}
                     step={1}
                     value={checkValidValue("hue")}
-                    setValue={(hue, overwrite) => {
+                    setValue={(value, overwrite) => {
                         if (!images[filterImageIndex]) return;
+                        const hue = parseInt(value);
                         images[filterImageIndex].hue = hue;
+                        root.style.setProperty("--hue", -hue * 2);
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-saturation"}
                     label="Saturation"
                     min={saturationMin}
                     max={saturationMax}
-                    step={0.5}
+                    step={0.1}
                     value={checkValidValue("saturation")}
-                    setValue={(saturation, overwrite) => {
+                    setValue={(value, overwrite) => {
                         if (!images[filterImageIndex]) return;
+                        const saturation = parseFloat(value);
                         images[filterImageIndex].saturation = saturation;
+                        root.style.setProperty("--saturation", ((saturation - saturationMin) / (saturationMax - saturationMin)) * (100));
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-value"}
                     label="Value"
                     min={valueMin}
                     max={valueMax}
                     step={0.1}
                     value={checkValidValue("value")}
-                    setValue={(value, overwrite) => {
+                    setValue={(val, overwrite) => {
                         if (!images[filterImageIndex]) return;
+                        const value = parseFloat(val);
                         images[filterImageIndex].value = value;
+                        root.style.setProperty("--value", ((value - valueMin) * 100) / (valueMax - valueMin));
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-luminance"}
                     label="Luminance"
                     min={luminanceMin}
                     max={luminanceMax}
                     step={0.1}
                     value={checkValidValue("luminance")}
-                    setValue={(luminance, overwrite) => {
+                    setValue={(value, overwrite) => {
                         if (!images[filterImageIndex]) return;
+                        const luminance = parseFloat(value);
                         images[filterImageIndex].luminance = luminance;
+                        root.style.setProperty("--luminance", ((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
+                    id={"filter-contrast"}
                     label="Contrast"
                     min={contrastMin}
                     max={contrastMax}
@@ -183,14 +207,51 @@ const FilterWindow = () => {
                     value={checkValidValue("contrast")}
                     setValue={(contrast, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].contrast = contrast;
+                        images[filterImageIndex].contrast = parseFloat(contrast);
                         setImages(images, overwrite);
+                    }}
+                />
+                <FilterForm
+                    id={"filter-mask"}
+                    label="Mask Threshold"
+                    min={thresholdMin}
+                    max={thresholdMax}
+                    step={1}
+                    value={checkValidValue("threshold")}
+                    setValue={(threshold, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].threshold = parseInt(threshold);
+                        setImages(images, overwrite);
+                    }}
+                />
+                <FilterToggle
+                    label="Grayscale"
+                    setValue={() => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].grayscale = !images[filterImageIndex].grayscale;
+                        setImages(images);
+                    }}
+                />
+                <FilterToggle
+                    label="Invert"
+                    setValue={() => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].invert = !images[filterImageIndex].invert;
+                        setImages(images);
                     }}
                 />
                 <button
                     className={"resetAll"}
-                    onClick={resetFilter}
-                >Reset all</button>
+                    onClick={resetFilter}>
+                    Reset all
+                </button>
+                <button
+                    className={"resetAll"}
+                    onClick={() => {
+                        setFilterEnabled((prevFilter) => !prevFilter);
+                    }}>
+                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
+                </button>
             </div>
         </div>
     )

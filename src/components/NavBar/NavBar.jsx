@@ -2,10 +2,9 @@ import React, {useContext, useState} from "react";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
-import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {openProjectDialog, saveProjectDialog} from "../FileHandling";
-import {confirm, open} from "@tauri-apps/api/dialog";
+import {open, confirm} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {useNavigate} from "react-router-dom";
 
@@ -17,17 +16,17 @@ import {useNavigate} from "react-router-dom";
  */
 const NavBar = ({stageRef}) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
+    const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
 
     const navigate = useNavigate();
 
-    const offset = 20;
+    const offset = 50;
 
     /**
      * Checks if there is an image at the position.
@@ -90,19 +89,22 @@ const NavBar = ({stageRef}) => {
         handleFileButtonClick()
     };
 
-    const toggleLock = () => {
+    const handleLockCanvasClick = () => {
         setIsLocked((prevLock) => !prevLock);
-    };
-
-    const toggleFilter = () => {
-        setFilterEnabled((prevFilter) => !prevFilter);
     };
 
     /**
      * Constant function to set the visibility of the file dropdown menu.
      */
     const handleFileButtonClick = () => {
-        setDropdownVisible(!dropdownVisible)
+        setFileDropdownVisible(!fileDropdownVisible)
+    }
+
+    /**
+     * Constant function to set the visibility of the tools dropdown menu.
+     */
+    const handleToolsButtonClick = () => {
+        setToolsDropdownVisible(!toolsDropdownVisible)
     }
 
 
@@ -120,7 +122,7 @@ const NavBar = ({stageRef}) => {
      */
     const handleOpenScoreWindow = async () => {
         setIsScoreWindowOpen(true);
-        handleFileButtonClick()
+        handleToolsButtonClick()
     };
 
     /**
@@ -144,7 +146,7 @@ const NavBar = ({stageRef}) => {
 
             const dx = imagePosX - currentStageCenterX;
             const dy = imagePosY - currentStageCenterY;
-            const distance = Math.sqrt(dx**2 + dy**2);
+            const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
 
             if (distance < shortestDistance) {
@@ -165,50 +167,56 @@ const NavBar = ({stageRef}) => {
                 duration: 0.5,
                 onFinish: () => {
                     project.zoom = 1
-            }
+                }
             })
         }
-        handleFileButtonClick();
+        handleToolsButtonClick();
     }
 
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <button className={"navButton"}
-                        onClick={() => {
-                            //TODO: open dialog save or not
-                            confirm("You may have unsaved changes. Do you want to save before closing?", {
-                                title: "Save changes?",
-                                type: "warning"
-                            }).then(response => {
-                                if (response === true) {
-                                    // save changes
-                                    saveProjectDialog(project, setProject, images)
-                                        .then(() => navigate("/"))
-                                        .catch(()=>{});
-                                } else if (response === false) {
-                                    // discard changes or canceled
-                                    navigate("/");
-                                } else {
-                                    console.log("HELLO")
-                                }
-                            }).catch(error => console.log(error));
-                        }}>Home</button>
                 <div className={"fileDiv"}>
                     <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
                     </button>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
-                    {dropdownVisible && (
+                    {fileDropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
+                                <li>
+                                    <button className={"dropdownButton"}
+                                            onClick={() => {
+                                                //TODO: open dialog save or not
+                                                confirm("You may have unsaved changes. Do you want to save before closing?", {
+                                                    title: "Save changes?",
+                                                    type: "warning"
+                                                }).then(response => {
+                                                    if (response === true) {
+                                                        // save changes
+                                                        saveProjectDialog(project, setProject, images)
+                                                            .then(() => navigate("/"))
+                                                            .catch(() => {
+                                                            });
+                                                    } else if (response === false) {
+                                                        // discard changes or canceled
+                                                        navigate("/");
+                                                    } else {
+                                                        console.log("HELLO")
+                                                    }
+                                                }).catch(error => console.log(error));
+                                            }}>
+                                        Close Project
+                                    </button>
+                                </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, images)
                                                 .then(handleFileButtonClick)
-                                                .catch(()=>{});
+                                                .catch(() => {
+                                                });
                                         }}>
                                         Save project
                                     </button>
@@ -219,9 +227,10 @@ const NavBar = ({stageRef}) => {
                                         onClick={() => {
                                             openProjectDialog(setProject, setImages)
                                                 .then(handleFileButtonClick)
-                                                .catch(()=>{});
+                                                .catch(() => {
+                                                });
                                         }}>
-                                        Open Project
+                                    Open Project
                                     </button>
                                 </li>
                                 <li>
@@ -238,6 +247,17 @@ const NavBar = ({stageRef}) => {
                                         Export As Image
                                     </button>
                                 </li>
+                            </ul>
+                        </div>
+                    )}
+                </div>
+                <div className={"fileDiv"}>
+                    <button className={"navButton"} onClick={handleToolsButtonClick}>
+                        Tools
+                    </button>
+                    {toolsDropdownVisible && (
+                        <div className={"dropdown"}>
+                            <ul>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
@@ -249,27 +269,24 @@ const NavBar = ({stageRef}) => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={findWorkArea}>
-                                        Go to work area
+                                        Go To Work Area
                                     </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleLockCanvasClick}>
+                                        {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                                 </li>
                             </ul>
                         </div>
                     )}
                 </div>
-                <button
-                    className={"navButton"}
-                    onClick={toggleLock}>
-                    {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
-                <button
-                    className={"navButton"}
-                    onClick={toggleFilter}>
-                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
-                </button>
-                <button className={"navButton"} onClick={undo}>Undo</button>
-                <button className={"navButton"} onClick={redo}>Redo</button>
             </div>
             <div className="nav-right">
-                {isLoading && <div className="nav-item-right">Loading images...</div>}
+                <button className={"navButton"} onClick={undo}>Undo</button>
+                <button className={"navButton"} onClick={redo}>Redo</button>
+                {isLoading && <div className="nav-item-right">Loading Images...</div>}
             </div>
         </nav>
     );

@@ -1,18 +1,18 @@
 import "./FilterForm.css";
 
-const FilterForm = ({ label, min, max, step, value, setValue }) => {
+const FilterForm = ({ label, min, max, step, value, setValue, id }) => {
 	return (
-		<div className={"form-group"}>
+		<div className="form-group" id={id}>
 			<p>{label}:</p>
 			<input
-                className={"input-slide-form"}
+                className="input-slide-form"
 				type="range"
 				min={min}
 				max={max}
 				step={step}
 				value={value}
-				onChange={(e) => setValue(parseFloat(e.target.value), true)}
-				onMouseDown={(e) => setValue(parseFloat(e.target.value), false)}
+				onChange={(e) => setValue(e.target.value, true)}
+				onMouseDown={(e) => setValue(e.target.value, false)}
 			/>
 			<input
 				className="input-number-form"
@@ -21,11 +21,11 @@ const FilterForm = ({ label, min, max, step, value, setValue }) => {
 				max={max}
 				step={step}
 				value={value}
-				onChange={(e) => setValue(parseFloat(e.target.value), false)}
+				onChange={(e) => setValue(e.target.value, false)}
 			/>
 			<button
+				className="resetButton"
 				onClick={() => setValue(0, false)}
-				className={"resetButton"}
 			>Reset</button>
 		</div>
 	);

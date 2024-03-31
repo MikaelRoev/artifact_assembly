@@ -58,7 +58,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if (e.key === "Delete" && selectedElementsIndex.length > 0) {
+			if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0) {
 				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
 				setImages(newImages);
 				setSelectedElements([]);
@@ -99,8 +99,8 @@ const StageArea = ({stageRef, layerRef}) => {
 		 * Key event handler for undo and redo.
 		 * @param e the event.
 		 */
-		const handleUndoPressed = (e) => {
-			if (e.ctrlKey && e.key === "y") {
+		const handleUndoRedoPressed = (e) => {
+			if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
 				e.preventDefault();
 				redo();
 			} else if (e.ctrlKey && e.key === "z") {
@@ -108,9 +108,9 @@ const StageArea = ({stageRef, layerRef}) => {
 				undo();
 			}
 		};
-		document.addEventListener("keydown", handleUndoPressed);
+		document.addEventListener("keydown", handleUndoRedoPressed);
 		return () => {
-			document.removeEventListener("keydown", handleUndoPressed);
+			document.removeEventListener("keydown", handleUndoRedoPressed);
 		};
 	}, [undo, redo]);
 
@@ -351,6 +351,7 @@ const StageArea = ({stageRef, layerRef}) => {
 						return newBox;
 					}}
 					resizeEnabled={false}
+					rotateEnabled={!isLocked}
 					/>
 				}
 			</Layer>
