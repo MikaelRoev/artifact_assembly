@@ -174,7 +174,6 @@ const NavBar = ({stageRef}) => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <a href="/">Home</a>
                 {/* TODO: move home button */}
                 <div className={"fileDiv"}>
                     {/* TODO: make a tool dropdown menu*/}
@@ -185,6 +184,13 @@ const NavBar = ({stageRef}) => {
                     {fileDropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
+                                <li>
+                                    <a
+                                        className={"dropdownButton"}
+                                        href="/">
+                                        Close Project
+                                    </a>
+                                </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
