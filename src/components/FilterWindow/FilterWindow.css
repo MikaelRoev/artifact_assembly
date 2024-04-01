@@ -82,13 +82,21 @@
     background-color: red;
 }
 
-.resetAll {
+.bottomButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.bottomButtons button {
     width: fit-content;
     align-self: center;
     border-radius: 5px;
 }
 
-.resetAll:hover {
+.bottomButtons button:hover {
     cursor: pointer;
     background-color: lightgrey;
 }

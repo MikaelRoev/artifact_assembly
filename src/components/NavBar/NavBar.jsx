@@ -95,14 +95,16 @@ const NavBar = ({stageRef}) => {
      * Constant function to set the visibility of the file dropdown menu.
      */
     const handleFileButtonClick = () => {
-        setFileDropdownVisible(!fileDropdownVisible)
+        setFileDropdownVisible(!fileDropdownVisible);
+        setToolsDropdownVisible(false);
     }
 
     /**
      * Constant function to set the visibility of the tools dropdown menu.
      */
     const handleToolsButtonClick = () => {
-        setToolsDropdownVisible(!toolsDropdownVisible)
+        setToolsDropdownVisible(!toolsDropdownVisible);
+        setFileDropdownVisible(false);
     }
 
 
@@ -174,9 +176,7 @@ const NavBar = ({stageRef}) => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                {/* TODO: move home button */}
                 <div className={"fileDiv"}>
-                    {/* TODO: make a tool dropdown menu*/}
                     <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
                     </button>
@@ -184,13 +184,6 @@ const NavBar = ({stageRef}) => {
                     {fileDropdownVisible && (
                         <div className={"dropdown"}>
                             <ul>
-                                <li>
-                                    <a
-                                        className={"dropdownButton"}
-                                        href="/">
-                                        Close Project
-                                    </a>
-                                </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
@@ -214,12 +207,18 @@ const NavBar = ({stageRef}) => {
                                         Export as image
                                     </button>
                                 </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={() => window.location.href='/'}>
+                                        Close Project
+                                    </button>
+                                </li>
                             </ul>
                         </div>
                     )}
                 </div>
                 <div className={"fileDiv"}>
-                    {/* TODO: make a tool dropdown menu*/}
                     <button className={"navButton"} onClick={handleToolsButtonClick}>
                         Tools
                     </button>

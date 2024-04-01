@@ -338,18 +338,19 @@ const FilterWindow = () => {
                         setImages(images);
                     }}
                 />
-                <button
-                    className={"resetAll"}
-                    onClick={resetFilter}>
-                    Reset all
-                </button>
-                <button
-                    className={"resetAll"}
-                    onClick={() => {
-                        setFilterEnabled((prevFilter) => !prevFilter);
-                    }}>
-                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
-                </button>
+                <div className={"bottomButtons"}>
+                    <button
+                        onClick={resetFilter}>
+                        Reset all
+                    </button>
+                    <button
+                        onClick={() => {
+                            setFilterEnabled((prevFilter) => !prevFilter);
+                        }}>
+                        {!filterEnabled ? "Enable Filter" : "Disable Filter"}
+                    </button>
+                </div>
+
             </div>
         </div>
     );
