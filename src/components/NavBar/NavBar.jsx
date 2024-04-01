@@ -91,20 +91,23 @@ const NavBar = ({stageRef}) => {
 
     const handleLockCanvasClick = () => {
         setIsLocked((prevLock) => !prevLock);
+        handleToolsButtonClick();
     };
 
     /**
      * Constant function to set the visibility of the file dropdown menu.
      */
     const handleFileButtonClick = () => {
-        setFileDropdownVisible(!fileDropdownVisible)
+        setFileDropdownVisible(!fileDropdownVisible);
+        setToolsDropdownVisible(false);
     }
 
     /**
      * Constant function to set the visibility of the tools dropdown menu.
      */
     const handleToolsButtonClick = () => {
-        setToolsDropdownVisible(!toolsDropdownVisible)
+        setToolsDropdownVisible(!toolsDropdownVisible);
+        setFileDropdownVisible(false);
     }
 
 
@@ -185,31 +188,6 @@ const NavBar = ({stageRef}) => {
                         <div className={"dropdown"}>
                             <ul>
                                 <li>
-                                    <button className={"dropdownButton"}
-                                            onClick={() => {
-                                                //TODO: open dialog save or not
-                                                confirm("You may have unsaved changes. Do you want to save before closing?", {
-                                                    title: "Save changes?",
-                                                    type: "warning"
-                                                }).then(response => {
-                                                    if (response === true) {
-                                                        // save changes
-                                                        saveProjectDialog(project, setProject, images)
-                                                            .then(() => navigate("/"))
-                                                            .catch(() => {
-                                                            });
-                                                    } else if (response === false) {
-                                                        // discard changes or canceled
-                                                        navigate("/");
-                                                    } else {
-                                                        console.log("HELLO")
-                                                    }
-                                                }).catch(error => console.log(error));
-                                            }}>
-                                        Close Project
-                                    </button>
-                                </li>
-                                <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
@@ -245,6 +223,30 @@ const NavBar = ({stageRef}) => {
                                         className={"dropdownButton"}
                                         onClick={handleImageOfCanvasExport}>
                                         Export As Image
+                                    </button>
+                                </li>
+                                <li>
+                                    <button className={"dropdownButton"}
+                                        onClick={() => {
+                                            confirm("You may have unsaved changes. Do you want to save before closing?", {
+                                                title: "Save changes?",
+                                                type: "warning"
+                                            }).then(response => {
+                                                if (response === true) {
+                                                    // save changes
+                                                    saveProjectDialog(project, setProject, images)
+                                                        .then(() => navigate("/"))
+                                                        .catch(() => {
+                                                        });
+                                                } else if (response === false) {
+                                                    // discard changes or canceled
+                                                    navigate("/");
+                                                } else {
+                                                    console.log("HELLO")
+                                                }
+                                            }).catch(error => console.log(error));
+                                        }}>
+                                        Close Project
                                     </button>
                                 </li>
                             </ul>

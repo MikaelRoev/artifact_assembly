@@ -4,6 +4,9 @@
     --value: 50;
     --luminance: 50;
     --contrast: 0;
+    --mask: 0;
+    --invert-first: 0;
+    --invert-last: 100;
 }
 
 .filterWindow {
@@ -79,13 +82,21 @@
     background-color: red;
 }
 
-.resetAll {
+.bottomButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.bottomButtons button {
     width: fit-content;
     align-self: center;
     border-radius: 5px;
 }
 
-.resetAll:hover {
+.bottomButtons button:hover {
     cursor: pointer;
     background-color: lightgrey;
 }
@@ -149,8 +160,8 @@
 #filter-value input[type='range']::-webkit-slider-runnable-track {
     background-image: linear-gradient(
         90deg,
-        hsl(0, 0%, 0%),
-        hsl(0, 0%, 100%)
+        hsl(0, 0%, calc(var(--invert-first)*1%)),
+        hsl(0, 0%, calc(var(--invert-last)*1%))
     )
 }
 
@@ -161,8 +172,8 @@
 #filter-luminance input[type='range']::-webkit-slider-runnable-track {
         background-image: linear-gradient(
         90deg,
-        hsl(0, 0%, 0%),
-        hsl(0, 0%, 100%)
+        hsl(0, 0%, calc(var(--invert-first)*1%)),
+        hsl(0, 0%, calc(var(--invert-last)*1%))
     );
 }
 
@@ -174,6 +185,17 @@
     background-color: grey;
 }
 
+#filter-mask input[type='range']::-webkit-slider-thumb {
+    background-color: hsl(0, 0%, calc(var(--mask)*1%));
+}
+
+#filter-mask input[type='range']::-webkit-slider-runnable-track {
+    background-image: linear-gradient(
+            90deg,
+            hsl(0, 0%, calc(var(--invert-first)*1%)),
+            hsl(0, 0%, calc(var(--invert-last)*1%))
+    );
+}
 
 
 
