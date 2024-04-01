@@ -8,6 +8,7 @@ import {saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import {Group} from "react-konva";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -70,7 +71,7 @@ const NavBar = () => {
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
-                    className: 'Image',
+                    type: 'Image',
                     filePath: file,
                     x: position.x,
                     y: position.y,
@@ -123,25 +124,24 @@ const NavBar = () => {
     };
 
     const handleLockPiecesTogether = () => {
-        // make a group
         const newGroup = {
-            className: 'Group',
+            type: 'Group',
             groupElements: []
         }
-        // get selected elements
-        for (let i= 1; i < selectedElementsIndex.length; i++) {
+
+        for (let i= 0; i < selectedElementsIndex.length; i++) {
             const groupElement = elements[selectedElementsIndex[i]];
-            // add selected elements to group
             newGroup.groupElements.push(groupElement)
         }
-        // remove selected elements (as single elements)
+
         const newElements = elements.filter((element, index) =>
             !selectedElementsIndex.includes(index)
         )
-        // add group to elements
         setElements([...newElements, newGroup])
 
-        // close file
+        // TODO deselect selected elements
+
+
         handleFileButtonClick()
     }
 
