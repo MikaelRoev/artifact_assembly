@@ -11,6 +11,7 @@ import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
 import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import {ConfirmCloseContextProvider, ConfirmCloseWindow} from "../../components/ConfirmCloseWindow";
 
 /**
  * Creates a project page.
@@ -38,13 +39,16 @@ const Canvas = () => {
             <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
-                        <div className="stage-container">
-                            <NavBar stageRef={stageRef} />
-                            <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                            {isScoreWindowOpen && <ScoreWindow/>}
-                            {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
-                            {isFilterWindowOpen && <FilterWindow/>}
-                        </div>
+                        <ConfirmCloseContextProvider>
+                            <div className="stage-container">
+                                <NavBar stageRef={stageRef}/>
+                                <StageArea stageRef={stageRef} layerRef={layerRef}/>
+                                {isScoreWindowOpen && <ScoreWindow/>}
+                                {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
+                                {isFilterWindowOpen && <FilterWindow/>}
+                                <ConfirmCloseWindow/>
+                            </div>
+                        </ConfirmCloseContextProvider>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>

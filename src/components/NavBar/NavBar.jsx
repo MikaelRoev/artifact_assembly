@@ -7,6 +7,7 @@ import {openProjectDialog, saveProjectDialog} from "../FileHandling";
 import {open, confirm} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {useNavigate} from "react-router-dom";
+import ConfirmCloseWindowContext from "../ConfirmCloseWindow";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -23,6 +24,7 @@ const NavBar = ({stageRef}) => {
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {setIsConfirmWindowOpen} = useContext(ConfirmCloseWindowContext);
 
     const navigate = useNavigate();
 
@@ -228,6 +230,8 @@ const NavBar = ({stageRef}) => {
                                 <li>
                                     <button className={"dropdownButton"}
                                             onClick={() => {
+                                                setIsConfirmWindowOpen(true);
+                                                /*
                                                 confirm("You may have unsaved changes. Do you want to save before closing?", {
                                                     title: "Save changes?",
                                                     type: "warning"
@@ -245,6 +249,8 @@ const NavBar = ({stageRef}) => {
                                                         console.log("HELLO")
                                                     }
                                                 }).catch(error => console.log(error));
+
+                                                 */
                                             }}>
                                         Close Project
                                     </button>
