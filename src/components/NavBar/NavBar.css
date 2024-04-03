@@ -128,3 +128,7 @@
 	cursor: pointer;
 }
 
+.undoRedo {
+	font-size: larger;
+	font-weight: bold;
+}

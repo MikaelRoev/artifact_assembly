@@ -249,8 +249,10 @@ const NavBar = ({stageRef}) => {
                         </div>
                     )}
                 </div>
-                <button className={"navButton"} onClick={undo}>Undo</button>
-                <button className={"navButton"} onClick={redo}>Redo</button>
+                <div>
+                    <button className={"navButton undoRedo"} onClick={undo}>⭯</button>
+                    <button className={"navButton undoRedo"} onClick={redo}>⭮</button>
+                </div>
             </div>
             <div className="nav-right">
                 {isLoading && <div className="nav-item-right">Loading images...</div>}
