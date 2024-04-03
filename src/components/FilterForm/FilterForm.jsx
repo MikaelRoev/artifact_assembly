@@ -1,6 +1,9 @@
 import "./FilterForm.css";
+import {useContext} from "react";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 const FilterForm = ({ label, min, max, step, value, setValue, id }) => {
+	const {setIsFilterInteracting} = useContext(WindowModalOpenContext);
 	return (
 		<div className="form-group" id={id}>
 			<p>{label}:</p>
@@ -22,6 +25,8 @@ const FilterForm = ({ label, min, max, step, value, setValue, id }) => {
 				step={step}
 				value={value}
 				onChange={(e) => setValue(e.target.value, false)}
+				onFocus={() => setIsFilterInteracting(true)}
+				onBlur={() => setIsFilterInteracting(false)}
 			/>
 			<button
 				className="resetButton"

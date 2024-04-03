@@ -7,6 +7,7 @@ export const WindowModalOpenContextProvider = ({children}) => {
     const [isScoreWindowOpen, setIsScoreWindowOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
+    const [isFilterInteracting, setIsFilterInteracting] = useState(false);
     const {images} = useContext(ImageContext);
 
     useEffect(() => {
@@ -21,7 +22,8 @@ export const WindowModalOpenContextProvider = ({children}) => {
             {
                 isScoreWindowOpen, setIsScoreWindowOpen,
                 isDialogOpen, setIsDialogOpen,
-                isFilterWindowOpen, setIsFilterWindowOpen
+                isFilterWindowOpen, setIsFilterWindowOpen,
+                isFilterInteracting, setIsFilterInteracting,
             }
         }>
             {children}

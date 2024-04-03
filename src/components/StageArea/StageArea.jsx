@@ -28,7 +28,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	const {project, setProject} = useContext(ProjectContext);
 	const {images, setImages, undo, redo} = useContext(ImageContext);
 	const {setFilterImageIndex} = useContext(ImageFilterContext);
-	const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+	const {isFilterInteracting, setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
 	const zoomScale = 1.17; //How much zoom each time
 	const zoomMin = 0.001; //zoom out limit
@@ -58,7 +58,7 @@ const StageArea = ({stageRef, layerRef}) => {
 	 	* @param e the event.
 		 */
 		const handleDeletePressed = (e) => {
-			if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0) {
+			if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0 && !isFilterInteracting) {
 				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
 				setImages(newImages);
 				setSelectedElements([]);
@@ -69,7 +69,7 @@ const StageArea = ({stageRef, layerRef}) => {
 		return () => {
 			document.removeEventListener("keydown", handleDeletePressed);
 		};
-	}, [images, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages]);
+	}, [images, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages, isFilterInteracting]);
 
 	/**
 	 * Sets up and cleans up the save event listener.
