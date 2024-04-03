@@ -99,6 +99,17 @@ const NavBar = ({stageRef}) => {
         setToolsDropdownVisible(false);
     }
 
+    /**
+     * Constant function to set the visibility of the tools dropdown menu.
+     */
+    const handleToolsButtonClick = () => {
+        setToolsDropdownVisible(!toolsDropdownVisible);
+        setFileDropdownVisible(false);
+    }
+
+    /**
+     * useEffect to align the dropdown menu with the button.
+     */
     useEffect(() => {
         if (fileDropdownVisible) {
             const file = document.querySelector(".fileDiv").getBoundingClientRect();
@@ -107,6 +118,9 @@ const NavBar = ({stageRef}) => {
         }
     }, [fileDropdownVisible]);
 
+    /**
+     * useEffect to align the dropdown menu with the button.
+     */
     useEffect(() => {
         if (toolsDropdownVisible) {
             const tools = document.querySelector(".toolsDiv").getBoundingClientRect();
@@ -116,13 +130,6 @@ const NavBar = ({stageRef}) => {
     }, [toolsDropdownVisible]);
 
 
-    /**
-     * Constant function to set the visibility of the tools dropdown menu.
-     */
-    const handleToolsButtonClick = () => {
-        setToolsDropdownVisible(!toolsDropdownVisible);
-        setFileDropdownVisible(false);
-    }
 
 
     /**
