@@ -1,4 +1,4 @@
-import React, {useRef, useContext} from "react";
+import React, {useRef, useContext, useEffect} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
@@ -11,7 +11,9 @@ import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
 import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import {ConfirmCloseContextProvider, ConfirmCloseWindow} from "../../components/ConfirmCloseWindow";
+import {
+    ConfirmCloseModal,
+    ConfirmCloseModalContextProvider,} from "../../components/ConfirmCloseModal";
 
 /**
  * Creates a project page.
@@ -39,16 +41,16 @@ const Canvas = () => {
             <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
-                        <ConfirmCloseContextProvider>
+                        <ConfirmCloseModalContextProvider>
                             <div className="stage-container">
                                 <NavBar stageRef={stageRef}/>
                                 <StageArea stageRef={stageRef} layerRef={layerRef}/>
                                 {isScoreWindowOpen && <ScoreWindow/>}
                                 {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
                                 {isFilterWindowOpen && <FilterWindow/>}
-                                <ConfirmCloseWindow/>
+                                <ConfirmCloseModal/>
                             </div>
-                        </ConfirmCloseContextProvider>
+                        </ConfirmCloseModalContextProvider>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>

@@ -4,10 +4,10 @@ import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {openProjectDialog, saveProjectDialog} from "../FileHandling";
-import {open, confirm} from "@tauri-apps/api/dialog";
+import {open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {useNavigate} from "react-router-dom";
-import ConfirmCloseWindowContext from "../ConfirmCloseWindow";
+import ConfirmCloseModalContext from "../ConfirmCloseModal";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -24,7 +24,10 @@ const NavBar = ({stageRef}) => {
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
-    const {setIsConfirmWindowOpen} = useContext(ConfirmCloseWindowContext);
+    const {setIsConfirmModalOpen,
+        setOnSave,
+        setOnDoNotSave
+    } = useContext(ConfirmCloseModalContext);
 
     const navigate = useNavigate();
 
@@ -230,27 +233,15 @@ const NavBar = ({stageRef}) => {
                                 <li>
                                     <button className={"dropdownButton"}
                                             onClick={() => {
-                                                setIsConfirmWindowOpen(true);
-                                                /*
-                                                confirm("You may have unsaved changes. Do you want to save before closing?", {
-                                                    title: "Save changes?",
-                                                    type: "warning"
-                                                }).then(response => {
-                                                    if (response === true) {
-                                                        // save changes
-                                                        saveProjectDialog(project, setProject, images)
-                                                            .then(() => navigate("/"))
-                                                            .catch(() => {
-                                                            });
-                                                    } else if (response === false) {
-                                                        // discard changes or canceled
-                                                        navigate("/");
-                                                    } else {
-                                                        console.log("HELLO")
-                                                    }
-                                                }).catch(error => console.log(error));
-
-                                                 */
+                                                setFileDropdownVisible(false);
+                                                setOnSave(() => () => {
+                                                    saveProjectDialog(project, setProject, images)
+                                                        .then(() => navigate("/"))
+                                                        .catch(() => {
+                                                        })
+                                                });
+                                                setOnDoNotSave(() => () => navigate("/"));
+                                                setIsConfirmModalOpen(true);
                                             }}>
                                         Close Project
                                     </button>
