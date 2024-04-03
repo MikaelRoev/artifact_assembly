@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
@@ -99,6 +99,23 @@ const NavBar = ({stageRef}) => {
         setToolsDropdownVisible(false);
     }
 
+    useEffect(() => {
+        if (fileDropdownVisible) {
+            const file = document.querySelector(".fileDiv").getBoundingClientRect();
+            const dropdown = document.querySelector(".fileDiv .dropdown");
+            dropdown.style.left = file.left.toFixed(0) + "px";
+        }
+    }, [fileDropdownVisible]);
+
+    useEffect(() => {
+        if (toolsDropdownVisible) {
+            const tools = document.querySelector(".toolsDiv").getBoundingClientRect();
+            const dropdown = document.querySelector(".toolsDiv .dropdown");
+            dropdown.style.left = tools.left.toFixed(0) + "px";
+        }
+    }, [toolsDropdownVisible]);
+
+
     /**
      * Constant function to set the visibility of the tools dropdown menu.
      */
@@ -176,7 +193,7 @@ const NavBar = ({stageRef}) => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <div className={"fileDiv"}>
+                <div className={"fileDiv navDiv"}>
                     <button className={"navButton"} onClick={handleFileButtonClick}>
                         File
                     </button>
@@ -218,7 +235,7 @@ const NavBar = ({stageRef}) => {
                         </div>
                     )}
                 </div>
-                <div className={"fileDiv"}>
+                <div className={"toolsDiv navDiv"}>
                     <button className={"navButton"} onClick={handleToolsButtonClick}>
                         Tools
                     </button>
