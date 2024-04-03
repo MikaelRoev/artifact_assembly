@@ -1,8 +1,7 @@
 :root {
     --hue: 0;
     --saturation: 16.666;
-    --value: 50;
-    --luminance: 50;
+    --brightness: 50;
     --contrast: 0;
     --mask: 0;
     --invert-first: 0;
@@ -35,6 +34,11 @@
     flex-direction: column;
     width: 100%;
     gap: 5px;
+}
+
+.filterWindowBody .form-group:nth-child(4),
+.filterWindowBody .form-group:nth-child(5) {
+    margin-bottom: 10px;
 }
 
 .filterWindowHeader {
@@ -153,11 +157,11 @@
     )
 }
 
-#filter-value input[type='range']::-webkit-slider-thumb {
-    background-color: hsl(0, 0%, calc(var(--value)*1%));
+#filter-brightness input[type='range']::-webkit-slider-thumb {
+    background-color: hsl(0, 0%, calc(var(--brightness)*1%));
 }
 
-#filter-value input[type='range']::-webkit-slider-runnable-track {
+#filter-brightness input[type='range']::-webkit-slider-runnable-track {
     background-image: linear-gradient(
         90deg,
         hsl(0, 0%, calc(var(--invert-first)*1%)),
@@ -165,36 +169,26 @@
     )
 }
 
-#filter-luminance input[type='range']::-webkit-slider-thumb {
-    background-color: hsl(0, 0%, calc(var(--luminance)*1%));
-}
-
-#filter-luminance input[type='range']::-webkit-slider-runnable-track {
-        background-image: linear-gradient(
-        90deg,
-        hsl(0, 0%, calc(var(--invert-first)*1%)),
-        hsl(0, 0%, calc(var(--invert-last)*1%))
-    );
-}
-
 #filter-contrast input[type='range']::-webkit-slider-thumb {
     background-color: grey;
 }
 
 #filter-contrast input[type='range']::-webkit-slider-runnable-track {
-    background-color: grey;
+    background-image: linear-gradient(
+        90deg,
+        grey 20%,
+        hsl(var(--hue), 100%, 50%),
+        black 85%,
+        black
+    );
 }
 
 #filter-mask input[type='range']::-webkit-slider-thumb {
-    background-color: hsl(0, 0%, calc(var(--mask)*1%));
+    background-color: grey;
 }
 
 #filter-mask input[type='range']::-webkit-slider-runnable-track {
-    background-image: linear-gradient(
-            90deg,
-            hsl(0, 0%, calc(var(--invert-first)*1%)),
-            hsl(0, 0%, calc(var(--invert-last)*1%))
-    );
+    background-color: grey;
 }
 
 
