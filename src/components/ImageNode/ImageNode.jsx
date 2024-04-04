@@ -40,7 +40,6 @@ const ImageNode = ({
 				|| (imageProps.saturation !== undefined && imageProps.saturation !== 0)
 				|| (imageProps.value !== undefined && imageProps.value !== 0)
 			) filters.push(Konva.Filters.HSV);
-			if (imageProps.luminance !== undefined && imageProps.luminance !== 0) filters.push(Konva.Filters.HSL);
 			if (imageProps.contrast !== undefined && imageProps.contrast !== 0) filters.push(Konva.Filters.Contrast);
 			if (imageProps.threshold !== undefined && imageProps.threshold !== 0) {
 				filters.push(Konva.Filters.Mask);

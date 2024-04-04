@@ -22,10 +22,8 @@ const FilterWindow = () => {
     const hueMin = 0;
     const saturationMax = 10;
     const saturationMin = -2;
-    const valueMax = 2;
-    const valueMin = -2;
-    const luminanceMax = 2;
-    const luminanceMin = -2;
+    const brightnessMax = 2;
+    const brightnessMin = -2;
     const contrastMax = 100;
     const contrastMin = -100;
     const thresholdMax = 350;
@@ -111,8 +109,7 @@ const FilterWindow = () => {
         if (!newImage) return;
         newImage.hue = 0;
         newImage.saturation = 0;
-        newImage.value = 0;
-        newImage.luminance = 0;
+        newImage.value = 0; //Value is Brightness
         newImage.contrast = 0;
         newImage.threshold = 0;
         newImage.grayscale = false;
@@ -123,8 +120,7 @@ const FilterWindow = () => {
         })
         root.style.setProperty("--hue", 0);
         root.style.setProperty("--saturation", 16.666);
-        root.style.setProperty("--value", 50);
-        root.style.setProperty("--luminance", 50);
+        root.style.setProperty("--brightness", 50);
         root.style.setProperty("--contrast", 0);
         root.style.setProperty("--mask", 0)
         root.style.setProperty("--invert-first", 0);
@@ -149,23 +145,14 @@ const FilterWindow = () => {
             } else {
                 root.style.setProperty("--saturation", 16.666);
             }
-            if (image.value !== undefined) {
+            if (image.value !== undefined) { //Value is Brightness
                 if (image.invert) {
-                    root.style.setProperty("--value", 100 - (((image.value - valueMin) * 100) / (valueMax - valueMin)));
+                    root.style.setProperty("--brightness", 100 - (((image.value - brightnessMin) * 100) / (brightnessMax - brightnessMin)));
                 } else {
-                    root.style.setProperty("--value", ((image.value - valueMin) * 100) / (valueMax - valueMin));
+                    root.style.setProperty("--brightness", ((image.value - brightnessMin) * 100) / (brightnessMax - brightnessMin));
                 }
             } else {
-                root.style.setProperty("--value", 50);
-            }
-            if (image.luminance !== undefined) {
-                if (image.invert) {
-                    root.style.setProperty("--luminance", 100 - (((image.luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin)));
-                } else {
-                    root.style.setProperty("--luminance", ((image.luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
-                }
-            } else {
-                root.style.setProperty("--luminance", 50);
+                root.style.setProperty("--brightness", 50);
             }
             if (image.threshold !== undefined) {
                 if (image.invert) {
@@ -236,59 +223,40 @@ const FilterWindow = () => {
                     }}
                 />
                 <FilterForm
-                    id={"filter-value"}
-                    label="Value"
-                    min={valueMin}
-                    max={valueMax}
+                id={"filter-contrast"}
+                label="Contrast"
+                min={contrastMin}
+                max={contrastMax}
+                step={1}
+                value={checkValidValue("contrast")}
+                setValue={(contrast, overwrite) => {
+                    if (!images[filterImageIndex]) return;
+                    images[filterImageIndex].contrast = parseFloat(contrast);
+                    setImages(images, overwrite);
+                }}
+                />
+                <FilterForm
+                    id={"filter-brightness"}
+                    label="Brightness"
+                    min={brightnessMin}
+                    max={brightnessMax}
                     step={0.05}
                     value={checkValidValue("value")}
-                    setValue={(val, overwrite) => {
+                    setValue={(bri, overwrite) => {
                         if (!images[filterImageIndex]) return;
-                        const value = parseFloat(val);
-                        images[filterImageIndex].value = value;
+                        const brightness = parseFloat(bri);
+                        images[filterImageIndex].value = brightness;
                         if (images[filterImageIndex].invert) {
-                            root.style.setProperty("--value", 100 - (((value - valueMin) * 100) / (valueMax - valueMin)));
+                            root.style.setProperty("--brightness", 100 - (((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin)));
                         } else {
-                            root.style.setProperty("--value", ((value - valueMin) * 100) / (valueMax - valueMin));
+                            root.style.setProperty("--brightness", ((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin));
                         }
-                        setImages(images, overwrite);
-                    }}
-                />
-                <FilterForm
-                    id={"filter-luminance"}
-                    label="Luminance"
-                    min={luminanceMin}
-                    max={luminanceMax}
-                    step={0.05}
-                    value={checkValidValue("luminance")}
-                    setValue={(lum, overwrite) => {
-                        if (!images[filterImageIndex]) return;
-                        const luminance = parseFloat(lum);
-                        images[filterImageIndex].luminance = luminance;
-                        if (images[filterImageIndex].invert) {
-                            root.style.setProperty("--luminance", 100 - (((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin)));
-                        } else {
-                            root.style.setProperty("--luminance", ((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
-                        }
-                        setImages(images, overwrite);
-                    }}
-                />
-                <FilterForm
-                    id={"filter-contrast"}
-                    label="Contrast"
-                    min={contrastMin}
-                    max={contrastMax}
-                    step={1}
-                    value={checkValidValue("contrast")}
-                    setValue={(contrast, overwrite) => {
-                        if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].contrast = parseFloat(contrast);
                         setImages(images, overwrite);
                     }}
                 />
                 <FilterForm
                     id={"filter-mask"}
-                    label="Mask Threshold"
+                    label="Edge reduction"
                     min={thresholdMin}
                     max={thresholdMax}
                     step={1}
@@ -319,20 +287,17 @@ const FilterWindow = () => {
                     setValue={() => {
                         if (!images[filterImageIndex]) return;
                         images[filterImageIndex].invert = !images[filterImageIndex].invert;
-                        const value = isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value;
-                        const luminance = isNaN(images[filterImageIndex].luminance) ? 0 : images[filterImageIndex].luminance;
+                        const brightness = isNaN(images[filterImageIndex].value) ? 0 : images[filterImageIndex].value;
                         const threshold = isNaN(images[filterImageIndex].threshold) ? 0 : images[filterImageIndex].threshold;
                         if (images[filterImageIndex].invert) {
                             root.style.setProperty("--invert-first", 100);
                             root.style.setProperty("--invert-last", 0);
-                            root.style.setProperty("--value", 100 - (((value - valueMin) * 100) / (valueMax - valueMin)));
-                            root.style.setProperty("--luminance", 100 - (((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin)));
+                            root.style.setProperty("--brightness", 100 - (((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin)));
                             root.style.setProperty("--mask", 100 - (((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
                         } else {
                             root.style.setProperty("--invert-first", 0);
                             root.style.setProperty("--invert-last", 100);
-                            root.style.setProperty("--value", ((value - valueMin) * 100) / (valueMax - valueMin));
-                            root.style.setProperty("--luminance", ((luminance - luminanceMin) * 100) / (luminanceMax - luminanceMin));
+                            root.style.setProperty("--brightness", ((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin));
                             root.style.setProperty("--mask", ((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
                         }
                         setImages(images);
