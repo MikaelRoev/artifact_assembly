@@ -39,9 +39,9 @@ const Canvas = () => {
                         <div className="stage-container">
                             <NavBar stageRef={stageRef} />
                             <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                            {isScoreWindowOpen && <ScoreWindow/>}
+                            {isScoreWindowOpen && <ScoreWindow stageRef={stageRef}/>}
                             {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
-                            {isFilterWindowOpen && <FilterWindow/>}
+                            {isFilterWindowOpen && <FilterWindow stageRef={stageRef}/>}
                         </div>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
