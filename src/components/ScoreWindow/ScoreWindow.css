@@ -2,9 +2,12 @@
     position: fixed;
     display: flex;
     flex-direction: column;
+    width: 400px;
     min-width: 400px;
+    height: 250px;
     min-height: 250px;
     border-radius: 10px;
+    overflow: hidden;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
     background: #fff;
     user-select: none;
@@ -17,9 +20,9 @@
     height: calc(100% - 30px);
     font-family: monospace;
     padding: 5px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    overflow-y: auto;
+    margin: 5px;
+    overflow-y: scroll;
+    box-sizing: content-box;
     flex-grow: 1;
 }
 

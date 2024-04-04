@@ -84,7 +84,7 @@ const ScoreWindow = () => {
             const scoreWindowContent = document.querySelector('.window-content');
             if (images.length > 0) {
                 scoreWindowContent.innerHTML = images.map(data => `ID: ${data.fileName}, Width: ${data.width}, 
-                Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)}`).join('<br>');
+                Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)} Hue: ${data.hueValues.slice(0, 100).join('<br>')}`).join('<br>');
 
             } else if (images.length === 0) {
                 scoreWindowContent.innerHTML = '';
@@ -102,7 +102,7 @@ const ScoreWindow = () => {
         const resizable = document.getElementById('scoreWindow');
         let isResizing = false;
         let startX, startY, startWidth, startHeight, direction;
-        let distance = 7;
+        let distance = 10;
 
         function initDrag(e) {
             // Determine if the mouse is near the edges

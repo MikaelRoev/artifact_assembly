@@ -59,6 +59,9 @@ export const openProjectDialog = async (setProject, setElements) => {
  * Opens the "save project as"-dialog window.
  */
 export const saveProjectDialog = async (project, setProject, elements) => {
+    elements.forEach((element) => {
+        delete element.hueValues;
+    })
     try {
         const filePath = await dialog.save({
             title: 'Save Project As',
