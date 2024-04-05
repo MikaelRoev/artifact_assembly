@@ -4,7 +4,7 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import ImageContext from "../../contexts/ImageContext";
 import {makeDraggable, makeResizable} from "../WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
-import async from "async";
+import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 
 
 /**
@@ -16,6 +16,7 @@ const ScoreWindow = ({stageRef}) => {
 
     const {setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
     const {images} = useContext(ImageContext);
+    const {selectedElementsIndex} = useContext(selectedElementsIndexContext)
     const contentRef = useRef(null);
 
     /**
@@ -56,13 +57,14 @@ const ScoreWindow = ({stageRef}) => {
                 <button className="square exit" onClick={() => setIsScoreWindowOpen(false)}></button>
             </div>
             <div ref={contentRef} className="window-content">
-                { images.length > 0 &&
-                    images.map((image, i) => {
+                {images.length > 0 &&
+                    selectedElementsIndex.map((index) => {
+                        const image = images[index];
                         if (image.hueValues) {
                             const max = image.hueValues.reduce((acc, curr) => Math.max(acc, curr), -Infinity);
                             const min = image.hueValues.reduce((acc, curr) => Math.min(acc, curr), Infinity);
                             return <Histogram
-                                key={i}
+                                key={image.fileName}
                                 array={image.hueValues}
                                 widthProp={400}
                                 heightProp={300}
@@ -70,11 +72,17 @@ const ScoreWindow = ({stageRef}) => {
                                 maxValue={max}
                                 minValue={min}
                                 maxTheoretical={359}
-                            />
+                            />;
                         }
+                        return null;
                     })}
-                {images.length > 0 && contentRef.current && !contentRef.current.textContent.trim() &&
-                    <p>Info.<br/>The window needs to be reloaded <br/>when a new fragment is uploaded</p>}
+                {selectedElementsIndex.length === 0 &&
+                    <p style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)"
+                    }}>Info.<br/>Select one or more images to display their histogram</p>}
             </div>
         </div>)
 }
