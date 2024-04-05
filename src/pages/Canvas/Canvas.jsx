@@ -5,7 +5,7 @@ import "./Canvas.css";
 import SimilarityMetricsWindow from "../../components/SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
-import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedElementsIndexContext";
+import {SelectContextProvider} from "../../contexts/SelectContext";
 import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
 import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
@@ -39,7 +39,7 @@ const Canvas = () => {
 
     return (
         <FilterEnabledContextProvider>
-            <SelectedElementsIndexContextProvider>
+            <SelectContextProvider>
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
                         <ConfirmCloseModalContextProvider>
@@ -54,7 +54,7 @@ const Canvas = () => {
                         </ConfirmCloseModalContextProvider>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
-            </SelectedElementsIndexContextProvider>
+            </SelectContextProvider>
         </FilterEnabledContextProvider>
     );
 };

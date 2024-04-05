@@ -5,7 +5,7 @@ import LockedContext from "../../contexts/LockedContext";
 import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
-import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
@@ -17,13 +17,20 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
  * @constructor
  */
 const StageArea = ({stageRef, layerRef}) => {
-    const [selectedElements, setSelectedElements] = useState([]);
     const [ctrlPressed, setCtrlPressed] = useState(false);
     const [shiftPressed, setShiftPressed] = useState(false);
 
     const trRef = useRef();
 
-    const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
+    const {
+        selectedElements,
+        selectedElementsIndex,
+        select,
+        deselect,
+        deselectAll,
+        selectOnly,
+        isSelected
+    } = useContext(SelectContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
@@ -58,18 +65,19 @@ const StageArea = ({stageRef, layerRef}) => {
          * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0 && !isFilterInteracting) {
+            if ((e.key === "Delete" || e.key === 'Backspace')
+                && selectedElementsIndex.length > 0
+                && !isFilterInteracting) {
                 const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
                 setImages(newImages);
-                setSelectedElements([]);
-                setSelectedElementsIndex([]);
+                deselectAll();
             }
         };
         document.addEventListener("keydown", handleDeletePressed);
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [images, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages, isFilterInteracting]);
+    }, [images, selectedElementsIndex, setImages, isFilterInteracting, deselectAll]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -160,9 +168,7 @@ const StageArea = ({stageRef, layerRef}) => {
      */
     const checkDeselect = (e) => {
         if (e.target === e.currentTarget && !ctrlPressed && !shiftPressed) {
-            selectedElements.forEach((element) => element.draggable(false));
-            setSelectedElements([]);
-            setSelectedElementsIndex([]);
+            deselectAll();
         }
     };
 
@@ -227,29 +233,17 @@ const StageArea = ({stageRef, layerRef}) => {
     const handleElementClick = (e, index) => {
         const element = e.target;
         element.moveToTop();
-        const elementIndex = selectedElements.indexOf(element);
-        const indexIndex = selectedElementsIndex.indexOf(index);
 
         if (ctrlPressed || shiftPressed) {
-            if (elementIndex !== -1) {
+            if (isSelected(index)) {
                 // already selected
-                selectedElements[elementIndex].draggable(false);
-                const newSelected = [...selectedElements];
-                newSelected.splice(elementIndex, 1);
-                setSelectedElements(newSelected);
-
-                const newSelectedIndex = [...selectedElementsIndex];
-                newSelectedIndex.splice(indexIndex, 1);
-                setSelectedElementsIndex(newSelectedIndex);
+                deselect(index);
             } else {
                 // not already selected
-                setSelectedElements([...selectedElements, element]);
-                setSelectedElementsIndex([...selectedElementsIndex, index]);
+                select(element, index);
             }
         } else {
-            selectedElements.forEach((element) => element.draggable(false));
-            setSelectedElements([element]);
-            setSelectedElementsIndex([index]);
+            selectOnly(element, index);
         }
     }
 
@@ -300,7 +294,7 @@ const StageArea = ({stageRef, layerRef}) => {
             const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
                 .filter((child) => !child.attrs.width);
             if (imageNodes.length !== 0) {
-                setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
+                setImageDimensions(imageNodes);
             }
         }
     }, [images.length, layerRef, images]);
