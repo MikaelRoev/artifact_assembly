@@ -2,10 +2,18 @@ import {useState} from "react";
 
 /**
  * Hook for handling the state history, undo, and redo.
- * @param initialState - the first state in the history.
- * @param maxSteps - of undo or redo actions or max length of the history.
- * @return {[any,function(any, boolean): *,function(): *, function(): *]}
- * getter for the current state, setter for the current state, the undo function, and the redo function.
+ * @param {Object} initialState - The first state in the history.
+ * @param {number} maxSteps - Maximum number of undo or redo actions or max length of the history.
+ * @returns {[Object,
+ *            function((Function|Object), boolean): void,
+ *            () => void,
+ *            () => void]}
+ * Returns an array containing:
+ *  - The current state object.
+ *  - A function to set the state, which takes a callback or a new state object
+ *      and a boolean indicating if it should overwrite the previous commit to the history.
+ *  - An undo function to revert to the previous state in history.
+ *  - A redo function to move forward to the next state in history.
  */
 const useHistory = (initialState, maxSteps) => {
     const [index, setIndex] = useState(0);
@@ -13,11 +21,12 @@ const useHistory = (initialState, maxSteps) => {
 
     const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
 
-
     /**
      * Updates the state.
-     * @param action
-     * @param overwrite
+     * @param action {Function|Object} a callback that returns a new state or a new state object
+     * @param overwrite {boolean}
+     *  true - overwrites the previous history commit.
+     *  false (default) - makes a new history commit.
      */
     const setState = (action, overwrite = false) => {
         // get the new state ether from a function or a variable, implemented similar to useState
@@ -59,7 +68,5 @@ const useHistory = (initialState, maxSteps) => {
 
     return [deepCopy(history[index]), setState, undo, redo];
 }
-
-
 
 export default useHistory;
