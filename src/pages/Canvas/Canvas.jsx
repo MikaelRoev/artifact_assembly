@@ -13,11 +13,12 @@ import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {
     ConfirmCloseModal,
-    ConfirmCloseModalContextProvider,} from "../../components/ConfirmCloseModal";
+    ConfirmCloseModalContextProvider,
+} from "../../components/ConfirmCloseModal";
 
 /**
- * Creates a project page.
- * @returns {Element}
+ * Component that represents the canvas page.
+ * @returns {JSX.Element} the canvas page.
  * @constructor
  */
 const Canvas = () => {
@@ -26,8 +27,8 @@ const Canvas = () => {
     const {isScoreWindowOpen, isDialogOpen, setIsDialogOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
 
     /**
-     * Function to get the canvas as DataURL and send it to
-     * @param number
+     * Gets the canvas as DataURL and send it to the export canvas as image dialog.
+     * @param number {number} the scaling factor of the canvas.
      */
     function handleSave(number) {
         let image = stageRef.current.toDataURL({pixelRatio: number});
