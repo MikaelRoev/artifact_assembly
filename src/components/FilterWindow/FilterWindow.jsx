@@ -8,8 +8,8 @@ import FilterToggle from "../FilterToggle/FilterToggle";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 
 /**
- * Component representing the window containing the filter for the images.
- * @returns {Element}
+ * Component representing the window containing the filters for an image.
+ * @returns {JSX.Element} the filter window.
  * @constructor
  */
 const FilterWindow = () => {
@@ -32,8 +32,8 @@ const FilterWindow = () => {
 
 
     /**
-     * UseEffect to make the filter window draggable on creation.
-     * And handle hiding the window when the exit button is pressed.
+     * Makes the filter window draggable on creation
+     * and handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
         /**
@@ -90,7 +90,7 @@ const FilterWindow = () => {
 
 
     /**
-     * useEffect to prevent right-click on the filter window
+     * On creation, adds prevent right-click on the filter window.
      */
     useEffect(() => {
         let window = document.querySelector('#filter-window');
@@ -102,35 +102,7 @@ const FilterWindow = () => {
     }, []);
 
     /**
-     * Function to reset the filters on an image.
-     */
-    const resetFilter = () => {
-        const newImage = images[filterImageIndex];
-        if (!newImage) return;
-        newImage.hue = 0;
-        newImage.saturation = 0;
-        newImage.value = 0; //Value is Brightness
-        newImage.contrast = 0;
-        newImage.threshold = 0;
-        newImage.grayscale = false;
-        newImage.invert = false;
-        const checkboxes = document.querySelectorAll('input[name="toggleCheckbox"]');
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = false;
-        })
-        root.style.setProperty("--hue", 0);
-        root.style.setProperty("--saturation", 16.666);
-        root.style.setProperty("--brightness", 50);
-        root.style.setProperty("--contrast", 0);
-        root.style.setProperty("--mask", 0)
-        root.style.setProperty("--invert-first", 0);
-        root.style.setProperty("--invert-last", 100);
-        images[filterImageIndex] = newImage;
-        setImages(images);
-    };
-
-    /**
-     * useEffect to set the sliders and toggles on the filtervindow when changing which fragment to filter.
+     * Sets the sliders and toggles on the filter window when changing which fragment to filter.
      */
     useEffect(() => {
         if (images[filterImageIndex]) {
@@ -177,6 +149,11 @@ const FilterWindow = () => {
 
     }, [filterImageIndex]);
 
+    /**
+     * Checks if the filter image has a parameter.
+     * @param parameter the parameter to be checked.
+     * @return {number} returns the value of the parameter or 0 if the image do not have the parameter.
+     */
     function checkValidValue(parameter) {
         if (!images[filterImageIndex] || isNaN(images[filterImageIndex][parameter])) {
             return 0;
@@ -184,6 +161,34 @@ const FilterWindow = () => {
             return images[filterImageIndex][parameter];
         }
     }
+
+    /**
+     * Resets the filters on the filter image.
+     */
+    const resetFilter = () => {
+        const newImage = images[filterImageIndex];
+        if (!newImage) return;
+        newImage.hue = 0;
+        newImage.saturation = 0;
+        newImage.value = 0; //Value is Brightness
+        newImage.contrast = 0;
+        newImage.threshold = 0;
+        newImage.grayscale = false;
+        newImage.invert = false;
+        const checkboxes = document.querySelectorAll('input[name="toggleCheckbox"]');
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = false;
+        })
+        root.style.setProperty("--hue", 0);
+        root.style.setProperty("--saturation", 16.666);
+        root.style.setProperty("--brightness", 50);
+        root.style.setProperty("--contrast", 0);
+        root.style.setProperty("--mask", 0)
+        root.style.setProperty("--invert-first", 0);
+        root.style.setProperty("--invert-last", 100);
+        images[filterImageIndex] = newImage;
+        setImages(images);
+    };
 
     return (
         <div id='filter-window' className={"filterWindow"}>
@@ -223,17 +228,17 @@ const FilterWindow = () => {
                     }}
                 />
                 <FilterForm
-                id={"filter-contrast"}
-                label="Contrast"
-                min={contrastMin}
-                max={contrastMax}
-                step={1}
-                value={checkValidValue("contrast")}
-                setValue={(contrast, overwrite) => {
-                    if (!images[filterImageIndex]) return;
-                    images[filterImageIndex].contrast = parseFloat(contrast);
-                    setImages(images, overwrite);
-                }}
+                    id={"filter-contrast"}
+                    label="Contrast"
+                    min={contrastMin}
+                    max={contrastMax}
+                    step={1}
+                    value={checkValidValue("contrast")}
+                    setValue={(contrast, overwrite) => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].contrast = parseFloat(contrast);
+                        setImages(images, overwrite);
+                    }}
                 />
                 <FilterForm
                     id={"filter-brightness"}
