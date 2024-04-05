@@ -3,10 +3,9 @@ import "./ExportImageModal.css"
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 
 /**
- * Dialog modal that shows up when the export image of canvas button is pressed in the file dropdown menu
- * @param onSave Function to send number up to parent when pressing save.
- * @param onClose Function for closing dialog when pressing cancel.
- * @returns {JSX.Element}
+ * Component that is a dialog modal that will show up when the export image button is pressed in the file dropdown menu.
+ * @param onSave {function(number): void} Function to send number up to parent when pressing save.
+ * @returns {JSX.Element} the dialog modal.
  * @constructor
  */
 const ExportImageModal = ({onSave}) => {
@@ -61,7 +60,6 @@ const ExportImageModal = ({onSave}) => {
             </div>
         </div>
     )
-
 }
 
 export default ExportImageModal;
