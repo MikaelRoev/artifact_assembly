@@ -1,11 +1,15 @@
 import {createContext, useState} from "react";
 
+/**
+ * The project context that allows the getting and setting of the current project's information.
+ * @type {React.Context<null>}
+ */
 const ProjectContext = createContext(null);
 
 /**
  * Provider for the project context that allows the getting and setting of the current project's information.
  * @param children the tree that can use the project context.
- * @return {JSX.Element} the provider with the tree under it.
+ * @return {JSX.Element} the context provider.
  * @constructor
  */
 export const ProjectContextProvider = ({children}) => {
