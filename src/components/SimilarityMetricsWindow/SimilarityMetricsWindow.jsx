@@ -1,21 +1,21 @@
 import React, {useContext, useEffect} from 'react';
-import "./ScoreWindow.css"
+import "./SimilarityMetricsWindow.css"
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import ImageContext from "../../contexts/ImageContext";
 
 
 /**
- * Creates a ScoreWindow element.
- * @returns {Element}
+ * Component that represents a window that shows similarity metrics of the selected images.
+ * @returns {JSX.Element} the similarity metrics window
  * @constructor
  */
-const ScoreWindow = () => {
+const SimilarityMetricsWindow = () => {
 
     const {isScoreWindowOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
     const {images} = useContext(ImageContext);
 
     /**
-     * UseEffect to make the scorewindow draggable on creation.
+     * UseEffect to make the score window draggable on creation.
      * And handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
@@ -73,7 +73,7 @@ const ScoreWindow = () => {
 
 
     /**
-     * UseEffect to get the data from the images on the canvas and put it inside the score window.
+     * Gets the data from the images on the canvas and put it inside the score window.
      */
     useEffect(() => {
 
@@ -96,7 +96,7 @@ const ScoreWindow = () => {
     }, [isScoreWindowOpen, images, images.length]);
 
     /**
-     * UseEffect for resizing the window
+     * Resizes the window.
      */
     useEffect(() => {
         const resizable = document.getElementById('scoreWindow');
@@ -104,9 +104,13 @@ const ScoreWindow = () => {
         let startX, startY, startWidth, startHeight, direction;
         let distance = 7;
 
+        /**
+         * Starts the drag event.
+         * @param e {MouseEvent}
+         */
         function initDrag(e) {
             // Determine if the mouse is near the edges
-            const { left, right, bottom } = resizable.getBoundingClientRect();
+            const {left, right, bottom} = resizable.getBoundingClientRect();
             const nearLeftEdge = Math.abs(e.clientX - left) < distance;
             const nearRightEdge = Math.abs(e.clientX - right) < distance;
             const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
@@ -124,6 +128,10 @@ const ScoreWindow = () => {
             }
         }
 
+        /**
+         * Starts the drag event.
+         * @param e{MouseEvent}
+         */
         function doDrag(e) {
             if (!isResizing) return;
 
@@ -145,26 +153,34 @@ const ScoreWindow = () => {
             }
         }
 
+        /**
+         * When stopping the drag event.
+         */
         function stopDrag() {
             isResizing = false;
             document.documentElement.removeEventListener('mousemove', doDrag, false);
             document.documentElement.removeEventListener('mouseup', stopDrag, false);
         }
 
-        resizable.addEventListener("mousemove", function(e) {
-            const { left, right, bottom} = resizable.getBoundingClientRect();
-            resizable.style.cursor = getCursor(e, left, right, bottom, distance);
+        resizable.addEventListener("mousemove", function (e) {
+            const boundingClientRect = resizable.getBoundingClientRect();
+            resizable.style.cursor = getCursor(e, boundingClientRect, distance);
         }, false)
 
         resizable.addEventListener('mousedown', initDrag, false);
-
-
     }, []);
 
-    function getCursor(e, left, right, bottom, distance) {
-        const nearLeftEdge = Math.abs(e.clientX - left) < distance;
-        const nearRightEdge = Math.abs(e.clientX - right) < distance;
-        const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
+    /**
+     * Get the cursor type.
+     * @param e {MouseEvent} the mouse event.
+     * @param boundingRect {DOMRect} the bounding rect of the window.
+     * @param distance {number} the distance to the bounding rect of the activation of the drag.
+     * @return {string} the cursor type.
+     */
+    function getCursor(e, boundingRect, distance) {
+        const nearLeftEdge = Math.abs(e.clientX - boundingRect.left) < distance;
+        const nearRightEdge = Math.abs(e.clientX - boundingRect.right) < distance;
+        const nearBottomEdge = Math.abs(e.clientY - boundingRect.bottom) < distance;
 
         if (nearBottomEdge && nearLeftEdge) return 'nesw-resize';
         if (nearBottomEdge && nearRightEdge) return 'nwse-resize';
@@ -195,4 +211,4 @@ const ScoreWindow = () => {
         </div>)
 }
 
-export default ScoreWindow
+export default SimilarityMetricsWindow

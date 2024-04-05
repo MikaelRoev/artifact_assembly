@@ -1,8 +1,8 @@
-import React, {useRef, useContext, useEffect} from "react";
+import React, {useRef, useContext} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
-import ScoreWindow from "../../components/ScoreWindow/ScoreWindow";
+import SimilarityMetricsWindow from "../../components/SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
 import {SelectedElementsIndexContextProvider} from "../../contexts/SelectedElementsIndexContext";
@@ -45,7 +45,7 @@ const Canvas = () => {
                             <div className="stage-container">
                                 <NavBar stageRef={stageRef}/>
                                 <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                                {isScoreWindowOpen && <ScoreWindow/>}
+                                {isScoreWindowOpen && <SimilarityMetricsWindow/>}
                                 {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
                                 {isFilterWindowOpen && <FilterWindow/>}
                                 <ConfirmCloseModal/>
