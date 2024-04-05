@@ -329,7 +329,7 @@ const StageArea = ({stageRef, layerRef}) => {
 								key={index}
 								imageURL={image.imageUrl}
 								imageProps={image}
-								onSelect={(e) => handleElementClick(e, index)}
+								onClick={(e) => handleElementClick(e, index)}
 								onContextMenu={(e) => handleImageContextClick(e, index)}
 								onChange={(newImage) => {
 									newImages[index] = newImage;
