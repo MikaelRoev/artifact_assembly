@@ -1,19 +1,21 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import "./ScoreWindow.css"
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import ImageContext from "../../contexts/ImageContext";
 import {makeDraggable, makeResizable} from "../WindowFunctionality";
+import Histogram from "../Histogram/Histogram";
 
 
 /**
- * Creates a ScoreWindow element.
+ *
  * @returns {Element}
  * @constructor
  */
 const ScoreWindow = ({stageRef}) => {
 
-    const {isScoreWindowOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
     const {images} = useContext(ImageContext);
+    const contentRef = useRef(null);
 
     /**
      * UseEffect to make the scorewindow draggable on creation.
@@ -25,30 +27,6 @@ const ScoreWindow = ({stageRef}) => {
         const stage = stageRef.current;
         makeDraggable(element, dragFrom, stage);
     }, [stageRef]);
-
-
-    /**
-     * UseEffect to get the data from the images on the canvas and put it inside the score window.
-     */
-    useEffect(() => {
-
-        /**
-         * Adds the image data to the score window.
-         */
-        const appendImageData = () => {
-            const scoreWindowContent = document.querySelector('.window-content');
-            if (images.length > 0) {
-                scoreWindowContent.innerHTML = images.map(data => `ID: ${data.fileName}, Width: ${data.width}, 
-                Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)} Hue: ${data.hueValues.slice(0, 100).join('<br>')}`).join('<br>');
-
-            } else if (images.length === 0) {
-                scoreWindowContent.innerHTML = '';
-            }
-        }
-        if (isScoreWindowOpen) {
-            appendImageData();
-        }
-    }, [isScoreWindowOpen, images, images.length]);
 
     /**
      * UseEffect for resizing the window
@@ -76,7 +54,23 @@ const ScoreWindow = ({stageRef}) => {
                 <div className="window-top-left">Similarity Metrics Window</div>
                 <button className="square exit" onClick={() => setIsScoreWindowOpen(false)}></button>
             </div>
-            <div className="window-content"></div>
+            <div ref={contentRef} className="window-content">
+                { images.length > 0 &&
+                    images.map((image, i) => {
+                        const max = image.hueValues.reduce((acc, curr) => Math.max(acc, curr), -Infinity);
+                        const min = image.hueValues.reduce((acc, curr) => Math.min(acc, curr), Infinity);
+                        return <Histogram
+                            key={i}
+                            array={image.hueValues}
+                            widthProp={400}
+                            heightProp={300}
+                            binsProp={100}
+                            maxValue={max}
+                            minValue={min}
+                            maxTheoretical={359}
+                        />
+                })}
+            </div>
         </div>)
 }
 

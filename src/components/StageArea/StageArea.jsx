@@ -305,7 +305,9 @@ const StageArea = ({stageRef, layerRef}) => {
 					let hueValues = []
 					for (let i = 0; i < data.length; i += 4) {
 						let hsv = rgbToHsv(data[i], data[i + 1], data[i + 2]);
-						hueValues.push(hsv[0]*360);
+						if (hsv[0] > 0) {
+							hueValues.push(hsv[0]*360);
+						}
 					}
 					resolve(hueValues);
 				}

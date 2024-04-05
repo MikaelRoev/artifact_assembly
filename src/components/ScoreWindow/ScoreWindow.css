@@ -2,9 +2,9 @@
     position: fixed;
     display: flex;
     flex-direction: column;
-    width: 400px;
+    width: fit-content;
     min-width: 400px;
-    height: 250px;
+    height: 350px;
     min-height: 250px;
     border-radius: 10px;
     overflow: hidden;
