@@ -3,9 +3,13 @@ import {createRoot} from "react-dom/client";
 import "./index.css";
 import App from "./App";
 
-const root = createRoot(document.getElementById("root"));
-root.render(
-	<React.StrictMode>
-		<App />
-	</React.StrictMode>
+/**
+ * The root of the application.
+ * @type {Root}
+ */
+const Root = createRoot(document.getElementById("Root"));
+Root.render(
+    <React.StrictMode>
+        <App/>
+    </React.StrictMode>
 );
