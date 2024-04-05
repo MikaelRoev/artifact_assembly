@@ -1,12 +1,25 @@
 import {createContext, useContext, useState} from "react";
 
+/**
+ * The context for the close confirmation modal.
+ * @type {React.Context<null>}
+ */
 const ConfirmCloseModalContext = createContext(null);
 
+/**
+ * The context provider for the close confirmation modal context.
+ * @param children the children that can use the context.
+ * @return {JSX.Element} the context provider.
+ * @constructor
+ */
 export const ConfirmCloseModalContextProvider = ({children}) => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [onSave, setOnSave] = useState(() => () => {});
-    const [onDoNotSave, setOnDoNotSave] = useState(() => () => {});
-    const [onCancel, setOnCancel] = useState(() => () => {});
+    const [onSave, setOnSave] = useState(() => () => {
+    });
+    const [onDoNotSave, setOnDoNotSave] = useState(() => () => {
+    });
+    const [onCancel, setOnCancel] = useState(() => () => {
+    });
 
     const valueProp = {
         isConfirmModalOpen, setIsConfirmModalOpen,
@@ -22,6 +35,11 @@ export const ConfirmCloseModalContextProvider = ({children}) => {
     );
 }
 
+/**
+ * Component that represents the close confirmation modal.
+ * @return {JSX.Element} the modal.
+ * @constructor
+ */
 export const ConfirmCloseModal = () => {
     const {
         isConfirmModalOpen, setIsConfirmModalOpen,
