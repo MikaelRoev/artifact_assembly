@@ -4,6 +4,7 @@ import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import ImageContext from "../../contexts/ImageContext";
 import {makeDraggable, makeResizable} from "../WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
+import async from "async";
 
 
 /**
@@ -57,19 +58,23 @@ const ScoreWindow = ({stageRef}) => {
             <div ref={contentRef} className="window-content">
                 { images.length > 0 &&
                     images.map((image, i) => {
-                        const max = image.hueValues.reduce((acc, curr) => Math.max(acc, curr), -Infinity);
-                        const min = image.hueValues.reduce((acc, curr) => Math.min(acc, curr), Infinity);
-                        return <Histogram
-                            key={i}
-                            array={image.hueValues}
-                            widthProp={400}
-                            heightProp={300}
-                            binsProp={100}
-                            maxValue={max}
-                            minValue={min}
-                            maxTheoretical={359}
-                        />
-                })}
+                        if (image.hueValues) {
+                            const max = image.hueValues.reduce((acc, curr) => Math.max(acc, curr), -Infinity);
+                            const min = image.hueValues.reduce((acc, curr) => Math.min(acc, curr), Infinity);
+                            return <Histogram
+                                key={i}
+                                array={image.hueValues}
+                                widthProp={400}
+                                heightProp={300}
+                                binsProp={100}
+                                maxValue={max}
+                                minValue={min}
+                                maxTheoretical={359}
+                            />
+                        }
+                    })}
+                {images.length > 0 && contentRef.current && !contentRef.current.textContent.trim() &&
+                    <p>Info.<br/>The window needs to be reloaded <br/>when a new fragment is uploaded</p>}
             </div>
         </div>)
 }
