@@ -306,13 +306,13 @@ const FilterWindow = () => {
                 <div className={"bottomButtons"}>
                     <button
                         onClick={resetFilter}>
-                        Reset all
+                        Reset Filters
                     </button>
                     <button
                         onClick={() => {
                             setFilterEnabled((prevFilter) => !prevFilter);
                         }}>
-                        {!filterEnabled ? "Enable Filter" : "Disable Filter"}
+                        {!filterEnabled ? "Enable Filters" : "Disable Filters"}
                     </button>
                 </div>
 
