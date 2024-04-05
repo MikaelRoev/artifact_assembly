@@ -21,8 +21,8 @@ import {
  * @constructor
  */
 const Canvas = () => {
-    const stageRef = useRef(null);
-    const layerRef = useRef(null);
+    const stageRef = useRef();
+    const layerRef = useRef();
     const {isScoreWindowOpen, isDialogOpen, setIsDialogOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
 
     /**
