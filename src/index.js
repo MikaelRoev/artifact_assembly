@@ -7,7 +7,7 @@ import App from "./App";
  * The root of the application.
  * @type {Root}
  */
-const Root = createRoot(document.getElementById("Root"));
+const Root = createRoot(document.getElementById("root"));
 Root.render(
     <React.StrictMode>
         <App/>
