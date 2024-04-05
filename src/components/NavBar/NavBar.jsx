@@ -10,9 +10,9 @@ import {useNavigate} from "react-router-dom";
 import ConfirmCloseModalContext from "../ConfirmCloseModal";
 
 /**
- * Creates a navigation bar that is at the top of the project page.
- * @param stageRef Reference to the canvas stage
- * @returns {Element}
+ * Component for the navigation bar that is at the top of the canvas page.
+ * @param stageRef Reference to the canvas stage in the canvas page.
+ * @returns {JSX.Element} the navigation bar.
  * @constructor
  */
 const NavBar = ({stageRef}) => {
@@ -24,7 +24,8 @@ const NavBar = ({stageRef}) => {
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
-    const {setIsConfirmModalOpen,
+    const {
+        setIsConfirmModalOpen,
         setOnSave,
         setOnDoNotSave
     } = useContext(ConfirmCloseModalContext);
@@ -36,8 +37,9 @@ const NavBar = ({stageRef}) => {
     /**
      * Checks if there is an image at the position.
      * @param position {{x: number, y: number}} the position to check.
-     * @return {boolean} true if there are at least one image at the position,
-     * false if there are no images at the position.
+     * @return {boolean}
+     *  true if there are at least one image at the position,
+     *  false if there are no images at the position.
      */
     const isAnyImageAtPosition = (position) => {
         return images.some((image) => {
@@ -59,7 +61,7 @@ const NavBar = ({stageRef}) => {
     }
 
     /**
-     * Handles uploading of an image.
+     * Asynchronous function for uploading of an image.
      * @returns {Promise<void>}
      */
     const handleImageUpload = async () => {
@@ -94,6 +96,9 @@ const NavBar = ({stageRef}) => {
         handleFileButtonClick()
     };
 
+    /**
+     * Clocks the canvas.
+     */
     const handleLockCanvasClick = () => {
         setIsLocked((prevLock) => !prevLock);
         handleToolsButtonClick();
@@ -230,7 +235,7 @@ const NavBar = ({stageRef}) => {
                                                 .catch(() => {
                                                 });
                                         }}>
-                                    Open Project
+                                        Open Project
                                     </button>
                                 </li>
                                 <li>
