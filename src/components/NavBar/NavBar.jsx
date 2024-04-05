@@ -35,6 +35,14 @@ const NavBar = ({stageRef}) => {
     const offset = 50;
 
     /**
+     * Closes the project and returns to the landing page.
+     */
+    const goToLandingPage = () => {
+        setImages([]);
+        navigate('/');
+    }
+
+    /**
      * Checks if there is an image at the position.
      * @param position {{x: number, y: number}} the position to check.
      * @return {boolean}
@@ -258,11 +266,11 @@ const NavBar = ({stageRef}) => {
                                                 setFileDropdownVisible(false);
                                                 setOnSave(() => () => {
                                                     saveProjectDialog(project, setProject, images)
-                                                        .then(() => navigate("/"))
+                                                        .then(goToLandingPage)
                                                         .catch(() => {
                                                         })
                                                 });
-                                                setOnDoNotSave(() => () => navigate("/"));
+                                                setOnDoNotSave(() => goToLandingPage());
                                                 setIsConfirmModalOpen(true);
                                             }}>
                                         Close Project
