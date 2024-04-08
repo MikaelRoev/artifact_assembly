@@ -5,9 +5,9 @@ import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
+import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
 import "./NavBar.css";
 
 /**
@@ -24,8 +24,8 @@ const NavBar = ({stageRef}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
-    const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
+    const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
+    const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {
         setIsConfirmModalOpen,
         setOnSave,
@@ -161,8 +161,8 @@ const NavBar = ({stageRef}) => {
      * @returns Void
      */
     const handleOpenScoreWindow = async () => {
-        setIsScoreWindowOpen(true);
-        handleToolsButtonClick()
+        setIsSimilarityMetricsWindowOpen(true);
+        handleToolsButtonClick();
     };
 
     /**

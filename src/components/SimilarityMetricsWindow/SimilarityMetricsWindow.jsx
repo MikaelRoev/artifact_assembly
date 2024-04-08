@@ -1,7 +1,36 @@
-import React, {useContext, useEffect} from 'react';
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import ImageContext from "../../contexts/ImageContext";
 import "./SimilarityMetricsWindow.css"
+
+/**
+ * The context for the similarity metrics window.
+ * @type {React.Context<null>}
+ */
+export const SimilarityMetricsWindowContext = createContext(null);
+
+/**
+ * The context provider for the similarity metrics window context.
+ * @param children the children that can use the context.
+ * @return {JSX.Element} the context provider.
+ * @constructor
+ */
+export const SimilarityMetricsWindowContextProvider = ({children}) => {
+    const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
+    const {images} = useContext(ImageContext);
+
+    useEffect(() => {
+        if (images.length === 0) setIsSimilarityMetricsWindowOpen(false);
+    }, [images.length]);
+
+    return (
+        <SimilarityMetricsWindowContext.Provider value={{
+            isSimilarityMetricsWindowOpen,
+            setIsSimilarityMetricsWindowOpen
+        }}>
+            {children}
+        </SimilarityMetricsWindowContext.Provider>
+    )
+}
 
 /**
  * Component that represents a window that shows similarity metrics of the selected images.
@@ -9,8 +38,10 @@ import "./SimilarityMetricsWindow.css"
  * @constructor
  */
 const SimilarityMetricsWindow = () => {
-
-    const {isScoreWindowOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {
+        isSimilarityMetricsWindowOpen,
+        setIsSimilarityMetricsWindowOpen
+    } = useContext(SimilarityMetricsWindowContext);
     const {images} = useContext(ImageContext);
 
     /**
@@ -26,7 +57,7 @@ const SimilarityMetricsWindow = () => {
             // Initiating position variables.
             let currentPosX = 0, currentPosY = 0, previousPosX = 0, previousPosY = 0;
             // Sets onmousedown attribute to use the dragMouseDown function
-            element.querySelector('.window-top').onmousedown = dragMouseDown;
+            if (isSimilarityMetricsWindowOpen) element.querySelector('.window-top').onmousedown = dragMouseDown;
 
             /**
              * Function to handle pressing the top element and moving it.
@@ -82,22 +113,27 @@ const SimilarityMetricsWindow = () => {
         const appendImageData = () => {
             const scoreWindowContent = document.querySelector('.window-content');
             if (images.length > 0) {
-                scoreWindowContent.innerHTML = images.map(data => `ID: ${data.fileName}, Width: ${data.width}, 
-                Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)}`).join('<br>');
+                scoreWindowContent.innerHTML = images.map(data =>
+                    `ID: ${data.fileName}, 
+                    Width: ${data.width}, 
+                    Height: ${data.height}, 
+                    Position: ${data.x.toFixed(0)} 
+                    ${data.y.toFixed(0)}`).join('<br>');
 
             } else if (images.length === 0) {
                 scoreWindowContent.innerHTML = '';
             }
         }
-        if (isScoreWindowOpen) {
+        if (isSimilarityMetricsWindowOpen) {
             appendImageData();
         }
-    }, [isScoreWindowOpen, images, images.length]);
+    }, [isSimilarityMetricsWindowOpen, images, images.length]);
 
     /**
      * Resizes the window.
      */
     useEffect(() => {
+        if (!isSimilarityMetricsWindowOpen) return;
         const resizable = document.getElementById('scoreWindow');
         let isResizing = false;
         let startX, startY, startWidth, startHeight, direction;
@@ -129,7 +165,7 @@ const SimilarityMetricsWindow = () => {
 
         /**
          * Starts the drag event.
-         * @param e{MouseEvent}
+         * @param e {MouseEvent}
          */
         function doDrag(e) {
             if (!isResizing) return;
@@ -201,13 +237,14 @@ const SimilarityMetricsWindow = () => {
     }, []);
 
     return (
+        isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
             <div className="window-top">
                 <div className="window-top-left">Similarity Metrics Window</div>
-                <button className="square exit" onClick={() => setIsScoreWindowOpen(false)}></button>
+                <button className="square exit" onClick={() => setIsSimilarityMetricsWindowOpen(false)}></button>
             </div>
             <div className="window-content"></div>
         </div>)
 }
 
-export default SimilarityMetricsWindow
+export default SimilarityMetricsWindow;
