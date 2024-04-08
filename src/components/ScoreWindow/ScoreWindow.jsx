@@ -75,11 +75,14 @@ const ScoreWindow = ({stageRef}) => {
     return (
         <div id="scoreWindow" className="window">
             <div className="window-top">
-                <div className="window-top-left">Similarity Metrics Window <button className={"updateButton"} onClick={updateHistograms}>Update</button></div>
+                <div className="window-top-left">Similarity Metrics Window</div>
                 <button className="square exit" onClick={() => setIsScoreWindowOpen(false)}></button>
             </div>
+            <div className={"options-container"}>
+                <button className={"updateButton"} onClick={updateHistograms}>⟳</button>
+            </div>
             <div ref={contentRef} className="window-content">
-                {images.length > 0 && update &&
+            {images.length > 0 && update &&
                     selectedElementsIndex.map((index) => {
                         const image = images[index];
                         if (image.hueValues) {

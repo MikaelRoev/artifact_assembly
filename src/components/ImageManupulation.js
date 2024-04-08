@@ -32,14 +32,11 @@ export const getHueData = (imageDataURL) => {
             const data = imageData.data;
 
             let hueValues = []
-            let count = 0
             for (let i = 0; i < data.length; i += 4) {
 
                 if (!(data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0 && data[i + 3] === 0)) {
                     let hsv = rgbToHsv(data[i], data[i + 1], data[i + 2]);
-                    hueValues.push(hsv[0] * 360);
-                } else {
-                    count++
+                    hueValues.push(hsv[0]*360);
                 }
             }
             resolve(hueValues);
