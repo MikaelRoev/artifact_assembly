@@ -5,7 +5,7 @@ import React, {createContext, useContext, useState} from "react";
  * The context for the close confirmation modal.
  * @type {React.Context<null>}
  */
-const ConfirmCloseModalContext = createContext(null);
+export const ConfirmCloseModalContext = createContext(null);
 
 /**
  * The context provider for the close confirmation modal context.
@@ -41,7 +41,7 @@ export const ConfirmCloseModalContextProvider = ({children}) => {
  * @return {JSX.Element} the modal.
  * @constructor
  */
-export const ConfirmCloseModal = () => {
+const ConfirmCloseModal = () => {
     const {
         isConfirmModalOpen, setIsConfirmModalOpen,
         onSave,
@@ -84,4 +84,4 @@ export const ConfirmCloseModal = () => {
     );
 }
 
-export default ConfirmCloseModalContext;
+export default ConfirmCloseModal;

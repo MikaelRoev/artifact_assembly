@@ -23,7 +23,7 @@ export const WindowModalOpenContextProvider = ({children}) => {
     useEffect(() => {
         if (images.length === 0) {
             setIsScoreWindowOpen(false);
-            setIsFilterWindowOpen(false)
+            setIsFilterWindowOpen(false);
         }
     }, [images.length]);
 

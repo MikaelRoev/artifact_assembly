@@ -6,7 +6,8 @@ import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import ConfirmCloseModalContext from "../ConfirmCloseModal/ConfirmCloseModal";
+import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
+import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import "./NavBar.css";
 
 /**

@@ -5,7 +5,10 @@ import NavBar from "../../components/NavBar/NavBar";
 import SimilarityMetricsWindow from "../../components/SimilarityMetricsWindow/SimilarityMetricsWindow";
 import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
-import {ConfirmCloseModal, ConfirmCloseModalContextProvider} from "../../components/ConfirmCloseModal/ConfirmCloseModal";
+import ExportImageModal, {ExportImageModalContextProvider} from "../../components/ExportImageModal/ExportImageModal";
+import ConfirmCloseModal, {
+    ConfirmCloseModalContextProvider
+} from "../../components/ConfirmCloseModal/ConfirmCloseModal";
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
 import {SelectContextProvider} from "../../contexts/SelectContext";
