@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import "./FilterForm.css";
 
 /**
@@ -20,7 +20,7 @@ import "./FilterForm.css";
  * @constructor
  */
 const FilterForm = ({label, min, max, step, value, setValue, id}) => {
-    const {setIsFilterInteracting} = useContext(WindowModalOpenContext);
+    const {setIsFilterInteracting} = useContext(FilterInteractionContext);
 
     return (
         <div className="form-group" id={id}>

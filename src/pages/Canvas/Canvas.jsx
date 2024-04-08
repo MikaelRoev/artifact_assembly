@@ -14,6 +14,7 @@ import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext"
 import {SelectContextProvider} from "../../contexts/SelectContext";
 import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 import "./Canvas.css";
+import {FilterInteractionContextProvider} from "../../contexts/FilterInteractionContext";
 
 /**
  * Component that represents the canvas page.
@@ -33,14 +34,16 @@ const Canvas = () => {
                             <ExportImageModalContextProvider>
                                 <FilterWindowContextProvider>
                                     <SimilarityMetricsWindowContextProvider>
-                                        <div className="stage-container">
-                                            <NavBar stageRef={stageRef}/>
-                                            <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                                            <SimilarityMetricsWindow/>
-                                            <ExportImageModal stageRef={stageRef}/>
-                                            <FilterWindow/>
-                                            <ConfirmCloseModal/>
-                                        </div>
+                                        <FilterInteractionContextProvider>
+                                            <div className="stage-container">
+                                                <NavBar stageRef={stageRef}/>
+                                                <StageArea stageRef={stageRef} layerRef={layerRef}/>
+                                                <SimilarityMetricsWindow/>
+                                                <ExportImageModal stageRef={stageRef}/>
+                                                <FilterWindow/>
+                                                <ConfirmCloseModal/>
+                                            </div>
+                                        </FilterInteractionContextProvider>
                                     </SimilarityMetricsWindowContextProvider>
                                 </FilterWindowContextProvider>
                             </ExportImageModalContextProvider>

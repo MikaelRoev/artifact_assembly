@@ -7,7 +7,7 @@ import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
 import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 
 /**
@@ -36,7 +36,7 @@ const StageArea = ({stageRef, layerRef}) => {
     const {project, setProject} = useContext(ProjectContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {setFilterImageIndex} = useContext(ImageFilterContext);
-    const {isFilterInteracting} = useContext(WindowModalOpenContext);
+    const {isFilterInteracting} = useContext(FilterInteractionContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
 
     const zoomScale = 1.17; //How much zoom each time
