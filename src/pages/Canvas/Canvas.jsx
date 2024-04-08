@@ -1,9 +1,7 @@
 import React, {useRef, useContext} from "react";
-import {exportCanvasAsImageDialog} from "../../util/FileHandling";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import SimilarityMetricsWindow from "../../components/SimilarityMetricsWindow/SimilarityMetricsWindow";
-import ExportImageModal from "../../components/ExportImageModal/ExportImageModal";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
 import ExportImageModal, {ExportImageModalContextProvider} from "../../components/ExportImageModal/ExportImageModal";
 import ConfirmCloseModal, {
@@ -24,18 +22,7 @@ import "./Canvas.css";
 const Canvas = () => {
     const stageRef = useRef();
     const layerRef = useRef();
-    const {isScoreWindowOpen, isDialogOpen, setIsDialogOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
-
-    /**
-     * Gets the canvas as DataURL and send it to the export canvas as image dialog.
-     * @param number {number} the scaling factor of the canvas.
-     */
-    function handleSave(number) {
-        let image = stageRef.current.toDataURL({pixelRatio: number});
-        exportCanvasAsImageDialog(image)
-            .then(() => setIsDialogOpen(false))
-            .catch(() => setIsDialogOpen(false))
-    }
+    const {isScoreWindowOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
 
     return (
         <FilterEnabledContextProvider>
@@ -43,14 +30,16 @@ const Canvas = () => {
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
                         <ConfirmCloseModalContextProvider>
-                            <div className="stage-container">
-                                <NavBar stageRef={stageRef}/>
-                                <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                                {isScoreWindowOpen && <SimilarityMetricsWindow/>}
-                                {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
-                                {isFilterWindowOpen && <FilterWindow/>}
-                                <ConfirmCloseModal/>
-                            </div>
+                            <ExportImageModalContextProvider>
+                                <div className="stage-container">
+                                    <NavBar stageRef={stageRef}/>
+                                    <StageArea stageRef={stageRef} layerRef={layerRef}/>
+                                    {isScoreWindowOpen && <SimilarityMetricsWindow/>}
+                                    <ExportImageModal stageRef={stageRef}/>
+                                    {isFilterWindowOpen && <FilterWindow/>}
+                                    <ConfirmCloseModal/>
+                                </div>
+                            </ExportImageModalContextProvider>
                         </ConfirmCloseModalContextProvider>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>

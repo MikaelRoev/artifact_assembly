@@ -24,7 +24,8 @@ const NavBar = ({stageRef}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {
         setIsConfirmModalOpen,
         setOnSave,
@@ -151,7 +152,7 @@ const NavBar = ({stageRef}) => {
      * Function to handle exporting an image of the canvas
      */
     const handleImageOfCanvasExport = () => {
-        setIsDialogOpen(true);
+        setIsExportImageModalOpen(true);
         handleFileButtonClick()
     }
 

@@ -1,5 +1,5 @@
-import "./ExportImageModal.css"
 import React, {createContext, useContext, useState} from "react";
+import "../ExportImageModal/ExportImageModal.css"
 
 /**
  * The context for the close confirmation modal.

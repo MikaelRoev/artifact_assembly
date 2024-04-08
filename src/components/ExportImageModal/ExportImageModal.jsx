@@ -1,24 +1,49 @@
-import React, {useContext, useState} from "react";
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import React, {createContext, useContext, useState} from "react";
 import "./ExportImageModal.css"
+import {exportCanvasAsImageDialog} from "../../util/FileHandling";
+
+/**
+ * The context for the export image modal.
+ * @type {React.Context<null>}
+ */
+export const ExportImageModalContext = createContext(null);
+
+/**
+ * The context provider for the export image modal context.
+ * @param children the children that can use the context.
+ * @return {JSX.Element} the context provider.
+ * @constructor
+ */
+export const ExportImageModalContextProvider = ({children}) => {
+    const [isExportImageModalOpen, setIsExportImageModalOpen] = useState(false);
+
+    return (
+        <ExportImageModalContext.Provider value={{isExportImageModalOpen, setIsExportImageModalOpen}}>
+            {children}
+        </ExportImageModalContext.Provider>
+    )
+}
 
 /**
  * Component that is a dialog modal that will show up when the export image button is pressed in the file dropdown menu.
- * @param onSave {function(number): void} Function to send number up to parent when pressing save.
+ * @param stageRef {MutableRefObject} the reference to the konva stage in the stage area.
  * @returns {JSX.Element} the dialog modal.
  * @constructor
  */
-const ExportImageModal = ({onSave}) => {
+const ExportImageModal = ({stageRef}) => {
     const [number, setNumber] = useState(1);
     const [isInfoVisible, setIsInfoVisible] = useState(false);
-    const {setIsDialogOpen} = useContext(WindowModalOpenContext);
+    const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
 
     /**
-     * Function to send number to parent and close the modal.
+     * Gets the canvas as DataURL and send it to the export canvas as image dialog.
      */
-    const handleSave = () => {
-        onSave(number);
-        setIsDialogOpen(false);
+    function handleSave() {
+        let image = stageRef.current.toDataURL({pixelRatio: number});
+        exportCanvasAsImageDialog(image)
+            .then(() => setIsExportImageModalOpen(false))
+            .catch(() => setIsExportImageModalOpen(false));
+        setIsExportImageModalOpen(false);
     }
 
     /**
@@ -29,6 +54,7 @@ const ExportImageModal = ({onSave}) => {
     }
 
     return (
+        isExportImageModalOpen &&
         <div className={"exportModal"} id={"exportImageDialog"}>
             <div className={"modalContent"}>
                 <div className={"modalMainInfo"}>
@@ -55,7 +81,7 @@ const ExportImageModal = ({onSave}) => {
                 />
                 <div className={"modalButtonDiv"}>
                     <button className={"modalButton"} onClick={handleSave}>Open save window</button>
-                    <button className={"modalButton"} onClick={() => setIsDialogOpen(false)}>Cancel</button>
+                    <button className={"modalButton"} onClick={() => setIsExportImageModalOpen(false)}>Cancel</button>
                 </div>
             </div>
         </div>
