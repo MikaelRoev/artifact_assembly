@@ -8,12 +8,10 @@ import * as d3 from "d3";
  * @param heightProp The height of the histogram
  * @param binsProp The number of bins the histogram will have
  * @param maxValue The maximum value of the array. Used to cut of the histogram at that value
- * @param maxTheoretical The theoretical maximum value. Default = maxValue. Used to indicate what the maximum could be if there is no such value
- * @param minValue The minimum value of the histogram. Default = 0
  * @returns {JSX.Element}
  * @constructor
  */
-const Histogram = ({array, widthProp, heightProp, binsProp, maxValue, maxTheoretical = maxValue, minValue = 0}) => {
+const Histogram = ({array, widthProp, heightProp, binsProp, maxValue}) => {
     const d3Container = useRef(null);
 
     /**
@@ -25,12 +23,12 @@ const Histogram = ({array, widthProp, heightProp, binsProp, maxValue, maxTheoret
 
             svg.selectAll("*").remove();
 
-            const margin = {top: 20, right: 40, bottom: 90, left: 60},
+            const margin = {top: 20, right: 20, bottom: 50, left: 60},
                 width = widthProp - margin.left - margin.right,
                 height = heightProp - margin.top - margin.bottom;
 
             const x = d3.scaleLinear()
-                .domain([minValue, maxValue])
+                .domain([0, maxValue])
                 .range([0, width])
 
             const bins = d3.histogram()
@@ -70,35 +68,6 @@ const Histogram = ({array, widthProp, heightProp, binsProp, maxValue, maxTheoret
                 .style("text-anchor", "middle")
                 .text("Pixel count");
 
-            if (minValue > 1 || maxTheoretical - maxValue > 1) {
-                g.append("text")
-                    .attr("transform", `translate(${width / 2}, ${height + margin.top + 40})`)
-                    .style("text-anchor", "middle")
-                    .text(`x-axis has been compressed to [${minValue.toFixed(0)}, ${maxValue.toFixed(0)}]`);
-            }
-
-            if (minValue > 1) {
-                // Start of the X-axis
-                g.append("text")
-                    .attr("x", x(minValue) - 10)
-                    .attr("y", height + margin.top + 10)
-                    .style("text-anchor", "middle")
-                    .style("font-size", "11px")
-                    .style("font-family", "sans-serif")
-                    .text(`0~${minValue.toFixed(0)}`);
-            }
-
-            if (maxTheoretical - maxValue > 1) {
-                // End of the X-axis
-                g.append("text")
-                    .attr("x", x(maxValue) + 10)
-                    .attr("y", height + margin.top + 10)
-                    .style("text-anchor", "middle")
-                    .style("font-size", "11px")
-                    .style("font-family", "sans-serif")
-                    .text(`${maxValue.toFixed(0)}~${maxTheoretical}`);
-            }
-
             g.append("g")
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x));
@@ -107,7 +76,7 @@ const Histogram = ({array, widthProp, heightProp, binsProp, maxValue, maxTheoret
             g.append("g")
                 .call(d3.axisLeft(y));
         }
-    }, [array, widthProp, heightProp, binsProp, maxValue, minValue, maxTheoretical]);
+    }, [array, widthProp, heightProp, binsProp, maxValue]);
 
     return (
         <svg

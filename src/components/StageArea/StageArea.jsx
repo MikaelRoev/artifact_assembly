@@ -8,6 +8,7 @@ import ImageContext from "../../contexts/ImageContext";
 import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import {getHueData} from "../ImageManupulation";
 
 /**
  * Creates the canvas area in the project page.
@@ -269,53 +270,6 @@ const StageArea = ({stageRef, layerRef}) => {
 	 * useEffect for updating image dimensions
 	 */
 	useEffect(() => {
-		function rgbToHsv(r, g, b) {
-			r /= 255; g /= 255; b /= 255;
-			let max = Math.max(r, g, b), min = Math.min(r, g, b);
-			let h, s, v = max;
-
-			let d = max - min;
-			s = max === 0 ? 0 : d / max;
-
-			if(max === min){
-				h = 0; // achromatic
-			} else {
-				switch(max){
-					case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-					case g: h = (b - r) / d + 2; break;
-					case b: h = (r - g) / d + 4; break;
-				}
-				h /= 6;
-			}
-			return [h, s, v];
-		}
-
-		const getHueData = (imageDataURL) => {
-			return new Promise((resolve, reject) => {
-				const image = new Image();
-				image.onload = () => {
-					const canvas = document.createElement('canvas');
-					const ctx = canvas.getContext('2d', { willReadFrequently: true });
-					canvas.width = image.width;
-					canvas.height = image.height;
-					ctx.drawImage(image, 0, 0);
-					const imageData = ctx.getImageData(0, 0, image.width, image.height);
-					const data = imageData.data;
-
-					let hueValues = []
-					for (let i = 0; i < data.length; i += 4) {
-						let hsv = rgbToHsv(data[i], data[i + 1], data[i + 2]);
-						if (hsv[0] > 0) {
-							hueValues.push(hsv[0]*360);
-						}
-					}
-					resolve(hueValues);
-				}
-				image.onerror = reject;
-				image.crossOrigin = 'anonymous';
-				image.src = imageDataURL;
-			})
-		}
 
 		/**
 		 * Sets the width and height of images that does not have them yet.
@@ -327,7 +281,7 @@ const StageArea = ({stageRef, layerRef}) => {
 			for (const imageNode of imageNodes) {
 				for (const image of images) {
 					const index = images.indexOf(image);
-					if (imageNode.attrs.fileName === image.fileName) {
+					if (imageNode.attrs.id === image.id) {
 						const hueValues = await getHueData(imageNode.toDataURL());
 						images[index] = {
 							...image,
@@ -376,6 +330,7 @@ const StageArea = ({stageRef, layerRef}) => {
 						return (
 							<ImageNode
 								key={index}
+								id={image.id}
 								imageURL={image.imageUrl}
 								imageProps={image}
 								onSelect={(e) => handleElementClick(e, index)}

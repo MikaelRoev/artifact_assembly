@@ -70,3 +70,15 @@
     cursor: pointer;
     background-color: red;
 }
+
+.histogram-container {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    margin-block: 10px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
+}
+
+.histogram-container img {
+    align-self: flex-start;
+}

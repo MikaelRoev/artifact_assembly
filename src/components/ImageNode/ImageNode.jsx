@@ -18,7 +18,8 @@ const ImageNode = ({
 	imageProps,
 	onSelect,
 	onChange,
-	onContextMenu
+	onContextMenu,
+	id
 }) => {
 	const imageRef = useRef();
 
@@ -76,6 +77,7 @@ const ImageNode = ({
 		<KonvaImage
 			{...imageProps}
 			ref={imageRef}
+			id={id}
 			filters={handleFilter()}
 			image={image}
 			onClick={onSelect}

@@ -65,6 +65,7 @@ const NavBar = ({stageRef}) => {
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
+            let idAdder = 0 //For when multiple images are loaded at the same time
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
@@ -73,9 +74,11 @@ const NavBar = ({stageRef}) => {
                     filePath: file,
                     x: position.x,
                     y: position.y,
+                    id: Date.now()+idAdder.toString(),
                     // rotation?
                     // Other properties for the `shapeProps` object
                 };
+                idAdder++
                 position.x += offset;
                 position.y += offset;
                 return newImage
