@@ -2,7 +2,7 @@ import React, {useRef, useContext} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import SimilarityMetricsWindow from "../../components/SimilarityMetricsWindow/SimilarityMetricsWindow";
-import FilterWindow from "../../components/FilterWindow/FilterWindow";
+import FilterWindow, {FilterWindowContextProvider} from "../../components/FilterWindow/FilterWindow";
 import ExportImageModal, {ExportImageModalContextProvider} from "../../components/ExportImageModal/ExportImageModal";
 import ConfirmCloseModal, {
     ConfirmCloseModalContextProvider
@@ -22,7 +22,7 @@ import "./Canvas.css";
 const Canvas = () => {
     const stageRef = useRef();
     const layerRef = useRef();
-    const {isScoreWindowOpen, isFilterWindowOpen} = useContext(WindowModalOpenContext)
+    const {isScoreWindowOpen} = useContext(WindowModalOpenContext);
 
     return (
         <FilterEnabledContextProvider>
@@ -31,14 +31,16 @@ const Canvas = () => {
                     <ImageFilterContextProvider>
                         <ConfirmCloseModalContextProvider>
                             <ExportImageModalContextProvider>
-                                <div className="stage-container">
-                                    <NavBar stageRef={stageRef}/>
-                                    <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                                    {isScoreWindowOpen && <SimilarityMetricsWindow/>}
-                                    <ExportImageModal stageRef={stageRef}/>
-                                    {isFilterWindowOpen && <FilterWindow/>}
-                                    <ConfirmCloseModal/>
-                                </div>
+                                <FilterWindowContextProvider>
+                                    <div className="stage-container">
+                                        <NavBar stageRef={stageRef}/>
+                                        <StageArea stageRef={stageRef} layerRef={layerRef}/>
+                                        {isScoreWindowOpen && <SimilarityMetricsWindow/>}
+                                        <ExportImageModal stageRef={stageRef}/>
+                                        <FilterWindow/>
+                                        <ConfirmCloseModal/>
+                                    </div>
+                                </FilterWindowContextProvider>
                             </ExportImageModalContextProvider>
                         </ConfirmCloseModalContextProvider>
                     </ImageFilterContextProvider>

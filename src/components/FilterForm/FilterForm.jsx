@@ -48,7 +48,7 @@ const FilterForm = ({label, min, max, step, value, setValue, id}) => {
             />
             <button
                 className="resetButton"
-                onClick={() => setValue(0, false)}>
+                onClick={() => setValue('0', false)}>
                 Reset
             </button>
         </div>

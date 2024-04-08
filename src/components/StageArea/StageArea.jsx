@@ -8,6 +8,7 @@ import ImageContext from "../../contexts/ImageContext";
 import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 
 /**
  * Component that represents the konva stage area in the canvas page.
@@ -35,7 +36,8 @@ const StageArea = ({stageRef, layerRef}) => {
     const {project, setProject} = useContext(ProjectContext);
     const {images, setImages, undo, redo} = useContext(ImageContext);
     const {setFilterImageIndex} = useContext(ImageFilterContext);
-    const {isFilterInteracting, setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+    const {isFilterInteracting} = useContext(WindowModalOpenContext);
+    const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
