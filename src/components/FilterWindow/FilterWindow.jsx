@@ -1,11 +1,11 @@
-import "./FilterWindow.css"
 import React, {useContext, useEffect} from "react";
 import FilterForm from "../FilterForm/FilterForm";
+import FilterToggle from "../FilterToggle/FilterToggle";
 import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import FilterToggle from "../FilterToggle/FilterToggle";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
+import "./FilterWindow.css"
 
 /**
  * Component representing the window containing the filters for an image.

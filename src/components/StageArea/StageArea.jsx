@@ -1,8 +1,8 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Layer, Stage, Transformer} from "react-konva";
+import {saveProjectDialog} from "../../util/FileHandling"
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
-import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
 import SelectContext from "../../contexts/SelectContext";

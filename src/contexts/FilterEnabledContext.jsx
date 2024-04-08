@@ -1,4 +1,4 @@
-import {createContext, useState} from "react";
+import React, {createContext, useState} from "react";
 
 /**
  * The filter context that allows for enabling or disabling the image filters.

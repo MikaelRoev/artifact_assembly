@@ -1,6 +1,6 @@
-import "./FilterForm.css";
-import {useContext} from "react";
+import React, {useContext} from "react";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import "./FilterForm.css";
 
 /**
  * Component that represents a filter form that asks the user for a filter value.

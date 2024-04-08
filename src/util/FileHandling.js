@@ -1,5 +1,5 @@
-import {invoke} from "@tauri-apps/api/tauri";
 import {dialog, fs} from "@tauri-apps/api";
+import {invoke} from "@tauri-apps/api/tauri";
 
 /**
  * Saves a string into a file.

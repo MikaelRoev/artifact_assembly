@@ -1,8 +1,7 @@
 import React, {useContext, useEffect} from 'react';
-import "./SimilarityMetricsWindow.css"
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import ImageContext from "../../contexts/ImageContext";
-
+import "./SimilarityMetricsWindow.css"
 
 /**
  * Component that represents a window that shows similarity metrics of the selected images.

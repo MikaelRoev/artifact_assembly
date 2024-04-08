@@ -1,4 +1,4 @@
-import {createContext, useState} from "react";
+import React, {createContext, useState} from "react";
 
 /**
  * The image filter context that allows for getting and setting index of the image to add filter to.

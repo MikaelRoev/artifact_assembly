@@ -1,13 +1,13 @@
 import React, {useContext, useEffect, useState} from "react";
-import "./NavBar.css";
+import {useNavigate} from "react-router-dom";
+import {open} from "@tauri-apps/api/dialog";
+import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
 import LockedContext from "../../contexts/LockedContext";
 import ImageContext from "../../contexts/ImageContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import {openProjectDialog, saveProjectDialog} from "../FileHandling";
-import {open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import {useNavigate} from "react-router-dom";
-import ConfirmCloseModalContext from "../ConfirmCloseModal";
+import ConfirmCloseModalContext from "../ConfirmCloseModal/ConfirmCloseModal";
+import "./NavBar.css";
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.

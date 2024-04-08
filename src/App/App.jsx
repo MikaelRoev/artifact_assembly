@@ -1,11 +1,11 @@
 import React from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import Canvas from "./pages/Canvas/Canvas";
-import LandingPage from "./pages/LandingPage/LandingPage";
+import Canvas from "../pages/Canvas/Canvas";
+import LandingPage from "../pages/LandingPage/LandingPage";
+import {ProjectContextProvider} from "../contexts/ProjectContext";
+import {ImageContextProvider} from "../contexts/ImageContext";
+import {WindowModalOpenContextProvider} from "../contexts/WindowModalOpenContext";
 import "./App.css";
-import {ProjectContextProvider} from "./contexts/ProjectContext";
-import {ImageContextProvider} from "./contexts/ImageContext";
-import {WindowModalOpenContextProvider} from "./contexts/WindowModalOpenContext";
 
 /**
  * The application component.

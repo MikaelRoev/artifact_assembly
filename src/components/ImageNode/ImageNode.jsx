@@ -1,9 +1,9 @@
+import React, {useContext, useRef, useEffect, useState} from "react";
 import Konva from "konva";
-import {useContext, useRef, useEffect, useState} from "react";
+import {convertFileSrc} from '@tauri-apps/api/tauri';
 import {Image as KonvaImage} from "react-konva";
 import useImage from "use-image";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
-import {convertFileSrc} from '@tauri-apps/api/tauri';
 
 /**
  * Component that represents a konva image object on the canvas.
@@ -48,7 +48,7 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu}) => {
 
     /**
      * Handles the filters on the image.
-     * @returns {Array<KonvaFilter>} an array of the filters or null.
+     * @returns {Array<Filter>} an array of the filters or null.
      */
     const handleFilters = () => {
         if (filterEnabled === true) {

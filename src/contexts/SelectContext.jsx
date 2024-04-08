@@ -1,4 +1,4 @@
-import {createContext, useState} from "react";
+import React, {createContext, useState} from "react";
 
 /**
  * The select context that allows for getting selected elements and indices lists,

@@ -1,4 +1,4 @@
-import {createContext, useState} from "react";
+import React, {createContext, useState} from "react";
 
 /**
  * The project context that allows the getting and setting of the current project's information.

@@ -1,11 +1,11 @@
 import React, {useContext} from "react";
-import ProjectList from "../../components/ProjectList/ProjectList";
-import "./LandingPage.css";
+import {useNavigate} from 'react-router-dom';
 import {appWindow} from "@tauri-apps/api/window";
-import {openProjectDialog} from "../../components/FileHandling";
+import {openProjectDialog} from "../../util/FileHandling";
+import ProjectList from "../../components/ProjectList/ProjectList";
 import ProjectContext from "../../contexts/ProjectContext";
 import ImageContext from "../../contexts/ImageContext";
-import {useNavigate} from 'react-router-dom';
+import "./LandingPage.css";
 
 /**
  * Creates the initial landing page of the application.

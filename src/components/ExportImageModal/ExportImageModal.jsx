@@ -1,6 +1,6 @@
-import {useContext, useState} from "react";
-import "./ExportImageModal.css"
+import React, {useContext, useState} from "react";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import "./ExportImageModal.css"
 
 /**
  * Component that is a dialog modal that will show up when the export image button is pressed in the file dropdown menu.
