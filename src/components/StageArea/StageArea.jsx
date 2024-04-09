@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Image, Group, Layer, Stage, Transformer} from "react-konva";
+import {Group, Layer, Stage, Transformer} from "react-konva";
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import {saveProjectDialog} from "../FileHandling"
@@ -44,7 +44,7 @@ const StageArea = ({stageRef, layerRef}) => {
         stage.scale({x: project.zoom, y: project.zoom});
         stage.batchDraw();
     }, [project, stageRef]);
-	let newImages = [...images];
+	let newImages = [...elements];
 
 	/**
 	 * Update the stage according to the project.
@@ -68,7 +68,7 @@ const StageArea = ({stageRef, layerRef}) => {
          * @param e the event.
          */
         const handleDeletePressed = (e) => {
-            if (e.key === "Delete" && selectedElementsIndex.length > 0) {
+            if (e.key === "Delete" && selectedElementsIndex.length > 0 && !isFilterInteracting) {
                 const newImages = elements.filter((image, index) => !selectedElementsIndex.includes(index));
                 setElements(newImages);
                 setSelectedElements([]);
@@ -79,24 +79,8 @@ const StageArea = ({stageRef, layerRef}) => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [elements, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setElements]);
-		/**
-	 	* Deletes the selected images if the delete key is pressed.
-	 	* @param e the event.
-		 */
-		const handleDeletePressed = (e) => {
-			if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0 && !isFilterInteracting) {
-				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
-				setImages(newImages);
-				setSelectedElements([]);
-				setSelectedElementsIndex([]);
-			}
-		};
-		document.addEventListener("keydown", handleDeletePressed);
-		return () => {
-			document.removeEventListener("keydown", handleDeletePressed);
-		};
-	}, [elements, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages, isFilterInteracting]);
+    }, [elements, selectedElements, setSelectedElements, selectedElementsIndex,
+        setSelectedElementsIndex, setElements, isFilterInteracting]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -328,8 +312,8 @@ const StageArea = ({stageRef, layerRef}) => {
 
                         );
                 }
-            }));
-
+            })
+        );
     }
 
     const renderImage = (image, index) => {
@@ -375,6 +359,45 @@ const StageArea = ({stageRef, layerRef}) => {
             </Group>
         );
     }
+    /**
+     * useEffect for updating image dimensions
+     */
+    useEffect(() => {
+        /**
+         * Sets the width and height of images that does not have them yet.
+         * @param imageNodes Image nodes on the canvas.
+         * @returns {Promise<void>}
+         */
+        const setImageDimensions = async (imageNodes) => {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            imageNodes.forEach(imageNode => {
+                if (!imageNode.attrs.width || !imageNode.attrs.height) {
+                    elements.forEach((image, index) => {
+                        if (imageNode.attrs.fileName === image.fileName) {
+                            elements[index] = {
+                                ...image,
+                                width: imageNode.width(),
+                                height: imageNode.height(),
+                            }
+
+                        }
+                    })
+                }
+            })
+        }
+
+        /**
+         * Checks if it is images on the canvas and only runs the function if there is
+         * an image that needs its width and height updated.
+         */
+        if (layerRef.current && elements.length > 0) {
+            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+                .filter((child) => !child.attrs.width);
+            if (imageNodes.length !== 0) {
+                setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
+            }
+        }
+    }, [elements.length, layerRef, elements]);
 
     /**
      * Returns a stage with a layer within.
@@ -411,99 +434,6 @@ const StageArea = ({stageRef, layerRef}) => {
             </Layer>
         </Stage>
     );
-
-	/**
-	 * useEffect for updating image dimensions
-	 */
-	useEffect(() => {
-		/**
-		 * Sets the width and height of images that does not have them yet.
-		 * @param imageNodes Image nodes on the canvas.
-		 * @returns {Promise<void>}
-		 */
-		const setImageDimensions = async (imageNodes) => {
-			await new Promise(resolve => setTimeout(resolve, 1000));
-			imageNodes.forEach(imageNode => {
-				if (!imageNode.attrs.width || !imageNode.attrs.height) {
-					images.forEach((image, index) => {
-						if (imageNode.attrs.fileName === image.fileName) {
-							images[index] = {
-								...image,
-								width: imageNode.width(),
-								height: imageNode.height(),
-							}
-
-						}
-					})
-				}
-			})
-		}
-
-		/**
-		 * Checks if it is images on the canvas and only runs the function if there is
-		 * an image that needs its width and height updated.
- 		 */
-		if (layerRef.current && images.length > 0) {
-			const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
-				.filter((child) => !child.attrs.width);
-			if (imageNodes.length !== 0) {
-				setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
-			}
-		}
-	}, [images.length, layerRef, images]);
-
-	/**
-	 * Returns a stage with a layer within.
-	 * Returns an imageNode and a transformer within the layer.
-	 */
-	return (
-		<Stage
-			width={window.innerWidth}
-			height={window.innerHeight}
-			draggable
-			className="stage"
-			onWheel={zoomStage}
-			onMouseDown={checkDeselect}
-			onTouchStart={checkDeselect}
-			ref={stageRef}>
-			<Layer
-				className="layer"
-				ref={layerRef}>
-				{ images.length > 0 &&
-					images.map((image, index) => {
-						return (
-							<ImageNode
-								key={index}
-								imageURL={image.imageUrl}
-								imageProps={image}
-								onSelect={(e) => handleElementClick(e, index)}
-								onContextMenu={(e) => handleImageContextClick(e, index)}
-								onChange={(newImage) => {
-									newImages[index] = newImage;
-									setImages(newImages);
-								}}
-							/>
-						);
-					})
-				}
-				{
-					selectedElements.length > 0 &&
-					<Transformer
-					ref={trRef}
-					boundBoxFunc={(oldBox, newBox) => {
-						// limit resize
-						if (newBox.width < 5 || newBox.height < 5) {
-							return oldBox;
-						}
-						return newBox;
-					}}
-					resizeEnabled={false}
-					rotateEnabled={!isLocked}
-					/>
-				}
-			</Layer>
-		</Stage>
-	);
 };
 
 export default StageArea;
