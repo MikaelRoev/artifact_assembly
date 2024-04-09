@@ -307,17 +307,20 @@ const StageArea = ({stageRef, layerRef}) => {
                 onContextMenu={e => handleImageContextClick(e, index)}
 
             >
-                {
-                    group.groupElements.map((groupElement, i) => {
-                        return (
-                            <ImageNode
-                                key={i}>
-
-                                imageProps={groupElement}
-                            </ImageNode>
-                        )
-                    })
-                }
+                {group.groupElements.map((groupElement, i) => {
+                    console.log("Rendering Image:", groupElement); // Add console.log here
+                    return (
+                        <ImageNode
+                            key={i}
+                            imageProps={groupElement}
+                            onChange={(newImage, overwrite) => {
+                                const newImages = [...elements];
+                                newImages[index] = { ...newImages[index], ...newImage }; // Update the specific image in the group
+                                setElements(newImages, overwrite);
+                            }}
+                        />
+                    );
+                })}
             </Group>
         );
     }
