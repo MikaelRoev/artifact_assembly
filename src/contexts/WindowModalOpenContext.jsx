@@ -8,14 +8,14 @@ export const WindowModalOpenContextProvider = ({children}) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
     const [isFilterInteracting, setIsFilterInteracting] = useState(false);
-    const {images} = useContext(ElementContext);
+    const {elements} = useContext(ElementContext);
 
     useEffect(() => {
-        if (images.length === 0) {
+        if (elements.length === 0) {
             setIsScoreWindowOpen(false);
             setIsFilterWindowOpen(false)
         }
-    }, [images.length]);
+    }, [elements.length]);
 
     return (
         <WindowModalOpenContext.Provider value={
