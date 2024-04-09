@@ -96,11 +96,24 @@
     display: flex;
     flex-direction: row;
     width: fit-content;
+    align-items: flex-start;
     margin-block: 10px;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
 }
 
-.histogram-container img {
+.histogram-info {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
     margin: 5px 0 0 5px;
-    align-self: flex-start;
+}
+
+.histogram-info img {
+    width: 100%;
+    height: auto;
+}
+.histogram-info p {
+    width: 100%;
+    text-align: center;
+    hyphens: auto;
 }
