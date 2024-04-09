@@ -273,15 +273,6 @@ const FilterWindow = () => {
                     }}
                 />
                 <FilterToggle
-                    label="Grayscale"
-                    id={"grayscaleToggle"}
-                    setValue={() => {
-                        if (!images[filterImageIndex]) return;
-                        images[filterImageIndex].grayscale = !images[filterImageIndex].grayscale;
-                        setImages(images);
-                    }}
-                />
-                <FilterToggle
                     label="Invert"
                     id={"invertToggle"}
                     setValue={() => {
@@ -300,6 +291,15 @@ const FilterWindow = () => {
                             root.style.setProperty("--brightness", ((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin));
                             root.style.setProperty("--mask", ((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
                         }
+                        setImages(images);
+                    }}
+                />
+                <FilterToggle
+                    label="Grayscale"
+                    id={"grayscaleToggle"}
+                    setValue={() => {
+                        if (!images[filterImageIndex]) return;
+                        images[filterImageIndex].grayscale = !images[filterImageIndex].grayscale;
                         setImages(images);
                     }}
                 />
