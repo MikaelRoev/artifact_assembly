@@ -34,16 +34,7 @@ const StageArea = ({stageRef, layerRef}) => {
     const zoomMin = 0.001; //zoom out limit
     const zoomMax = 300; //zoom in limit
 
-    /**
-     * Update the stage according to the project.
-     */
-    useEffect(() => {
-        const stage = stageRef.current;
-        if (!stage) return;
-        stage.position({x: project.x, y: project.y});
-        stage.scale({x: project.zoom, y: project.zoom});
-        stage.batchDraw();
-    }, [project, stageRef]);
+
 	let newImages = [...elements];
 
 	/**
