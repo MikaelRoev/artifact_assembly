@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import ImageContext from "./ImageContext";
+import ElementContext from "./ElementContext";
 
 const WindowModalOpenContext = createContext(null);
 
@@ -8,7 +8,7 @@ export const WindowModalOpenContextProvider = ({children}) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
     const [isFilterInteracting, setIsFilterInteracting] = useState(false);
-    const {images} = useContext(ImageContext);
+    const {images} = useContext(ElementContext);
 
     useEffect(() => {
         if (images.length === 0) {

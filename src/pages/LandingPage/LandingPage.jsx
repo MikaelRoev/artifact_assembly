@@ -32,7 +32,7 @@ const LandingPage = () => {
 		openProjectDialog(setProject, setElements).then(() => {
 			navigate('/canvas');
 		});
-		openProjectDialog(setProject, setImages)
+		openProjectDialog(setProject, setElements)
 			.then(() => navigate('/canvas'))
 			.catch(error => {
 				if (error) console.error('Failed to open project:', error);

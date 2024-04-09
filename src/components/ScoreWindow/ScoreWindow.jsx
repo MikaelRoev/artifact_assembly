@@ -1,7 +1,7 @@
 import React, {useContext, useEffect} from 'react';
 import "./ScoreWindow.css"
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 
 
 /**
@@ -12,7 +12,7 @@ import ImageContext from "../../contexts/ImageContext";
 const ScoreWindow = () => {
 
     const {isScoreWindowOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
-    const {images} = useContext(ImageContext);
+    const {images} = useContext(ElementContext);
 
     /**
      * UseEffect to make the scorewindow draggable on creation.
