@@ -1,52 +1,60 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Group, Layer, Stage, Transformer} from "react-konva";
+import {Layer, Stage, Transformer} from "react-konva";
+import {saveProjectDialog} from "../../util/FileHandling"
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
-import {saveProjectDialog} from "../FileHandling"
 import ProjectContext from "../../contexts/ProjectContext";
-import ElementContext from "../../contexts/ElementContext";
-import SelectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import ImageContext from "../../contexts/ImageContext";
+import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import FilterInteractionContext from "../../contexts/FilterInteractionContext";
+import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 
 /**
- * Creates the canvas area in the project page.
- * @param stageRef is the reference for the stage used.
- * @param layerRef is the reference for the layer inside the stage.
- * @returns {Element}
+ * Component that represents the konva stage area in the canvas page.
+ * @param stageRef{MutableRefObject} the reference for the konva stage.
+ * @param layerRef{MutableRefObject} the reference for the layer inside the konva stage.
+ * @returns {JSX.Element} the konva stage.
  * @constructor
  */
 const StageArea = ({stageRef, layerRef}) => {
-    const [selectedElements, setSelectedElements] = useState([]);
     const [ctrlPressed, setCtrlPressed] = useState(false);
     const [shiftPressed, setShiftPressed] = useState(false);
 
     const trRef = useRef();
 
-    const {selectedElementsIndex, setSelectedElementsIndex} = useContext(SelectedElementsIndexContext);
+    const {
+        selectedElements,
+        selectedElementsIndex,
+        select,
+        deselect,
+        deselectAll,
+        selectOnly,
+        isSelected
+    } = useContext(SelectContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {elements, setElements, undo, redo} = useContext(ElementContext);
+    const {images, setImages, undo, redo} = useContext(ImageContext);
     const {setFilterImageIndex} = useContext(ImageFilterContext);
-	const {isFilterInteracting, setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+    const {isFilterInteracting} = useContext(FilterInteractionContext);
+    const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
     const zoomMax = 300; //zoom in limit
 
+    let newImages = [...images];
 
-	let newImages = [...elements];
-
-	/**
-	 * Update the stage according to the project.
-	 */
-	useEffect(() => {
-		const stage = stageRef.current;
-		if (!stage) return;
-		stage.position({ x: project.x, y: project.y });
-		stage.scale({ x: project.zoom, y: project.zoom });
-		stage.batchDraw();
-	}, [project, stageRef]);
+    /**
+     * Update the stage according to the project.
+     */
+    useEffect(() => {
+        const stage = stageRef.current;
+        if (!stage) return;
+        stage.position({x: project.x, y: project.y});
+        stage.scale({x: project.zoom, y: project.zoom});
+        stage.batchDraw();
+    }, [project, stageRef]);
 
 
     /**
@@ -56,22 +64,22 @@ const StageArea = ({stageRef, layerRef}) => {
 
         /**
          * Deletes the selected images if the delete key is pressed.
-         * @param e the event.
+         * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
-            if (e.key === "Delete" && selectedElementsIndex.length > 0 && !isFilterInteracting) {
-                const newImages = elements.filter((image, index) => !selectedElementsIndex.includes(index));
-                setElements(newImages);
-                setSelectedElements([]);
-                setSelectedElementsIndex([]);
+            if ((e.key === "Delete" || e.key === 'Backspace')
+                && selectedElementsIndex.length > 0
+                && !isFilterInteracting) {
+                const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
+                setImages(newImages);
+                deselectAll();
             }
         };
         document.addEventListener("keydown", handleDeletePressed);
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [elements, selectedElements, setSelectedElements, selectedElementsIndex,
-        setSelectedElementsIndex, setElements, isFilterInteracting]);
+    }, [images, selectedElementsIndex, setImages, isFilterInteracting, deselectAll]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -79,19 +87,19 @@ const StageArea = ({stageRef, layerRef}) => {
     useEffect(() => {
         /**
          * Saves the image positions if ctrl + S is pressed.
-         * @param e the event.
+         * @param e{KeyboardEvent} the event.
          */
         const handleSavePressed = (e) => {
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
-                saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
+                saveProjectDialog(project, setProject, images).then(() => console.log("project saved"));
             }
         };
         document.addEventListener("keydown", handleSavePressed);
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
         };
-    }, [elements, project, setProject]);
+    }, [images, project, setProject]);
 
     /**
      * Sets up and cleans up the undo event listener.
@@ -99,10 +107,10 @@ const StageArea = ({stageRef, layerRef}) => {
     useEffect(() => {
         /**
          * Key event handler for undo and redo.
-         * @param e the event.
+         * @param e {KeyboardEvent} the event.
          */
-        const handleUndoPressed = (e) => {
-            if (e.ctrlKey && e.key === "y") {
+        const handleUndoRedoPressed = (e) => {
+            if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
                 e.preventDefault();
                 redo();
             } else if (e.ctrlKey && e.key === "z") {
@@ -110,33 +118,11 @@ const StageArea = ({stageRef, layerRef}) => {
                 undo();
             }
         };
-        document.addEventListener("keydown", handleUndoPressed);
+        document.addEventListener("keydown", handleUndoRedoPressed);
         return () => {
-            document.removeEventListener("keydown", handleUndoPressed);
+            document.removeEventListener("keydown", handleUndoRedoPressed);
         };
     }, [undo, redo]);
-	/**
-	 * Sets up and cleans up the undo event listener.
-	 */
-	useEffect(() => {
-		/**
-		 * Key event handler for undo and redo.
-		 * @param e the event.
-		 */
-		const handleUndoRedoPressed = (e) => {
-			if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
-				e.preventDefault();
-				redo();
-			} else if (e.ctrlKey && e.key === "z") {
-				e.preventDefault();
-				undo();
-			}
-		};
-		document.addEventListener("keydown", handleUndoRedoPressed);
-		return () => {
-			document.removeEventListener("keydown", handleUndoRedoPressed);
-		};
-	}, [undo, redo]);
 
     /**
      * Set up and cleans up the select key check.
@@ -144,7 +130,7 @@ const StageArea = ({stageRef, layerRef}) => {
     useEffect(() => {
         /**
          * The selection keys down event handler.
-         * @param e
+         * @param e{KeyboardEvent}
          */
         const handleSelectKeyDown = (e) => {
             if (e.key === 'Control') {
@@ -157,7 +143,7 @@ const StageArea = ({stageRef, layerRef}) => {
 
         /**
          * The select key up event handler.
-         * @param e
+         * @param e{KeyboardEvent}
          */
         const handleSelectKeyUp = (e) => {
             if (e.key === 'Control') {
@@ -180,23 +166,21 @@ const StageArea = ({stageRef, layerRef}) => {
     /**
      * Deselects when the mouse clicks on an empty area on the canvas
      * and ctrl key is not pressed.
-     * @param e the event.
+     * @param e{MouseEvent} the event.
      */
     const checkDeselect = (e) => {
         if (e.target === e.currentTarget && !ctrlPressed && !shiftPressed) {
-            selectedElements.forEach((element) => element.draggable(false));
-            setSelectedElements([]);
-            setSelectedElementsIndex([]);
+            deselectAll();
         }
     };
 
     /**
      * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
      *
-     * @param {Object} event - The event object containing information about the scroll event.
+     * @param e{KonvaEventObject} - The event object containing information about the scroll event.
      */
-    const zoomStage = (event) => {
-        event.evt.preventDefault();
+    const zoomStage = (e) => {
+        e.evt.preventDefault();
 
         const stage = stageRef.current;
         if (!stage) {
@@ -210,7 +194,7 @@ const StageArea = ({stageRef, layerRef}) => {
             y: (pointer.y - stage.y()) / oldScale,
         };
 
-        const zoomFactor = event.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
+        const zoomFactor = e.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
         const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
         setProject({
             ...project,
@@ -245,41 +229,29 @@ const StageArea = ({stageRef, layerRef}) => {
 
     /**
      * Event handler for element clicking. This will check the selection of the element.
-     * @param e click event.
-     * @param index of the element clicked on
+     * @param e {KonvaEventObject<MouseEvent>} click event.
+     * @param index {number} of the element clicked on.
      */
     const handleElementClick = (e, index) => {
         const element = e.target;
         element.moveToTop();
-        const elementIndex = selectedElements.indexOf(element);
-        const indexIndex = selectedElementsIndex.indexOf(index);
 
         if (ctrlPressed || shiftPressed) {
-            if (elementIndex !== -1) {
+            if (isSelected(index)) {
                 // already selected
-                selectedElements[elementIndex].draggable(false);
-                const newSelected = [...selectedElements];
-                newSelected.splice(elementIndex, 1);
-                setSelectedElements(newSelected);
-
-                const newSelectedIndex = [...selectedElementsIndex];
-                newSelectedIndex.splice(indexIndex, 1);
-                setSelectedElementsIndex(newSelectedIndex);
+                deselect(index);
             } else {
                 // not already selected
-                setSelectedElements([...selectedElements, element]);
-                setSelectedElementsIndex([...selectedElementsIndex, index]);
+                select(element, index);
             }
         } else {
-            selectedElements.forEach((element) => element.draggable(false));
-            setSelectedElements([element]);
-            setSelectedElementsIndex([index]);
+            selectOnly(element, index);
         }
     }
 
     /**
      * Handles when an image is right-clicked and opens the filter window.
-     * @param e right-click event
+     * @param e {KonvaEventObject<PointerEvent>} right-click event.
      * @param index {number} the index of the image to add filters to.
      */
     const handleImageContextClick = (e, index) => {
@@ -288,68 +260,7 @@ const StageArea = ({stageRef, layerRef}) => {
         setFilterImageIndex(index);
     }
 
-    const renderElements = () => {
-        return (
-            elements.length > 0 &&
-            elements.map((element, index) => {
-                switch (element.type) {
-                    case 'Image':
-                        return (
-                            renderImage(element, index)
-                        );
-                    case 'Group':
-                        return (
-                            renderGroup(element, index)
 
-                        );
-                }
-            })
-        );
-    }
-
-    const renderImage = (image, index) => {
-        return (
-            <ImageNode
-                key={index}
-                imageProps={image}
-                onSelect={(e) => handleElementClick(e, index)}
-                onContextMenu={(e) => handleImageContextClick(e, index)}
-                onChange={(newImage, overwrite) => {
-                    const newImages = [...elements];
-                    newImages[index] = newImage;
-                    setElements(newImages, overwrite);
-                }}
-            />
-        );
-    }
-
-
-    const renderGroup = (group, index) => {
-        return (
-            <Group
-                key={index}
-                onClick={e => handleElementClick(e, index)}
-                onTap={e => handleElementClick(e, index)}
-                onContextMenu={e => handleImageContextClick(e, index)}
-
-            >
-                {group.groupElements.map((groupElement, i) => {
-                    console.log("Rendering Image:", groupElement); // Add console.log here
-                    return (
-                        <ImageNode
-                            key={i}
-                            imageProps={groupElement}
-                            onChange={(newImage, overwrite) => {
-                                const newImages = [...elements];
-                                newImages[index] = { ...newImages[index], ...newImage }; // Update the specific image in the group
-                                setElements(newImages, overwrite);
-                            }}
-                        />
-                    );
-                })}
-            </Group>
-        );
-    }
     /**
      * useEffect for updating image dimensions
      */
@@ -363,9 +274,9 @@ const StageArea = ({stageRef, layerRef}) => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             imageNodes.forEach(imageNode => {
                 if (!imageNode.attrs.width || !imageNode.attrs.height) {
-                    elements.forEach((image, index) => {
+                    images.forEach((image, index) => {
                         if (imageNode.attrs.fileName === image.fileName) {
-                            elements[index] = {
+                            images[index] = {
                                 ...image,
                                 width: imageNode.width(),
                                 height: imageNode.height(),
@@ -381,19 +292,15 @@ const StageArea = ({stageRef, layerRef}) => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (layerRef.current && elements.length > 0) {
+        if (layerRef.current && images.length > 0) {
             const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
                 .filter((child) => !child.attrs.width);
             if (imageNodes.length !== 0) {
-                setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
+                setImageDimensions(imageNodes);
             }
         }
-    }, [elements.length, layerRef, elements]);
+    }, [images.length, layerRef, images]);
 
-    /**
-     * Returns a stage with a layer within.
-     * Returns an imageNode and a transformer within the layer.
-     */
     return (
         <Stage
             width={window.innerWidth}
@@ -407,7 +314,23 @@ const StageArea = ({stageRef, layerRef}) => {
             <Layer
                 className="layer"
                 ref={layerRef}>
-                {renderElements()}
+                {images.length > 0 &&
+                    images.map((image, index) => {
+                        return (
+                            <ImageNode
+                                key={index}
+                                imageURL={image.imageUrl}
+                                imageProps={image}
+                                onClick={(e) => handleElementClick(e, index)}
+                                onContextMenu={(e) => handleImageContextClick(e, index)}
+                                onChange={(newImage) => {
+                                    newImages[index] = newImage;
+                                    setImages(newImages);
+                                }}
+                            />
+                        );
+                    })
+                }
                 {
                     selectedElements.length > 0 &&
                     <Transformer
@@ -420,6 +343,7 @@ const StageArea = ({stageRef, layerRef}) => {
                             return newBox;
                         }}
                         resizeEnabled={false}
+                        rotateEnabled={!isLocked}
                     />
                 }
             </Layer>

@@ -1,21 +1,51 @@
-import React, {useContext, useEffect} from 'react';
-import "./ScoreWindow.css"
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import ElementContext from "../../contexts/ElementContext";
-
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import ImageContext from "../../contexts/ImageContext";
+import "./SimilarityMetricsWindow.css"
 
 /**
- * Creates a ScoreWindow element.
- * @returns {Element}
+ * The context for the similarity metrics window.
+ * @type {React.Context<null>}
+ */
+export const SimilarityMetricsWindowContext = createContext(null);
+
+/**
+ * The context provider for the similarity metrics window context.
+ * @param children the children that can use the context.
+ * @return {JSX.Element} the context provider.
  * @constructor
  */
-const ScoreWindow = () => {
+export const SimilarityMetricsWindowContextProvider = ({children}) => {
+    const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
+    const {images} = useContext(ImageContext);
 
-    const {isScoreWindowOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
-    const {images} = useContext(ElementContext);
+    useEffect(() => {
+        if (images.length === 0) setIsSimilarityMetricsWindowOpen(false);
+    }, [images.length]);
+
+    return (
+        <SimilarityMetricsWindowContext.Provider value={{
+            isSimilarityMetricsWindowOpen,
+            setIsSimilarityMetricsWindowOpen
+        }}>
+            {children}
+        </SimilarityMetricsWindowContext.Provider>
+    )
+}
+
+/**
+ * Component that represents a window that shows similarity metrics of the selected images.
+ * @returns {JSX.Element} the similarity metrics window
+ * @constructor
+ */
+const SimilarityMetricsWindow = () => {
+    const {
+        isSimilarityMetricsWindowOpen,
+        setIsSimilarityMetricsWindowOpen
+    } = useContext(SimilarityMetricsWindowContext);
+    const {images} = useContext(ImageContext);
 
     /**
-     * UseEffect to make the scorewindow draggable on creation.
+     * UseEffect to make the score window draggable on creation.
      * And handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
@@ -27,7 +57,7 @@ const ScoreWindow = () => {
             // Initiating position variables.
             let currentPosX = 0, currentPosY = 0, previousPosX = 0, previousPosY = 0;
             // Sets onmousedown attribute to use the dragMouseDown function
-            element.querySelector('.window-top').onmousedown = dragMouseDown;
+            if (isSimilarityMetricsWindowOpen) element.querySelector('.window-top').onmousedown = dragMouseDown;
 
             /**
              * Function to handle pressing the top element and moving it.
@@ -73,7 +103,7 @@ const ScoreWindow = () => {
 
 
     /**
-     * UseEffect to get the data from the images on the canvas and put it inside the score window.
+     * Gets the data from the images on the canvas and put it inside the score window.
      */
     useEffect(() => {
 
@@ -83,30 +113,39 @@ const ScoreWindow = () => {
         const appendImageData = () => {
             const scoreWindowContent = document.querySelector('.window-content');
             if (images.length > 0) {
-                scoreWindowContent.innerHTML = images.map(data => `ID: ${data.fileName}, Width: ${data.width}, 
-                Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)}`).join('<br>');
+                scoreWindowContent.innerHTML = images.map(data =>
+                    `ID: ${data.fileName}, 
+                    Width: ${data.width}, 
+                    Height: ${data.height}, 
+                    Position: ${data.x.toFixed(0)} 
+                    ${data.y.toFixed(0)}`).join('<br>');
 
             } else if (images.length === 0) {
                 scoreWindowContent.innerHTML = '';
             }
         }
-        if (isScoreWindowOpen) {
+        if (isSimilarityMetricsWindowOpen) {
             appendImageData();
         }
-    }, [isScoreWindowOpen, images, images.length]);
+    }, [isSimilarityMetricsWindowOpen, images, images.length]);
 
     /**
-     * UseEffect for resizing the window
+     * Resizes the window.
      */
     useEffect(() => {
+        if (!isSimilarityMetricsWindowOpen) return;
         const resizable = document.getElementById('scoreWindow');
         let isResizing = false;
         let startX, startY, startWidth, startHeight, direction;
         let distance = 7;
 
+        /**
+         * Starts the drag event.
+         * @param e {MouseEvent}
+         */
         function initDrag(e) {
             // Determine if the mouse is near the edges
-            const { left, right, bottom } = resizable.getBoundingClientRect();
+            const {left, right, bottom} = resizable.getBoundingClientRect();
             const nearLeftEdge = Math.abs(e.clientX - left) < distance;
             const nearRightEdge = Math.abs(e.clientX - right) < distance;
             const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
@@ -124,6 +163,10 @@ const ScoreWindow = () => {
             }
         }
 
+        /**
+         * Starts the drag event.
+         * @param e {MouseEvent}
+         */
         function doDrag(e) {
             if (!isResizing) return;
 
@@ -145,26 +188,34 @@ const ScoreWindow = () => {
             }
         }
 
+        /**
+         * When stopping the drag event.
+         */
         function stopDrag() {
             isResizing = false;
             document.documentElement.removeEventListener('mousemove', doDrag, false);
             document.documentElement.removeEventListener('mouseup', stopDrag, false);
         }
 
-        resizable.addEventListener("mousemove", function(e) {
-            const { left, right, bottom} = resizable.getBoundingClientRect();
-            resizable.style.cursor = getCursor(e, left, right, bottom, distance);
+        resizable.addEventListener("mousemove", function (e) {
+            const boundingClientRect = resizable.getBoundingClientRect();
+            resizable.style.cursor = getCursor(e, boundingClientRect, distance);
         }, false)
 
         resizable.addEventListener('mousedown', initDrag, false);
-
-
     }, []);
 
-    function getCursor(e, left, right, bottom, distance) {
-        const nearLeftEdge = Math.abs(e.clientX - left) < distance;
-        const nearRightEdge = Math.abs(e.clientX - right) < distance;
-        const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
+    /**
+     * Get the cursor type.
+     * @param e {MouseEvent} the mouse event.
+     * @param boundingRect {DOMRect} the bounding rect of the window.
+     * @param distance {number} the distance to the bounding rect of the activation of the drag.
+     * @return {string} the cursor type.
+     */
+    function getCursor(e, boundingRect, distance) {
+        const nearLeftEdge = Math.abs(e.clientX - boundingRect.left) < distance;
+        const nearRightEdge = Math.abs(e.clientX - boundingRect.right) < distance;
+        const nearBottomEdge = Math.abs(e.clientY - boundingRect.bottom) < distance;
 
         if (nearBottomEdge && nearLeftEdge) return 'nesw-resize';
         if (nearBottomEdge && nearRightEdge) return 'nwse-resize';
@@ -186,13 +237,14 @@ const ScoreWindow = () => {
     }, []);
 
     return (
+        isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
             <div className="window-top">
                 <div className="window-top-left">Similarity Metrics Window</div>
-                <button className="square exit" onClick={() => setIsScoreWindowOpen(false)}></button>
+                <button className="square exit" onClick={() => setIsSimilarityMetricsWindowOpen(false)}></button>
             </div>
             <div className="window-content"></div>
         </div>)
 }
 
-export default ScoreWindow
+export default SimilarityMetricsWindow;

@@ -1,76 +1,73 @@
 import React, {useContext} from "react";
+import {useNavigate} from 'react-router-dom';
+import {appWindow} from "@tauri-apps/api/window";
+import {openProjectDialog} from "../../util/FileHandling";
 import ProjectList from "../../components/ProjectList/ProjectList";
-import "./LandingPage.css";
-import { appWindow } from "@tauri-apps/api/window";
-import { openProjectDialog } from "../../components/FileHandling";
 import ProjectContext from "../../contexts/ProjectContext";
-import ElementContext from "../../contexts/ElementContext";
-import { useNavigate } from 'react-router-dom';
+import ImageContext from "../../contexts/ImageContext";
+import "./LandingPage.css";
 
 /**
  * Creates the initial landing page of the application.
- * @returns {Element}
+ * @returns {JSX.Element}
  * @constructor
  */
 const LandingPage = () => {
-	const navigate = useNavigate()
+    const navigate = useNavigate()
 
-	const {setProject} = useContext(ProjectContext);
-	const {setElements} = useContext(ElementContext);
+    const {setProject} = useContext(ProjectContext);
+    const {setImages} = useContext(ImageContext);
 
-	/**
-	 * Closes the application.
-	 */
-	async function handleQuitClick() {
-		await appWindow.close();
-	}
+    /**
+     * Closes the application.
+     */
+    async function handleQuitClick() {
+        await appWindow.close();
+    }
 
-	/**
-	 * Opens dialog window and goes to canvas of selected project.
-	 */
-	const handleOpenProjectClick = () => {
-		openProjectDialog(setProject, setElements).then(() => {
-			navigate('/canvas');
-		});
-		openProjectDialog(setProject, setElements)
-			.then(() => navigate('/canvas'))
-			.catch(error => {
-				if (error) console.error('Failed to open project:', error);
-			});
-	};
+    /**
+     * Opens dialog window and goes to canvas of selected project.
+     */
+    const handleOpenProjectClick = () => {
+        openProjectDialog(setProject, setImages)
+            .then(() => navigate('/canvas'))
+            .catch(error => {
+                if (error) console.error('Failed to open project:', error);
+            });
+    };
 
-	/**
-	 * Opens a new canvas
-	 */
-	const handleNewProjectClick = () => {
-		navigate('/canvas')
-	}
+    /**
+     * Opens the canvas page.
+     */
+    const handleNewProjectClick = () => {
+        navigate('/canvas')
+    }
 
-	return (
-		<div className="container">
-			<div className="left-main">
-				<h1>
-					Welcome to <br /> Artifact Assembly
-				</h1>
+    return (
+        <div className="container">
+            <div className="left-main">
+                <h1>
+                    Welcome to <br/> Artifact Assembly
+                </h1>
 
-				<div className="link-buttons-container">
-					<button onClick={handleNewProjectClick} className="link-button">
-						New Project
-					</button>
-					<button onClick={handleOpenProjectClick} className="link-button">
-						Open Project
-					</button>
-					<button onClick={handleQuitClick} className="link-button secondary">
-						Quit
-					</button>
-				</div>
-			</div>
-			<div className="right-main">
-				<h1>Projects</h1>
-				<ProjectList />
-			</div>
-		</div>
-	);
+                <div className="link-buttons-container">
+                    <button onClick={handleNewProjectClick} className="link-button">
+                        New Project
+                    </button>
+                    <button onClick={handleOpenProjectClick} className="link-button">
+                        Open Project
+                    </button>
+                    <button onClick={handleQuitClick} className="link-button secondary">
+                        Quit
+                    </button>
+                </div>
+            </div>
+            <div className="right-main">
+                <h1>Projects</h1>
+                <ProjectList/>
+            </div>
+        </div>
+    );
 };
 
 export default LandingPage;

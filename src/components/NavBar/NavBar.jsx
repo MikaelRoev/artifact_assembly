@@ -1,19 +1,19 @@
 import React, {useContext, useEffect, useState} from "react";
-import "./NavBar.css";
-import LockedContext from "../../contexts/LockedContext";
-import ElementContext from "../../contexts/ElementContext";
-import ProjectContext from "../../contexts/ProjectContext";
-import {openProjectDialog, saveProjectDialog} from "../FileHandling";
-import {open} from "@tauri-apps/api/dialog";
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import {useNavigate} from "react-router-dom";
-import ConfirmCloseModalContext from "../ConfirmCloseModal";
-import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
+import {open} from "@tauri-apps/api/dialog";
+import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
+import LockedContext from "../../contexts/LockedContext";
+import ImageContext from "../../contexts/ImageContext";
+import ProjectContext from "../../contexts/ProjectContext";
+import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
+import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
+import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
+import "./NavBar.css";
 
 /**
- * Creates a navigation bar that is at the top of the project page.
- * @param stageRef Reference to the canvas stage
- * @returns {Element}
+ * Component for the navigation bar that is at the top of the canvas page.
+ * @param stageRef Reference to the canvas stage in the canvas page.
+ * @returns {JSX.Element} the navigation bar.
  * @constructor
  */
 const NavBar = ({stageRef}) => {
@@ -22,11 +22,12 @@ const NavBar = ({stageRef}) => {
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {elements, setElements, undo, redo} = useContext(ElementContext);
+    const {images, setImages, undo, redo} = useContext(ImageContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
-    const {selectedElementsIndex} = useContext(selectedElementsIndexContext)
-    const {setIsConfirmModalOpen,
+    const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
+    const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
+    const {
+        setIsConfirmModalOpen,
         setOnSave,
         setOnDoNotSave
     } = useContext(ConfirmCloseModalContext);
@@ -36,13 +37,22 @@ const NavBar = ({stageRef}) => {
     const offset = 50;
 
     /**
+     * Closes the project and returns to the landing page.
+     */
+    const goToLandingPage = () => {
+        setImages([]);
+        navigate('/');
+    }
+
+    /**
      * Checks if there is an image at the position.
      * @param position {{x: number, y: number}} the position to check.
-     * @return {boolean} true if there are at least one image at the position,
-     * false if there are no images at the position.
+     * @return {boolean}
+     *  true if there are at least one image at the position,
+     *  false if there are no images at the position.
      */
     const isAnyImageAtPosition = (position) => {
-        return elements.some((image) => {
+        return images.some((image) => {
             return image.x === position.x && image.y === position.y
         })
     }
@@ -61,7 +71,7 @@ const NavBar = ({stageRef}) => {
     }
 
     /**
-     * Handles uploading of an image.
+     * Asynchronous function for uploading of an image.
      * @returns {Promise<void>}
      */
     const handleImageUpload = async () => {
@@ -78,7 +88,7 @@ const NavBar = ({stageRef}) => {
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
-                    type: 'Image',
+                    className: 'Image',
                     fileName: file.split('\\')[file.split('\\').length - 1],
                     filePath: file,
                     x: position.x,
@@ -90,12 +100,15 @@ const NavBar = ({stageRef}) => {
                 position.y += offset;
                 return newImage
             });
-            setElements([...elements, ...newImages]);
+            setImages([...images, ...newImages]);
             setIsLoading(false);
         }
         handleFileButtonClick()
     };
 
+    /**
+     * Clocks the canvas.
+     */
     const handleLockCanvasClick = () => {
         setIsLocked((prevLock) => !prevLock);
         handleToolsButtonClick();
@@ -139,9 +152,7 @@ const NavBar = ({stageRef}) => {
      * Function to handle exporting an image of the canvas
      */
     const handleImageOfCanvasExport = () => {
-        console.log("1")
-        setIsDialogOpen(true);
-        console.log("2")
+        setIsExportImageModalOpen(true);
         handleFileButtonClick()
     }
 
@@ -150,31 +161,9 @@ const NavBar = ({stageRef}) => {
      * @returns Void
      */
     const handleOpenScoreWindow = async () => {
-        setIsScoreWindowOpen(true);
-        handleFileButtonClick()
+        setIsSimilarityMetricsWindowOpen(true);
+        handleToolsButtonClick();
     };
-
-    const handleLockPiecesTogether = () => {
-        const newGroup = {
-            type: 'Group',
-            groupElements: []
-        }
-
-        for (let i= 0; i < selectedElementsIndex.length; i++) {
-            const groupElement = elements[selectedElementsIndex[i]];
-            newGroup.groupElements.push(groupElement)
-        }
-
-        const newElements = elements.filter((element, index) =>
-            !selectedElementsIndex.includes(index)
-        )
-        setElements([...newElements, newGroup])
-
-        // TODO deselect selected elements
-
-
-        handleFileButtonClick()
-    }
 
     /**
      * Function to find the work area. Works by finding the nearest image and moving the stage to that image.
@@ -191,7 +180,7 @@ const NavBar = ({stageRef}) => {
         const currentStageCenterY = -stage.y() / stage.scaleY() + stageHeight / 2 / stage.scaleY();
 
         //Finding the closest image
-        elements.forEach(image => {
+        images.forEach(image => {
             const imagePosX = image.x;
             const imagePosY = image.y;
 
@@ -239,7 +228,7 @@ const NavBar = ({stageRef}) => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                            saveProjectDialog(project, setProject, elements)
+                                            saveProjectDialog(project, setProject, images)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
@@ -251,7 +240,7 @@ const NavBar = ({stageRef}) => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                            openProjectDialog(setProject, setElements)
+                                            openProjectDialog(setProject, setImages)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
@@ -278,12 +267,12 @@ const NavBar = ({stageRef}) => {
                                             onClick={() => {
                                                 setFileDropdownVisible(false);
                                                 setOnSave(() => () => {
-                                                    saveProjectDialog(project, setProject, elements)
-                                                        .then(() => navigate("/"))
+                                                    saveProjectDialog(project, setProject, images)
+                                                        .then(goToLandingPage)
                                                         .catch(() => {
                                                         })
                                                 });
-                                                setOnDoNotSave(() => () => navigate("/"));
+                                                setOnDoNotSave(() => goToLandingPage());
                                                 setIsConfirmModalOpen(true);
                                             }}>
                                         Close Project
@@ -312,13 +301,6 @@ const NavBar = ({stageRef}) => {
                                         className={"dropdownButton"}
                                         onClick={findWorkArea}>
                                         Go To Work Area
-                                    </button>
-                                </li>
-                                <li>
-                                    <button
-                                        className={"dropdownButton"}
-                                        onClick={handleLockPiecesTogether}>
-                                        Lock selected images together
                                     </button>
                                 </li>
                                 <li>
