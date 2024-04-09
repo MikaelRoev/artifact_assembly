@@ -11,6 +11,9 @@ const useHistory = (initialState, maxSteps) => {
     const [index, setIndex] = useState(0);
     const [history, setHistory] = useState([initialState]);
 
+    const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
+
+
     /**
      * Updates the state.
      * @param action
@@ -18,7 +21,7 @@ const useHistory = (initialState, maxSteps) => {
      */
     const setState = (action, overwrite = false) => {
         // get the new state ether from a function or a variable, implemented similar to useState
-        const newState = typeof action === "function" ? action(history[index]) : action;
+        const newState = typeof action === "function" ? action(deepCopy(history[index])) : action;
 
         if (overwrite) {
             // overwrite the current state
@@ -54,7 +57,7 @@ const useHistory = (initialState, maxSteps) => {
      */
     const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
 
-    return [history[index], setState, undo, redo];
+    return [deepCopy(history[index]), setState, undo, redo];
 }
 
 

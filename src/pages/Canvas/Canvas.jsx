@@ -1,4 +1,4 @@
-import React, {useRef, useContext} from "react";
+import React, {useRef, useContext, useEffect} from "react";
 import StageArea from "../../components/StageArea/StageArea";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Canvas.css";
@@ -11,6 +11,9 @@ import {exportCanvasAsImageDialog} from "../../components/FileHandling";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
 import {ImageFilterContextProvider} from "../../contexts/ImageFilterContext";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import {
+    ConfirmCloseModal,
+    ConfirmCloseModalContextProvider,} from "../../components/ConfirmCloseModal";
 
 /**
  * Creates a project page.
@@ -28,7 +31,9 @@ const Canvas = () => {
      */
     function handleSave(number) {
         let image = stageRef.current.toDataURL({pixelRatio: number});
-        exportCanvasAsImageDialog(image).then(() => setIsDialogOpen(false))
+        exportCanvasAsImageDialog(image)
+            .then(() => setIsDialogOpen(false))
+            .catch(() => setIsDialogOpen(false))
     }
 
     return (
@@ -36,16 +41,16 @@ const Canvas = () => {
             <SelectedElementsIndexContextProvider>
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
-                        <div className="stage-container">
-                            <NavBar/>
-                            <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                            {isScoreWindowOpen &&
-                                <ScoreWindow layerRef={layerRef}/>}
-                            {isDialogOpen &&
-                                <ExportImageModal onSave={handleSave}/>}
-                            {isFilterWindowOpen &&
-                                <FilterWindow/>}
-                        </div>
+                        <ConfirmCloseModalContextProvider>
+                            <div className="stage-container">
+                                <NavBar stageRef={stageRef}/>
+                                <StageArea stageRef={stageRef} layerRef={layerRef}/>
+                                {isScoreWindowOpen && <ScoreWindow/>}
+                                {isDialogOpen && <ExportImageModal onSave={handleSave}/>}
+                                {isFilterWindowOpen && <FilterWindow/>}
+                                <ConfirmCloseModal/>
+                            </div>
+                        </ConfirmCloseModalContextProvider>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
             </SelectedElementsIndexContextProvider>

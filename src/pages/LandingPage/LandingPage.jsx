@@ -32,7 +32,19 @@ const LandingPage = () => {
 		openProjectDialog(setProject, setElements).then(() => {
 			navigate('/canvas');
 		});
+		openProjectDialog(setProject, setImages)
+			.then(() => navigate('/canvas'))
+			.catch(error => {
+				if (error) console.error('Failed to open project:', error);
+			});
 	};
+
+	/**
+	 * Opens a new canvas
+	 */
+	const handleNewProjectClick = () => {
+		navigate('/canvas')
+	}
 
 	return (
 		<div className="container">
@@ -42,15 +54,15 @@ const LandingPage = () => {
 				</h1>
 
 				<div className="link-buttons-container">
-					<a href="/canvas" className="link-button">
+					<button onClick={handleNewProjectClick} className="link-button">
 						New Project
-					</a>
-					<p onClick={handleOpenProjectClick} className="link-button">
+					</button>
+					<button onClick={handleOpenProjectClick} className="link-button">
 						Open Project
-					</p>
-					<p onClick={handleQuitClick} className="link-button secondary">
+					</button>
+					<button onClick={handleQuitClick} className="link-button secondary">
 						Quit
-					</p>
+					</button>
 				</div>
 			</div>
 			<div className="right-main">

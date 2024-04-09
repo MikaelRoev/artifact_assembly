@@ -44,23 +44,6 @@
 	color: #abb2bf;
 }
 
-.nav-left p,
-.nav-left a {
-	width: auto;
-	text-align: left;
-	color: #abb2bf;
-	transition: 100ms ease-in;
-	background-color: #202020;
-	cursor: pointer;
-	text-decoration: none;
-	border-radius: 6px;
-	padding-left: 12px;
-	padding-right: 12px;
-	-webkit-user-select: none; /* Safari */
-	-ms-user-select: none; /* IE 10 and IE 11 */
-	user-select: none; /* Standard syntax */
-	border: none;
-}
 
 .nav-left div {
 	width: auto;
@@ -73,18 +56,15 @@
 	user-select: none; /* Standard syntax */
 }
 
-.nav-left p:hover,
-.nav-left a:hover {
-	background-color: #323842;
-}
-
-.fileDiv {
+.fileDiv,
+.toolsDiv {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	margin: 12px;
 }
+
 .navButton {
 	width: auto;
 	color: #abb2bf;
@@ -134,6 +114,7 @@
 .dropdownButton {
 	text-align: left;
 	flex: 1;
+	white-space: nowrap;
 	border: none;
 	padding-block: 2px;
 	background-color: white;
@@ -144,3 +125,7 @@
 	cursor: pointer;
 }
 
+.undoRedo {
+	font-size: larger;
+	font-weight: bold;
+}

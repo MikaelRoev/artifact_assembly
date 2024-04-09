@@ -28,7 +28,7 @@ const StageArea = ({stageRef, layerRef}) => {
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {setFilterImageIndex} = useContext(ImageFilterContext);
-    const {setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
+	const {isFilterInteracting, setIsFilterWindowOpen} = useContext(WindowModalOpenContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
@@ -44,6 +44,18 @@ const StageArea = ({stageRef, layerRef}) => {
         stage.scale({x: project.zoom, y: project.zoom});
         stage.batchDraw();
     }, [project, stageRef]);
+	let newImages = [...images];
+
+	/**
+	 * Update the stage according to the project.
+	 */
+	useEffect(() => {
+		const stage = stageRef.current;
+		if (!stage) return;
+		stage.position({ x: project.x, y: project.y });
+		stage.scale({ x: project.zoom, y: project.zoom });
+		stage.batchDraw();
+	}, [project, stageRef]);
 
 
     /**
@@ -68,6 +80,23 @@ const StageArea = ({stageRef, layerRef}) => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
     }, [elements, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setElements]);
+		/**
+	 	* Deletes the selected images if the delete key is pressed.
+	 	* @param e the event.
+		 */
+		const handleDeletePressed = (e) => {
+			if ((e.key === "Delete" || e.key === 'Backspace') && selectedElementsIndex.length > 0 && !isFilterInteracting) {
+				const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
+				setImages(newImages);
+				setSelectedElements([]);
+				setSelectedElementsIndex([]);
+			}
+		};
+		document.addEventListener("keydown", handleDeletePressed);
+		return () => {
+			document.removeEventListener("keydown", handleDeletePressed);
+		};
+	}, [elements, selectedElements, setSelectedElements, selectedElementsIndex, setSelectedElementsIndex, setImages, isFilterInteracting]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -111,6 +140,28 @@ const StageArea = ({stageRef, layerRef}) => {
             document.removeEventListener("keydown", handleUndoPressed);
         };
     }, [undo, redo]);
+	/**
+	 * Sets up and cleans up the undo event listener.
+	 */
+	useEffect(() => {
+		/**
+		 * Key event handler for undo and redo.
+		 * @param e the event.
+		 */
+		const handleUndoRedoPressed = (e) => {
+			if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
+				e.preventDefault();
+				redo();
+			} else if (e.ctrlKey && e.key === "z") {
+				e.preventDefault();
+				undo();
+			}
+		};
+		document.addEventListener("keydown", handleUndoRedoPressed);
+		return () => {
+			document.removeEventListener("keydown", handleUndoRedoPressed);
+		};
+	}, [undo, redo]);
 
     /**
      * Set up and cleans up the select key check.
@@ -360,6 +411,99 @@ const StageArea = ({stageRef, layerRef}) => {
             </Layer>
         </Stage>
     );
+
+	/**
+	 * useEffect for updating image dimensions
+	 */
+	useEffect(() => {
+		/**
+		 * Sets the width and height of images that does not have them yet.
+		 * @param imageNodes Image nodes on the canvas.
+		 * @returns {Promise<void>}
+		 */
+		const setImageDimensions = async (imageNodes) => {
+			await new Promise(resolve => setTimeout(resolve, 1000));
+			imageNodes.forEach(imageNode => {
+				if (!imageNode.attrs.width || !imageNode.attrs.height) {
+					images.forEach((image, index) => {
+						if (imageNode.attrs.fileName === image.fileName) {
+							images[index] = {
+								...image,
+								width: imageNode.width(),
+								height: imageNode.height(),
+							}
+
+						}
+					})
+				}
+			})
+		}
+
+		/**
+		 * Checks if it is images on the canvas and only runs the function if there is
+		 * an image that needs its width and height updated.
+ 		 */
+		if (layerRef.current && images.length > 0) {
+			const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+				.filter((child) => !child.attrs.width);
+			if (imageNodes.length !== 0) {
+				setImageDimensions(imageNodes).then(() => console.log('Dimensions retrieved'))
+			}
+		}
+	}, [images.length, layerRef, images]);
+
+	/**
+	 * Returns a stage with a layer within.
+	 * Returns an imageNode and a transformer within the layer.
+	 */
+	return (
+		<Stage
+			width={window.innerWidth}
+			height={window.innerHeight}
+			draggable
+			className="stage"
+			onWheel={zoomStage}
+			onMouseDown={checkDeselect}
+			onTouchStart={checkDeselect}
+			ref={stageRef}>
+			<Layer
+				className="layer"
+				ref={layerRef}>
+				{ images.length > 0 &&
+					images.map((image, index) => {
+						return (
+							<ImageNode
+								key={index}
+								imageURL={image.imageUrl}
+								imageProps={image}
+								onSelect={(e) => handleElementClick(e, index)}
+								onContextMenu={(e) => handleImageContextClick(e, index)}
+								onChange={(newImage) => {
+									newImages[index] = newImage;
+									setImages(newImages);
+								}}
+							/>
+						);
+					})
+				}
+				{
+					selectedElements.length > 0 &&
+					<Transformer
+					ref={trRef}
+					boundBoxFunc={(oldBox, newBox) => {
+						// limit resize
+						if (newBox.width < 5 || newBox.height < 5) {
+							return oldBox;
+						}
+						return newBox;
+					}}
+					resizeEnabled={false}
+					rotateEnabled={!isLocked}
+					/>
+				}
+			</Layer>
+		</Stage>
+	);
 };
 
 export default StageArea;

@@ -1,12 +1,11 @@
+#![cfg_attr(
+  all(not(debug_assertions), target_os = "windows"),
+  windows_subsystem = "windows"
+)]
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use tokio::io::AsyncReadExt;
 use tauri::InvokeError;
-
-#[cfg_attr(
-  all(not(debug_assertions), target_os = "windows"),
-  windows_subsystem = "windows"
-)]
 
 /*
 Saves a contents  to a file at a file path.

@@ -2,7 +2,8 @@
 name = "app"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
+#Please add your name(s) if you have worked on the project
+authors = ["Casper Fabian Gulbrandsen", "Oda Katrine Steinsholt", "Mathias Iversen", "Mikael Røv Mathiassen"]
 license = ""
 repository = ""
 default-run = "app"
@@ -17,7 +18,7 @@ tauri-build = { version = "1.5", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.5", features = [ "dialog-message", "fs-all", "dialog-save", "dialog-open", "protocol-asset"] }
+tauri = { version = "1.5", features = [ "dialog-confirm", "window-close", "dialog-message", "fs-all", "dialog-save", "dialog-open", "protocol-asset"] }
 tokio = { version = "1.0", features = ["full"] }
 
 [features]

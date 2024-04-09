@@ -1,17 +1,18 @@
 import React, {useContext, useEffect} from 'react';
 import "./ScoreWindow.css"
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import ImageContext from "../../contexts/ImageContext";
 
 
 /**
  * Creates a ScoreWindow element.
- * @param layerRef reference to the layer in the stagearea.
  * @returns {Element}
  * @constructor
  */
-const ScoreWindow = ({layerRef}) => {
+const ScoreWindow = () => {
 
-    const {setIsScoreWindowOpen} = useContext(WindowModalOpenContext)
+    const {isScoreWindowOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
+    const {images} = useContext(ImageContext);
 
     /**
      * UseEffect to make the scorewindow draggable on creation.
@@ -80,42 +81,23 @@ const ScoreWindow = ({layerRef}) => {
          * Adds the image data to the score window.
          */
         const appendImageData = () => {
-            const layer = layerRef.current;
+            const scoreWindowContent = document.querySelector('.window-content');
+            if (images.length > 0) {
+                scoreWindowContent.innerHTML = images.map(data => `ID: ${data.fileName}, Width: ${data.width}, 
+                Height: ${data.height}, Position: ${data.x.toFixed(0)} ${data.y.toFixed(0)}`).join('<br>');
 
-            if (layer) {
-                const imageNodes = layer.getChildren().filter((child) => child.getClassName() === 'Image');
-                const imageData = imageNodes.map((image) => {
-                    return {
-                        id: image.name(), width: image.width().toFixed(0), height: image.height().toFixed(0),
-                    }
-                });
-                const message = imageData.map(data => `ID: ${data.id}, Width: ${data.width}, Height: ${data.height}`).join('<br>');
-                const scoreWindowContent = document.querySelector('.window-content');
-                scoreWindowContent.innerHTML = message;
+            } else if (images.length === 0) {
+                scoreWindowContent.innerHTML = '';
             }
         }
+        if (isScoreWindowOpen) {
+            appendImageData();
+        }
+    }, [isScoreWindowOpen, images, images.length]);
 
-        /**
-         * An observer that will observe when the score window is set to visible and then add the image data to the
-         * score window.
-         * @type {MutationObserver}
-         */
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'style') {
-                    const target = mutation.target;
-                    if (target.style.visibility === 'visible') {
-                        appendImageData()
-                    }
-                }
-            })
-        })
-        // Setting the observer to observe the score window.
-        const scoreWindow = document.querySelector('#scoreWindow');
-        observer.observe(scoreWindow, {attributes: true})
-
-    }, [layerRef]);
-
+    /**
+     * UseEffect for resizing the window
+     */
     useEffect(() => {
         const resizable = document.getElementById('scoreWindow');
         let isResizing = false;

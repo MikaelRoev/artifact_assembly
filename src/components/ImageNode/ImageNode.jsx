@@ -11,7 +11,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
  * @param isSelected
  * @param onSelect
  * @param onChange
- * @returns {Element}
+ * @returns {JSX.Element}
  * @constructor
  */
 const ImageNode = ({
@@ -34,7 +34,19 @@ const ImageNode = ({
 	 */
 	const handleFilter = () => {
 		if (filterEnabled === true) {
-			return [Konva.Filters.HSV, Konva.Filters.HSL, Konva.Filters.Contrast];
+			const filters = [];
+			if (
+				(imageProps.hue !== undefined && imageProps.hue !== 0)
+				|| (imageProps.saturation !== undefined && imageProps.saturation !== 0)
+				|| (imageProps.value !== undefined && imageProps.value !== 0)
+			) filters.push(Konva.Filters.HSV);
+			if (imageProps.contrast !== undefined && imageProps.contrast !== 0) filters.push(Konva.Filters.Contrast);
+			if (imageProps.threshold !== undefined && imageProps.threshold !== 0) {
+				filters.push(Konva.Filters.Mask);
+			}
+			if (imageProps.grayscale) filters.push(Konva.Filters.Grayscale);
+			if (imageProps.invert) filters.push(Konva.Filters.Invert);
+			return filters;
 		} else return null;
 	};
 
@@ -71,6 +83,7 @@ const ImageNode = ({
 			onContextMenu={onContextMenu}
 			x={imageProps.x}
 			y={imageProps.y}
+			draggable={false}
 			onDragEnd={(e) => {
 				onChange({
 					...imageProps,
