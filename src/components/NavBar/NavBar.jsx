@@ -2,16 +2,13 @@ import React, {useContext, useEffect, useState} from "react";
 import "./NavBar.css";
 import LockedContext from "../../contexts/LockedContext";
 import ElementContext from "../../contexts/ElementContext";
-import FilterEnabledContext from "../../contexts/FilterEnabledContext";
-import ImageContext from "../../contexts/ImageContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import {openProjectDialog, saveProjectDialog} from "../FileHandling";
 import {open} from "@tauri-apps/api/dialog";
 import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
-import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
-import {Group} from "react-konva";
 import {useNavigate} from "react-router-dom";
 import ConfirmCloseModalContext from "../ConfirmCloseModal";
+import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 
 /**
  * Creates a navigation bar that is at the top of the project page.
@@ -25,10 +22,8 @@ const NavBar = ({stageRef}) => {
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {elements, setElements} = useContext(ElementContext);
-    const {images, setImages, undo, redo} = useContext(ImageContext);
+    const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsDialogOpen, setIsScoreWindowOpen} = useContext(WindowModalOpenContext);
     const {selectedElementsIndex} = useContext(selectedElementsIndexContext)
     const {setIsConfirmModalOpen,
@@ -196,7 +191,7 @@ const NavBar = ({stageRef}) => {
         const currentStageCenterY = -stage.y() / stage.scaleY() + stageHeight / 2 / stage.scaleY();
 
         //Finding the closest image
-        images.forEach(image => {
+        elements.forEach(image => {
             const imagePosX = image.x;
             const imagePosY = image.y;
 
@@ -243,11 +238,8 @@ const NavBar = ({stageRef}) => {
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleImageUpload}
-                                    >Load Image
-                                    </button>
                                         onClick={() => {
-                                            saveProjectDialog(project, setProject, images)
+                                            saveProjectDialog(project, setProject, elements)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
@@ -259,24 +251,17 @@ const NavBar = ({stageRef}) => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={() => {
-                                            saveProjectDialog(project, setProject, elements).then(handleFileButtonClick);
-                                        }}
-                                    >Save project
-                                    </button>
-                                            openProjectDialog(setProject, setImages)
+                                            openProjectDialog(setProject, setElements)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
                                         }}>
-                                    Open Project
+                                        Open Project
                                     </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleImageOfCanvasExport}
-                                    >Export as image
-                                    </button>
                                         onClick={handleImageUpload}>
                                         Load Image
                                     </button>
@@ -284,16 +269,6 @@ const NavBar = ({stageRef}) => {
                                 <li>
                                     <button
                                         className={"dropdownButton"}
-                                        onClick={handleOpenScoreWindow}
-                                    >Open similarity metrics window
-                                    </button>
-                                </li>
-                                <li>
-                                    <button
-                                        className={"dropdownButton"}
-                                        onClick={handleLockPiecesTogether}
-                                    >Lock selected pieces together
-                                    </button>
                                         onClick={handleImageOfCanvasExport}>
                                         Export As Image
                                     </button>
@@ -303,7 +278,7 @@ const NavBar = ({stageRef}) => {
                                             onClick={() => {
                                                 setFileDropdownVisible(false);
                                                 setOnSave(() => () => {
-                                                    saveProjectDialog(project, setProject, images)
+                                                    saveProjectDialog(project, setProject, elements)
                                                         .then(() => navigate("/"))
                                                         .catch(() => {
                                                         })
@@ -318,11 +293,6 @@ const NavBar = ({stageRef}) => {
                         </div>
                     )}
                 </div>
-                <button className={"navButton"}
-                        onClick={toggleLock}>{!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
-                <button className={"navButton"} onClick={toggleFilter}>
-                    {!filterEnabled ? "Enable Filter" : "Disable Filter"}
-                </button>
                 <div className={"toolsDiv navDiv"}>
                     <button className={"navButton"} onClick={handleToolsButtonClick}>
                         Tools
@@ -342,6 +312,13 @@ const NavBar = ({stageRef}) => {
                                         className={"dropdownButton"}
                                         onClick={findWorkArea}>
                                         Go To Work Area
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className={"dropdownButton"}
+                                        onClick={handleLockPiecesTogether}>
+                                        Lock selected images together
                                     </button>
                                 </li>
                                 <li>
