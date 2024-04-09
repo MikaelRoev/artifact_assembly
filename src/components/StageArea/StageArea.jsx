@@ -1,10 +1,10 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Layer, Stage, Transformer} from "react-konva";
+import {Group, Layer, Stage, Transformer} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
@@ -34,7 +34,7 @@ const StageArea = ({stageRef, layerRef}) => {
     } = useContext(SelectContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {images, setImages, undo, redo} = useContext(ImageContext);
+    const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {setFilterImageIndex} = useContext(ImageFilterContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -43,7 +43,7 @@ const StageArea = ({stageRef, layerRef}) => {
     const zoomMin = 0.001; //zoom out limit
     const zoomMax = 300; //zoom in limit
 
-    let newImages = [...images];
+    let newElements = [...elements];
 
     /**
      * Update the stage according to the project.
@@ -63,15 +63,15 @@ const StageArea = ({stageRef, layerRef}) => {
     useEffect(() => {
 
         /**
-         * Deletes the selected images if the delete key is pressed.
+         * Deletes the selected elements if the delete key is pressed.
          * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
             if ((e.key === "Delete" || e.key === 'Backspace')
                 && selectedElementsIndex.length > 0
                 && !isFilterInteracting) {
-                const newImages = images.filter((image, index) => !selectedElementsIndex.includes(index));
-                setImages(newImages);
+                const newElements = elements.filter((element, index) => !selectedElementsIndex.includes(index));
+                setElements(newElements);
                 deselectAll();
             }
         };
@@ -79,27 +79,27 @@ const StageArea = ({stageRef, layerRef}) => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [images, selectedElementsIndex, setImages, isFilterInteracting, deselectAll]);
+    }, [elements, selectedElementsIndex, setElements, isFilterInteracting, deselectAll]);
 
     /**
      * Sets up and cleans up the save event listener.
      */
     useEffect(() => {
         /**
-         * Saves the image positions if ctrl + S is pressed.
+         * Saves the project if ctrl + S is pressed.
          * @param e{KeyboardEvent} the event.
          */
         const handleSavePressed = (e) => {
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
-                saveProjectDialog(project, setProject, images).then(() => console.log("project saved"));
+                saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
             }
         };
         document.addEventListener("keydown", handleSavePressed);
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
         };
-    }, [images, project, setProject]);
+    }, [elements, project, setProject]);
 
     /**
      * Sets up and cleans up the undo event listener.
@@ -260,6 +260,61 @@ const StageArea = ({stageRef, layerRef}) => {
         setFilterImageIndex(index);
     }
 
+    const renderElements = () => {
+        return (
+            elements.length > 0 &&
+            elements.map((element, index) => {
+                switch (element.type) {
+                    case 'Image':
+                        return (
+                            renderImage(element, index)
+                        );
+                    case 'Group':
+                        return (
+                            renderGroup(element, index)
+
+                        );
+                }
+            })
+        );
+    }
+
+    const renderImage = (image, index) => {
+        return (
+            <ImageNode
+                key={index}
+                imageProps={image}
+                onClick={(e) => handleElementClick(e, index)}
+                onContextMenu={(e) => handleImageContextClick(e, index)}
+                onChange={(newImage) => {
+                    newElements[index] = newImage;
+                    setElements(newElements);
+                }}
+            />
+        );
+    }
+
+    const renderGroup = (group, index) => {
+        return (
+            <Group
+                key={index}
+                onClick={e => handleElementClick(e, index)}
+                onTap={e => handleElementClick(e, index)}
+                onContextMenu={e => handleImageContextClick(e, index)}
+
+            >
+                {group.groupElements.map((groupElement, i) => {
+                    console.log("Rendering Image:", groupElement); // Add console.log here
+                    return (
+                        <ImageNode
+                            key={i}
+                            imageProps={groupElement}
+                        />
+                    );
+                })}
+            </Group>
+        );
+    }
 
     /**
      * useEffect for updating image dimensions
@@ -274,14 +329,13 @@ const StageArea = ({stageRef, layerRef}) => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             imageNodes.forEach(imageNode => {
                 if (!imageNode.attrs.width || !imageNode.attrs.height) {
-                    images.forEach((image, index) => {
-                        if (imageNode.attrs.fileName === image.fileName) {
-                            images[index] = {
-                                ...image,
+                    elements.forEach((element, index) => {
+                        if (imageNode.attrs.fileName === element.fileName) {
+                            elements[index] = {
+                                ...element,
                                 width: imageNode.width(),
                                 height: imageNode.height(),
                             }
-
                         }
                     })
                 }
@@ -292,14 +346,14 @@ const StageArea = ({stageRef, layerRef}) => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (layerRef.current && images.length > 0) {
+        if (layerRef.current && elements.length > 0) {
             const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
                 .filter((child) => !child.attrs.width);
             if (imageNodes.length !== 0) {
                 setImageDimensions(imageNodes);
             }
         }
-    }, [images.length, layerRef, images]);
+    }, [elements.length, layerRef, elements]);
 
     return (
         <Stage
@@ -314,23 +368,7 @@ const StageArea = ({stageRef, layerRef}) => {
             <Layer
                 className="layer"
                 ref={layerRef}>
-                {images.length > 0 &&
-                    images.map((image, index) => {
-                        return (
-                            <ImageNode
-                                key={index}
-                                imageURL={image.imageUrl}
-                                imageProps={image}
-                                onClick={(e) => handleElementClick(e, index)}
-                                onContextMenu={(e) => handleImageContextClick(e, index)}
-                                onChange={(newImage) => {
-                                    newImages[index] = newImage;
-                                    setImages(newImages);
-                                }}
-                            />
-                        );
-                    })
-                }
+                {renderElements()}
                 {
                     selectedElements.length > 0 &&
                     <Transformer

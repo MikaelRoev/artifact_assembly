@@ -24,6 +24,7 @@ export const SelectContextProvider = ({children}) => {
      * @param index {number} the index of the element to be selected.
      */
     const select = (element, index) => {
+        console.log(index)
         setSelectedElements([...selectedElements, element]);
         setSelectedElementsIndex([...selectedElementsIndex, index]);
     }

@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
-import ImageContext from "../../contexts/ImageContext";
+import ElementContext from "../../contexts/ElementContext";
 import "./SimilarityMetricsWindow.css"
 
 /**
@@ -16,11 +16,11 @@ export const SimilarityMetricsWindowContext = createContext(null);
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
     const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
-    const {images} = useContext(ImageContext);
+    const {elements} = useContext(ElementContext);
 
     useEffect(() => {
-        if (images.length === 0) setIsSimilarityMetricsWindowOpen(false);
-    }, [images.length]);
+        if (elements.length === 0) setIsSimilarityMetricsWindowOpen(false);
+    }, [elements.length]);
 
     return (
         <SimilarityMetricsWindowContext.Provider value={{
@@ -42,13 +42,14 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {images} = useContext(ImageContext);
+    const {elements} = useContext(ElementContext);
 
     /**
      * UseEffect to make the score window draggable on creation.
      * And handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
+
         /**
          * Function to make the score window draggable across the window.
          * @param element the score window.
@@ -112,22 +113,22 @@ const SimilarityMetricsWindow = () => {
          */
         const appendImageData = () => {
             const scoreWindowContent = document.querySelector('.window-content');
-            if (images.length > 0) {
-                scoreWindowContent.innerHTML = images.map(data =>
+            if (elements.length > 0) {
+                scoreWindowContent.innerHTML = elements.map(data =>
                     `ID: ${data.fileName}, 
                     Width: ${data.width}, 
                     Height: ${data.height}, 
                     Position: ${data.x.toFixed(0)} 
                     ${data.y.toFixed(0)}`).join('<br>');
 
-            } else if (images.length === 0) {
+            } else if (elements.length === 0) {
                 scoreWindowContent.innerHTML = '';
             }
         }
         if (isSimilarityMetricsWindowOpen) {
             appendImageData();
         }
-    }, [isSimilarityMetricsWindowOpen, images, images.length]);
+    }, [isSimilarityMetricsWindowOpen, elements, elements.length]);
 
     /**
      * Resizes the window.
