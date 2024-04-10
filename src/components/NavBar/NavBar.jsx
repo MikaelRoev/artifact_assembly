@@ -106,8 +106,8 @@ const NavBar = ({stageRef}) => {
                 return newImage
             });
             setElements([...elements, ...newImages]);
-            setIsLoading(false);
         }
+        setIsLoading(false);
         handleFileButtonClick()
     };
 
