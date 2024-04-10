@@ -34,6 +34,7 @@ import FilterEnabledContext from "../../contexts/FilterEnabledContext";
  *  invert: boolean
  * }} the event handler for the change of the konva image.
  * @param onContextMenu {function(evt: Konva.KonvaEventObject<PointerEvent>)} the event handler for context menu.
+ * @param id id of the image
  * @returns {JSX.Element} the konva image.
  * @constructor
  */

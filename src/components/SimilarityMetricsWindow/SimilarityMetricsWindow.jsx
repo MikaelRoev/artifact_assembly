@@ -1,12 +1,11 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
-import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
 import ImageContext from "../../contexts/ImageContext";
 import "./SimilarityMetricsWindow.css"
-import {makeDraggable, makeResizable} from "../WindowFunctionality";
+import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
-import selectedElementsIndexContext from "../../contexts/SelectedElementsIndexContext";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
-import {getHueData} from "../ImageManupulation";
+import {getHueData} from "../../util/ImageManupulation";
+import SelectContext from "../../contexts/SelectContext";
 
 /**
  * The context for the similarity metrics window.
@@ -49,7 +48,7 @@ const SimilarityMetricsWindow = ({stageRef}) => {
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {images} = useContext(ImageContext);
-    const {selectedElementsIndex} = useContext(selectedElementsIndexContext)
+    const {selectedElementsIndex} = useContext(SelectContext)
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
 
@@ -58,18 +57,20 @@ const SimilarityMetricsWindow = ({stageRef}) => {
      * And handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
+        if (!isSimilarityMetricsWindowOpen) return;
         const element = document.getElementById("scoreWindow");
         const dragFrom = element.querySelector('.window-top');
         const stage = stageRef.current;
         makeDraggable(element, dragFrom, stage);
-    }, [stageRef]);
+    }, [stageRef, isSimilarityMetricsWindowOpen]);
 
     /**
      * Resizes the window.
      */
     useEffect(() => {
+        if (!isSimilarityMetricsWindowOpen) return;
         makeResizable(document.getElementById('scoreWindow'), 10, stageRef.current);
-    }, [stageRef]);
+    }, [stageRef, isSimilarityMetricsWindowOpen]);
 
 
     /**
@@ -145,9 +146,6 @@ const SimilarityMetricsWindow = ({stageRef}) => {
             // Intersection
             intersection += Math.min(arrayA[i], arrayB[i]);
         }
-
-
-
 
         // Final calculation
         const euclideanDistance = Math.sqrt(euclidean);

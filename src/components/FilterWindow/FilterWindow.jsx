@@ -5,7 +5,7 @@ import ImageContext from "../../contexts/ImageContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import "./FilterWindow.css"
-import makeDraggable from "../WindowFunctionality";
+import {makeDraggable} from "../../util/WindowFunctionality";
 /**
  * The context for the filter window.
  * @type {React.Context<null>}
@@ -63,11 +63,12 @@ const FilterWindow = ({stageRef}) => {
      * and handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
+        if (!isFilterWindowOpen) return;
         const element = document.querySelector('.filterWindow');
         const dragFrom = element.querySelector('.filterWindowHeader');
         const stage = stageRef.current;
         makeDraggable(element, dragFrom, stage);
-    }, [stageRef]);
+    }, [stageRef, isFilterWindowOpen]);
 
 
     /**
@@ -121,6 +122,7 @@ const FilterWindow = ({stageRef}) => {
             } else {
                 root.style.setProperty("--mask", 0)
             }
+            if (!isFilterWindowOpen) return
             document.getElementById("grayscaleToggle")
                 .querySelector('input[name="toggleCheckbox"]').checked = !!image.grayscale;
             if (image.invert) {
