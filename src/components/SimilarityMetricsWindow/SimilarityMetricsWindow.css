@@ -1,3 +1,4 @@
+/* The whole window */
 .window {
     position: fixed;
     display: flex;
@@ -28,6 +29,7 @@
     flex-grow: 1;
 }
 
+/* The top row, containing the headline */
 .window-top {
     cursor: move;
     height: 30px;
@@ -38,32 +40,12 @@
     color: #f0f0f0;
 }
 
+/* The headline */
 .window-top-left {
     float: left;
 }
 
-.options-container {
-    display: flex;
-    background-color: #202020;
-    color: #f0f0f0;
-    padding: 2px;
-}
-.options-container button {
-    width: auto;
-    color: #f0f0f0;
-    transition: 100ms ease-in;
-    background-color: #202020;
-    cursor: pointer;
-    border-radius: 6px;
-    user-select: none;
-    border: none;
-}
-
-.options-container button:hover {
-    background-color: #323842;
-}
-
-
+/* The exit button */
 .square {
     float: right;
     height: 20px;
@@ -89,11 +71,39 @@
     color: #f0f0f0;
 }
 
+/* When hovering over the exit button */
 .exit:hover {
     cursor: pointer;
     background-color: red;
 }
 
+
+/* The next row, with the update button */
+.options-container {
+    display: flex;
+    background-color: #202020;
+    color: #f0f0f0;
+    padding: 2px;
+}
+
+/* The update button */
+.options-container button {
+    width: auto;
+    color: #f0f0f0;
+    transition: 100ms ease-in;
+    background-color: #202020;
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    border: none;
+}
+
+/* When hovering over the update button */
+.options-container button:hover {
+    background-color: #323842;
+}
+
+/* The box with the histogram including the info on the side */
 .histogram-container {
     display: flex;
     flex-direction: row;
@@ -102,9 +112,8 @@
     margin-block: 10px;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
 }
-/*
-HERE!
- */
+
+/* The image with text besides the histogram */
 .histogram-info {
     display: flex;
     flex-direction: column;
