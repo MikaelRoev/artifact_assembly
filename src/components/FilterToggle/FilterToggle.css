@@ -1,4 +1,14 @@
-/* The switch - the box around the slider */
+.toggle-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.toggle-group > p {
+    margin: 0 1px;
+}
+
+    /* The switch - the box around the slider */
 .switch {
     position: relative;
     display: inline-block;
