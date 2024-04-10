@@ -28,6 +28,8 @@ Look for placement of toggle box
     background: #fff;
     color: #000;
     height: calc(100% - 30px);
+    font-family: sans-serif;
+    letter-spacing: 1px;
     font-size: 15px;
     padding: 10px;
     border-bottom-right-radius: 10px;
