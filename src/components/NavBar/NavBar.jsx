@@ -334,7 +334,7 @@ const NavBar = ({stageRef}) => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={findWorkArea}>
-                                        Go To Work Area
+                                        Find Work Area
                                     </button>
                                 </li>
                                 {/*
