@@ -36,7 +36,8 @@ const NavBar = ({stageRef}) => {
 
     const navigate = useNavigate();
 
-    const offset = 50;
+    const xOffset = 200;
+    const yOffset = 75;
 
     /**
      * Closes the project and returns to the landing page.
@@ -66,8 +67,8 @@ const NavBar = ({stageRef}) => {
      */
     const findFirstFreePosition = (position) => {
         while (isAnyElementAtPosition(position)) {
-            position.x += offset;
-            position.y += offset;
+            position.x += xOffset;
+            position.y += yOffset;
         }
         return {x: position.x, y: position.y}
     }
@@ -101,8 +102,8 @@ const NavBar = ({stageRef}) => {
                     // Other properties for the `shapeProps` object
                 };
                 idAdder++
-                position.x += offset;
-                position.y += offset;
+                position.x += xOffset;
+                position.y += yOffset;
                 return newImage
             });
             setElements([...elements, ...newImages]);
