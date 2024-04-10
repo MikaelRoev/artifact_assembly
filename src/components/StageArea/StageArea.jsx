@@ -9,6 +9,8 @@ import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
+import WindowModalOpenContext from "../../contexts/WindowModalOpenContext";
+import {getHueData} from "../ImageManupulation";
 
 /**
  * Component that represents the konva stage area in the canvas page.
@@ -265,41 +267,42 @@ const StageArea = ({stageRef, layerRef}) => {
      * useEffect for updating image dimensions
      */
     useEffect(() => {
-        /**
-         * Sets the width and height of images that does not have them yet.
+
+        /** * Sets the width and height of images that does not have them yet.
          * @param imageNodes Image nodes on the canvas.
          * @returns {Promise<void>}
          */
         const setImageDimensions = async (imageNodes) => {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            imageNodes.forEach(imageNode => {
-                if (!imageNode.attrs.width || !imageNode.attrs.height) {
-                    images.forEach((image, index) => {
-                        if (imageNode.attrs.fileName === image.fileName) {
+            for (const imageNode of imageNodes) {
+                for (const image of images) {
+                    const index = images.indexOf(image);
+                        if (imageNode.attrs.id === image.id) {
+						const hueValues = await getHueData(imageNode.toDataURL());
                             images[index] = {
-                                ...image,
+                                ...image,hueValues: hueValues,
                                 width: imageNode.width(),
                                 height: imageNode.height(),
                             }
-
+}
                         }
-                    })
+                    }
                 }
-            })
-        }
 
-        /**
-         * Checks if it is images on the canvas and only runs the function if there is
-         * an image that needs its width and height updated.
-         */
-        if (layerRef.current && images.length > 0) {
-            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
-                .filter((child) => !child.attrs.width);
-            if (imageNodes.length !== 0) {
-                setImageDimensions(imageNodes);
-            }
-        }
-    }, [images.length, layerRef, images]);
+
+		/**
+		 * Checks if it is images on the canvas and only runs the function if there is
+		 * an image that needs its width and height updated.
+ 		 */
+		if (layerRef.current && images.length > 0) {
+			const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+				.filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
+			if (imageNodes.length > 0) {
+				setImageDimensions(imageNodes).then(() => console.log('Information retrieved'));
+
+			}
+		}
+	}, [images.length, layerRef, images]);
 
     return (
         <Stage
@@ -319,6 +322,7 @@ const StageArea = ({stageRef, layerRef}) => {
                         return (
                             <ImageNode
                                 key={index}
+                                id={image.id}
                                 imageURL={image.imageUrl}
                                 imageProps={image}
                                 onClick={(e) => handleElementClick(e, index)}

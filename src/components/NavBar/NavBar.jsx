@@ -85,6 +85,7 @@ const NavBar = ({stageRef}) => {
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
+            let idAdder = 0 //For when multiple images are loaded at the same time
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
@@ -93,9 +94,11 @@ const NavBar = ({stageRef}) => {
                     filePath: file,
                     x: position.x,
                     y: position.y,
+                    id: Date.now()+idAdder.toString(),
                     // rotation?
                     // Other properties for the `shapeProps` object
                 };
+                idAdder++
                 position.x += offset;
                 position.y += offset;
                 return newImage
@@ -122,6 +125,17 @@ const NavBar = ({stageRef}) => {
         setToolsDropdownVisible(false);
     }
 
+    /**
+     * Constant function to set the visibility of the tools dropdown menu.
+     */
+    const handleToolsButtonClick = () => {
+        setToolsDropdownVisible(!toolsDropdownVisible);
+        setFileDropdownVisible(false);
+    }
+
+    /**
+     * useEffect to align the dropdown menu with the button.
+     */
     useEffect(() => {
         if (fileDropdownVisible) {
             const file = document.querySelector(".fileDiv").getBoundingClientRect();
@@ -130,6 +144,9 @@ const NavBar = ({stageRef}) => {
         }
     }, [fileDropdownVisible]);
 
+    /**
+     * useEffect to align the dropdown menu with the button.
+     */
     useEffect(() => {
         if (toolsDropdownVisible) {
             const tools = document.querySelector(".toolsDiv").getBoundingClientRect();
@@ -139,13 +156,6 @@ const NavBar = ({stageRef}) => {
     }, [toolsDropdownVisible]);
 
 
-    /**
-     * Constant function to set the visibility of the tools dropdown menu.
-     */
-    const handleToolsButtonClick = () => {
-        setToolsDropdownVisible(!toolsDropdownVisible);
-        setFileDropdownVisible(false);
-    }
 
 
     /**
