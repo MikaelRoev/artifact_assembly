@@ -20,10 +20,7 @@
     user-select: none;
     z-index: 998;
 }
-/*
-Work with font and size here!
-Look for placement of toggle box
- */
+
 .filterWindowBody {
     background: #fff;
     color: #000;
