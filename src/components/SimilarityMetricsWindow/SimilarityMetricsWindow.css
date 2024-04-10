@@ -2,9 +2,12 @@
     position: fixed;
     display: flex;
     flex-direction: column;
+    width: fit-content;
     min-width: 400px;
+    height: 350px;
     min-height: 250px;
     border-radius: 10px;
+    overflow: hidden;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
     background: #fff;
     user-select: none;
@@ -17,16 +20,15 @@
     height: calc(100% - 30px);
     font-family: monospace;
     padding: 5px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    margin: 5px;
     overflow-y: auto;
+    box-sizing: content-box;
     flex-grow: 1;
 }
 
 .window-top {
     cursor: move;
     height: 30px;
-    border-bottom: 1px solid rgba(0,0,0,0.5);
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     padding: 5px;
@@ -37,6 +39,28 @@
 .window-top-left {
     float: left;
 }
+
+.options-container {
+    display: flex;
+    background-color: #202020;
+    color: #f0f0f0;
+    padding: 2px;
+}
+.options-container button {
+    width: auto;
+    color: #f0f0f0;
+    transition: 100ms ease-in;
+    background-color: #202020;
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    border: none;
+}
+
+.options-container button:hover {
+    background-color: #323842;
+}
+
 
 .square {
     float: right;
@@ -66,4 +90,30 @@
 .exit:hover {
     cursor: pointer;
     background-color: red;
+}
+
+.histogram-container {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    align-items: flex-start;
+    margin-block: 10px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
+}
+
+.histogram-info {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    margin: 5px 0 0 5px;
+}
+
+.histogram-info img {
+    width: 100%;
+    height: auto;
+}
+.histogram-info p {
+    width: 100%;
+    text-align: center;
+    hyphens: auto;
 }

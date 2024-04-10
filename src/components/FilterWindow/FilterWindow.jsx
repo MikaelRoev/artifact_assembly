@@ -5,7 +5,7 @@ import ElementContext from "../../contexts/ElementContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import "./FilterWindow.css"
-
+import {makeDraggable} from "../../util/WindowFunctionality";
 /**
  * The context for the filter window.
  * @type {React.Context<null>}
@@ -35,10 +35,11 @@ export const FilterWindowContextProvider = ({children}) => {
 
 /**
  * Component representing the window containing the filters for an image.
+ * @param stageRef {MuteableRefObject} is the reference to KonvaStage
  * @returns {JSX.Element} the filter window.
  * @constructor
  */
-const FilterWindow = () => {
+const FilterWindow = ({stageRef}) => {
     const {elements, setElements} = useContext(ElementContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -62,57 +63,12 @@ const FilterWindow = () => {
      * and handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
-        /**
-         * Function to make the score window draggable across the window.
-         * @param element the score window.
-         */
-        function makeDraggable(element) {
-            // Initiating position variables.
-            let currentPosX = 0, currentPosY = 0, previousPosX = 0, previousPosY = 0;
-            // Sets onmousedown attribute to use the dragMouseDown function
-            if (isFilterWindowOpen) element.querySelector('.filterWindowHeader').onmousedown = dragMouseDown;
-
-            /**
-             * Function to handle pressing the top element and moving it.
-             * @param e
-             */
-            function dragMouseDown(e) {
-                e.preventDefault();
-                // Setting the previous position to the current mouse position
-                previousPosX = e.clientX;
-                previousPosY = e.clientY;
-                // Call the close drag element function the mouse is let go.
-                document.onmouseup = closeDragElement;
-                // When the mouse is moved, call the element drag function.
-                document.onmousemove = elementDrag;
-            }
-
-            /**
-             * Function to handle dragging the element.
-             * @param e
-             */
-            function elementDrag(e) {
-                e.preventDefault();
-                // Calculate the new position of the mouse using the previous position data
-                currentPosX = previousPosX - e.clientX;
-                currentPosY = previousPosY - e.clientY;
-                // Replace the old values with the new values
-                previousPosX = e.clientX;
-                previousPosY = e.clientY;
-                // Set the element's new position
-                element.style.top = (element.offsetTop - currentPosY) + 'px';
-                element.style.left = (element.offsetLeft - currentPosX) + 'px';
-            }
-
-            function closeDragElement() {
-                // Stop moving when mouse button is released and release events
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
-        }
-
-        makeDraggable(document.querySelector('#filter-window'));
-    }, []);
+        if (!isFilterWindowOpen) return;
+        const element = document.querySelector('.filterWindow');
+        const dragFrom = element.querySelector('.filterWindowHeader');
+        const stage = stageRef.current;
+        makeDraggable(element, dragFrom, stage);
+    }, [stageRef, isFilterWindowOpen]);
 
 
     /**

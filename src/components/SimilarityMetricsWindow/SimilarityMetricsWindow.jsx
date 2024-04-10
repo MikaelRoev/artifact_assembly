@@ -1,6 +1,11 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import ElementContext from "../../contexts/ElementContext";
 import "./SimilarityMetricsWindow.css"
+import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
+import Histogram from "../Histogram/Histogram";
+import {convertFileSrc} from "@tauri-apps/api/tauri";
+import {getHueData} from "../../util/ImageManupulation";
+import SelectContext from "../../contexts/SelectContext";
 
 /**
  * The context for the similarity metrics window.
@@ -37,193 +42,36 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
  * @returns {JSX.Element} the similarity metrics window
  * @constructor
  */
-const SimilarityMetricsWindow = () => {
+const SimilarityMetricsWindow = ({stageRef}) => {
     const {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
+    const {selectedElementsIndex} = useContext(SelectContext)
+    const contentRef = useRef(null);
+    const [update, setUpdate] = useState(true);
 
     /**
      * UseEffect to make the score window draggable on creation.
      * And handle hiding the window when the exit button is pressed.
      */
     useEffect(() => {
-
-        /**
-         * Function to make the score window draggable across the window.
-         * @param element the score window.
-         */
-        function makeDraggable(element) {
-            // Initiating position variables.
-            let currentPosX = 0, currentPosY = 0, previousPosX = 0, previousPosY = 0;
-            // Sets onmousedown attribute to use the dragMouseDown function
-            if (isSimilarityMetricsWindowOpen) element.querySelector('.window-top').onmousedown = dragMouseDown;
-
-            /**
-             * Function to handle pressing the top element and moving it.
-             * @param e
-             */
-            function dragMouseDown(e) {
-                e.preventDefault();
-                // Setting the previous position to the current mouse position
-                previousPosX = e.clientX;
-                previousPosY = e.clientY;
-                // Call the close drag element function the mouse is let go.
-                document.onmouseup = closeDragElement;
-                // When the mouse is moved, call the element drag function.
-                document.onmousemove = elementDrag;
-            }
-
-            /**
-             * Function to handle dragging the element.
-             * @param e
-             */
-            function elementDrag(e) {
-                e.preventDefault();
-                // Calculate the new position of the mouse using the previous position data
-                currentPosX = previousPosX - e.clientX;
-                currentPosY = previousPosY - e.clientY;
-                // Replace the old values with the new values
-                previousPosX = e.clientX;
-                previousPosY = e.clientY;
-                // Set the element's new position
-                element.style.top = (element.offsetTop - currentPosY) + 'px';
-                element.style.left = (element.offsetLeft - currentPosX) + 'px';
-            }
-
-            function closeDragElement() {
-                // Stop moving when mouse button is released and release events
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
-        }
-
-        makeDraggable(document.querySelector('#scoreWindow'));
-    }, []);
-
-
-    /**
-     * Gets the data from the images on the canvas and put it inside the score window.
-     */
-    useEffect(() => {
-
-        /**
-         * Adds the image data to the score window.
-         */
-        const appendImageData = () => {
-            const scoreWindowContent = document.querySelector('.window-content');
-            if (elements.length > 0) {
-                scoreWindowContent.innerHTML = elements.map(data =>
-                    `ID: ${data.fileName}, 
-                    Width: ${data.width}, 
-                    Height: ${data.height}, 
-                    Position: ${data.x.toFixed(0)} 
-                    ${data.y.toFixed(0)}`).join('<br>');
-
-            } else if (elements.length === 0) {
-                scoreWindowContent.innerHTML = '';
-            }
-        }
-        if (isSimilarityMetricsWindowOpen) {
-            appendImageData();
-        }
-    }, [isSimilarityMetricsWindowOpen, elements, elements.length]);
+        if (!isSimilarityMetricsWindowOpen) return;
+        const element = document.getElementById("scoreWindow");
+        const dragFrom = element.querySelector('.window-top');
+        const stage = stageRef.current;
+        makeDraggable(element, dragFrom, stage);
+    }, [stageRef, isSimilarityMetricsWindowOpen]);
 
     /**
      * Resizes the window.
      */
     useEffect(() => {
         if (!isSimilarityMetricsWindowOpen) return;
-        const resizable = document.getElementById('scoreWindow');
-        let isResizing = false;
-        let startX, startY, startWidth, startHeight, direction;
-        let distance = 7;
+        makeResizable(document.getElementById('scoreWindow'), 10, stageRef.current);
+    }, [stageRef, isSimilarityMetricsWindowOpen]);
 
-        /**
-         * Starts the drag event.
-         * @param e {MouseEvent}
-         */
-        function initDrag(e) {
-            // Determine if the mouse is near the edges
-            const {left, right, bottom} = resizable.getBoundingClientRect();
-            const nearLeftEdge = Math.abs(e.clientX - left) < distance;
-            const nearRightEdge = Math.abs(e.clientX - right) < distance;
-            const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
-
-            if (nearRightEdge || nearBottomEdge || nearLeftEdge) {
-                startX = e.clientX;
-                startY = e.clientY;
-                startWidth = parseInt(document.defaultView.getComputedStyle(resizable).width, 10);
-                startHeight = parseInt(document.defaultView.getComputedStyle(resizable).height, 10);
-                direction = {right: nearRightEdge, left: nearLeftEdge, bottom: nearBottomEdge};
-                isResizing = true;
-
-                document.documentElement.addEventListener('mousemove', doDrag, false);
-                document.documentElement.addEventListener('mouseup', stopDrag, false);
-            }
-        }
-
-        /**
-         * Starts the drag event.
-         * @param e {MouseEvent}
-         */
-        function doDrag(e) {
-            if (!isResizing) return;
-
-            let newWidth = startWidth + e.clientX - startX;
-            let newHeight = startHeight + e.clientY - startY;
-
-            if (direction.right) {
-                resizable.style.width = Math.max(100, newWidth) + 'px';
-            }
-            if (direction.bottom) {
-                resizable.style.height = Math.max(100, newHeight) + 'px';
-            }
-            if (direction.left) {
-                const newWidth = Math.max(100, startWidth - (e.clientX - startX));
-                if (newWidth > 400) {
-                    resizable.style.width = newWidth + 'px';
-                    resizable.style.left = e.clientX + 'px';
-                }
-            }
-        }
-
-        /**
-         * When stopping the drag event.
-         */
-        function stopDrag() {
-            isResizing = false;
-            document.documentElement.removeEventListener('mousemove', doDrag, false);
-            document.documentElement.removeEventListener('mouseup', stopDrag, false);
-        }
-
-        resizable.addEventListener("mousemove", function (e) {
-            const boundingClientRect = resizable.getBoundingClientRect();
-            resizable.style.cursor = getCursor(e, boundingClientRect, distance);
-        }, false)
-
-        resizable.addEventListener('mousedown', initDrag, false);
-    }, []);
-
-    /**
-     * Get the cursor type.
-     * @param e {MouseEvent} the mouse event.
-     * @param boundingRect {DOMRect} the bounding rect of the window.
-     * @param distance {number} the distance to the bounding rect of the activation of the drag.
-     * @return {string} the cursor type.
-     */
-    function getCursor(e, boundingRect, distance) {
-        const nearLeftEdge = Math.abs(e.clientX - boundingRect.left) < distance;
-        const nearRightEdge = Math.abs(e.clientX - boundingRect.right) < distance;
-        const nearBottomEdge = Math.abs(e.clientY - boundingRect.bottom) < distance;
-
-        if (nearBottomEdge && nearLeftEdge) return 'nesw-resize';
-        if (nearBottomEdge && nearRightEdge) return 'nwse-resize';
-        if (nearRightEdge || nearLeftEdge) return 'ew-resize';
-        if (nearBottomEdge) return 'ns-resize';
-        return 'default';
-    }
 
     /**
      * useEffect to prevent right-click on the similarity metrics window
@@ -237,6 +85,130 @@ const SimilarityMetricsWindow = () => {
         }
     }, []);
 
+    /**
+     * Updates the hueValues value of the selected images when the update button is pushed
+     * @returns {Promise<void>}
+     */
+    async function updateHistograms() {
+        const imageNodes = stageRef.current.getChildren()[0].getChildren().filter((child) => child.getClassName() === 'Image')
+        for (const index of selectedElementsIndex) {
+            for (const imageNode of imageNodes) {
+                if (elements[index].id === imageNode.attrs.id) {
+                    const newHues = await getHueData(imageNode.toDataURL())
+                    elements[index] = {
+                        ...elements[index],
+                        hueValues: newHues,
+                    }
+                }
+            }
+
+        }
+        setUpdate(false)
+        await new Promise(resolve => setTimeout(resolve, 1));
+        setUpdate(true)
+    }
+
+    /**
+     * Calculates the Euclidean distance, Pearson correlation, Bhattacharyya distance, Intersection between the two histograms.
+     * @param arrayA Histogram A array
+     * @param arrayB Histogram B array
+     * @returns {
+     * {bhattacharyyaDistance: number,
+     * euclideanDistance: number,
+     * pearsonCorrelation: number,
+     * histogramIntersection: number}
+     * }
+     */
+    const getHistogramScores = (arrayA, arrayB) => {
+        // Euclidean Distance
+        let euclidean = 0
+        // Pearson Correlation
+        let meanA = arrayA.reduce((acc, val) => acc + val, 0) / arrayA.length;
+        let meanB = arrayB.reduce((acc, val) => acc + val, 0) / arrayB.length;
+        let numerator = 0, denominatorA = 0, denominatorB = 0;
+        // Bhattacharyya Distance
+        let coefficient = 0;
+        // Histogram Intersection
+        let intersection = 0;
+
+        for (let i = 0; i < arrayA.length; i++) {
+            // Euclidean
+            euclidean += Math.pow(arrayA[i] - arrayB[i], 2)
+
+            // Pearson
+            numerator += (arrayA[i] - meanA) * (arrayB[i] - meanB)
+            denominatorA += Math.pow(arrayA[i] - meanA, 2);
+            denominatorB += Math.pow(arrayB[i] - meanB, 2);
+
+            // Bhattacharyya
+            coefficient += Math.sqrt(arrayA[i] * arrayB[i]);
+
+            // Intersection
+            intersection += Math.min(arrayA[i], arrayB[i]);
+        }
+
+        // Final calculation
+        const euclideanDistance = Math.sqrt(euclidean);
+        const pearsonCorrelation = numerator / Math.sqrt(denominatorA + denominatorB);
+        const bhattacharyyaDistance = -Math.log(coefficient)
+        const histogramIntersection = intersection
+
+        return {
+            euclideanDistance: euclideanDistance,
+            pearsonCorrelation: pearsonCorrelation,
+            bhattacharyyaDistance: bhattacharyyaDistance,
+            histogramIntersection: histogramIntersection
+        }
+    }
+
+    /**
+     * Gets the similarity values from the selected elements and sets it to the window.
+     * @returns {*[]}
+     */
+    function setSimilarity() {
+        let similarities = []
+        selectedElementsIndex.forEach((index1Val, index1) => {
+            for (let index2 = index1 + 1; index2 < selectedElementsIndex.length; index2++){
+                const index2Val = selectedElementsIndex[index2];
+                if (index1Val !== index2Val) {
+                    const arrayA = countAndNormalizeValues(elements[index1Val].hueValues, 360)
+                    const arrayB = countAndNormalizeValues(elements[index2Val].hueValues, 360)
+                    const values = getHistogramScores(arrayA, arrayB)
+                    similarities.push(<div key={`${index1Val}-${index2Val}`}>
+                        <h3>Scores between {elements[index1Val].fileName} & {elements[index2Val].fileName}</h3>
+                        <p>Euclidean Distance: {values.euclideanDistance}</p>
+                        <p>Pearson Correlation: {values.pearsonCorrelation}</p>
+                        <p>Bhattacharyya Distance: {values.bhattacharyyaDistance}</p>
+                        <p>Histogram Intersection: {values.histogramIntersection}</p>
+                    </div>);
+                }
+            }
+        })
+        return similarities;
+    }
+
+    /**
+     * Counts all the values in an array and puts them into another array. It then normalizes the count values.
+     * @param array array to be counted and normalized.
+     * @param maxValue the max value possible in the array
+     * @returns {any[]}
+     */
+    const countAndNormalizeValues = (array, maxValue) => {
+        const probArray = new Array(maxValue + 1).fill(0)
+        array.forEach(value => {
+            if (value >= 0 && value <= maxValue) {
+                probArray[Math.floor(value)]++
+            }
+        })
+        const totalCount = array.length;
+        probArray.forEach((value, index, arr) => {
+            arr[index] = value / totalCount
+        })
+
+        return probArray;
+    }
+
+
     return (
         isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
@@ -244,8 +216,47 @@ const SimilarityMetricsWindow = () => {
                 <div className="window-top-left">Similarity Metrics Window</div>
                 <button className="square exit" onClick={() => setIsSimilarityMetricsWindowOpen(false)}></button>
             </div>
-            <div className="window-content"></div>
-        </div>)
+            <div className={"options-container"}>
+                <button className={"updateButton"} onClick={updateHistograms}>⟳</button>
+            </div>
+            <div ref={contentRef} className="window-content">
+                {elements.length > 0 && update &&
+                    selectedElementsIndex.map((index) => {
+                        const image = elements[index];
+                        if (image.hueValues) {
+                            const path = convertFileSrc(image.filePath)
+                            return (
+                                <div className={"histogram-container"} key={index}>
+                                    <div className="histogram-info">
+                                        <img src={path} alt={"For histogram"}/>
+                                        <p>{image.fileName}</p>
+                                    </div>
+                                    <Histogram
+                                        key={index}
+                                        array={image.hueValues}
+                                        widthProp={400}
+                                        heightProp={300}
+                                        binsProp={360}
+                                        maxValue={359}
+                                    />
+                                </div>
+                            )
+                        }
+                        return null;
+                    })
+                }
+                {selectedElementsIndex.length > 1 && update && <div>{setSimilarity()}</div>}
+                {selectedElementsIndex.length === 0 &&
+                    <p style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)"
+                    }}>Info.<br/>Select one or more images to display their histogram</p>
+                }
+            </div>
+
+        </div>);
 }
 
 export default SimilarityMetricsWindow;

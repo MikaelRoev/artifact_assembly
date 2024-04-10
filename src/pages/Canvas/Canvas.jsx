@@ -38,9 +38,9 @@ const Canvas = () => {
                                             <div className="stage-container">
                                                 <NavBar stageRef={stageRef}/>
                                                 <StageArea stageRef={stageRef} layerRef={layerRef}/>
-                                                <SimilarityMetricsWindow/>
+                                                <SimilarityMetricsWindow stageRef={stageRef}/>
                                                 <ExportImageModal stageRef={stageRef}/>
-                                                <FilterWindow/>
+                                                <FilterWindow stageRef={stageRef}/>
                                                 <ConfirmCloseModal/>
                                             </div>
                                         </FilterInteractionContextProvider>

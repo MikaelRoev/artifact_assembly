@@ -9,6 +9,7 @@ import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
+import {getHueData} from "../../util/ImageManupulation";
 
 /**
  * Component that represents the konva stage area in the canvas page.
@@ -282,7 +283,8 @@ const StageArea = ({stageRef, layerRef}) => {
     const renderImage = (image, index) => {
         return (
             <ImageNode
-                key={index}
+                key={image.id}
+                id={image.id}
                 imageProps={image}
                 onClick={(e) => handleElementClick(e, index)}
                 onContextMenu={(e) => handleImageContextClick(e, index)}
@@ -327,19 +329,19 @@ const StageArea = ({stageRef, layerRef}) => {
          */
         const setImageDimensions = async (imageNodes) => {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            imageNodes.forEach(imageNode => {
-                if (!imageNode.attrs.width || !imageNode.attrs.height) {
-                    elements.forEach((element, index) => {
-                        if (imageNode.attrs.fileName === element.fileName) {
-                            elements[index] = {
-                                ...element,
-                                width: imageNode.width(),
-                                height: imageNode.height(),
-                            }
+            for (const imageNode of imageNodes) {
+                for (const image of elements) {
+                    const index = elements.indexOf(image);
+                    if (imageNode.attrs.id === image.id) {
+                        const hueValues = await getHueData(imageNode.toDataURL());
+                        elements[index] = {
+                            ...image, hueValues: hueValues,
+                            width: imageNode.width(),
+                            height: imageNode.height(),
                         }
-                    })
+                    }
                 }
-            })
+            }
         }
 
         /**
@@ -348,9 +350,10 @@ const StageArea = ({stageRef, layerRef}) => {
          */
         if (layerRef.current && elements.length > 0) {
             const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
-                .filter((child) => !child.attrs.width);
-            if (imageNodes.length !== 0) {
-                setImageDimensions(imageNodes);
+                .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
+            if (imageNodes.length > 0) {
+                setImageDimensions(imageNodes).then(() => console.log('Information retrieved'));
+
             }
         }
     }, [elements.length, layerRef, elements]);
