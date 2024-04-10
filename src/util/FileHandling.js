@@ -1,24 +1,24 @@
-import {invoke} from "@tauri-apps/api/tauri";
 import {dialog, fs} from "@tauri-apps/api";
+import {invoke} from "@tauri-apps/api/tauri";
 
 /**
  * Saves a string into a file.
- * @param content to be saved.
- * @param filePath the path to the file including the file name and type.
+ * @param content {Object} to be saved.
+ * @param filePath {string} the path to the file including the file name and type.
  */
-async function saveToFile(content, filePath){
+async function saveToFile(content, filePath) {
     await invoke('save_file', {filePath: filePath, content: content})
         .catch((error) => console.error('Error when saving to file: ', error));
 }
 
 /**
  * Reads the contents of a file.
- * @param filePath of the file including name and type.
+ * @param filePath {string} of the file including name and type.
  * @return {Promise<String>} Promise resolving to the contents of the file.
  */
-function readFile(filePath){
+function readFile(filePath) {
     return new Promise((resolve, reject) => {
-        invoke('read_file', { filePath: filePath })
+        invoke('read_file', {filePath: filePath})
             .then((content) => {
                 resolve(content);
             })
@@ -30,7 +30,9 @@ function readFile(filePath){
 }
 
 /**
- * Opens the "open project"-dialog window
+ * Opens the "open project"-dialog window.
+ * @param setProject {function(Object)} the setter for the project.
+ * @param setElements {function(Object)} the setter for the elements.
  * @return {Promise<void>} when the dialog window closes.
  */
 export const openProjectDialog = async (setProject, setElements) => {
@@ -56,8 +58,15 @@ export const openProjectDialog = async (setProject, setElements) => {
 
 /**
  * Opens the "save project as"-dialog window.
+ * @param project {Object} the project.
+ * @param setProject {function(Object)} setter of the project.
+ * @param elements {Object[]} the elements on the canvas.
+ * @return {Promise<never>}
  */
 export const saveProjectDialog = async (project, setProject, elements) => {
+    elements.forEach((element) => {
+        delete element.hueValues;
+    })
     try {
         const filePath = await dialog.save({
             title: 'Save Project As',
@@ -80,8 +89,8 @@ export const saveProjectDialog = async (project, setProject, elements) => {
     }
 };
 /**
- * Opens a save dialog window to select where the exported image of the canvas should be saved
- * @param image the image of the canvas. Needs to be in base64 dataURL form.
+ * Opens a save dialog window to select where the exported image of the canvas should be saved.
+ * @param image{Object} the image of the canvas. Needs to be in base64 dataURL form.
  * @returns {Promise<void>}
  */
 export const exportCanvasAsImageDialog = async (image) => {

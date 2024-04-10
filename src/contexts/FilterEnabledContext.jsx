@@ -1,11 +1,15 @@
-import {createContext, useState} from "react";
+import React, {createContext, useState} from "react";
 
+/**
+ * The filter context that allows for enabling or disabling the image filters.
+ * @type {React.Context<null>}
+ */
 const FilterEnabledContext = createContext(null);
 
 /**
- * Provider for the filter context that allows for getting and setting the image filters.
- * @param children the tree that can use the context.
- * @return {JSX.Element} the provider with the tree under it.
+ * Provider for the filter context that allows for enabling or disabling the image filters.
+ * @param children {JSX.Element} the components that can use the context.
+ * @return {JSX.Element} the context provider.
  * @constructor
  */
 export const FilterEnabledContextProvider = ({children}) => {

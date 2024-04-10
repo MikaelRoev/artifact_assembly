@@ -1,11 +1,15 @@
-import {createContext, useState} from "react";
+import React, {createContext, useState} from "react";
 
+/**
+ * The image filter context that allows for getting and setting index of the image to add filter to.
+ * @type {React.Context<null>}
+ */
 const ImageFilterContext = createContext(null);
 
 /**
- * Provider for the image filter context that allows for getting and setting index of image to add filter to.
- * @param children the tree that can use the context.
- * @return {JSX.Element} the provider with the tree under it.
+ * Provider for the image filter context that allows for getting and setting index of the image to add filter to.
+ * @param children {JSX.Element} the components that can use the context.
+ * @return {JSX.Element} the context provider.
  * @constructor
  */
 export const ImageFilterContextProvider = ({children}) => {
