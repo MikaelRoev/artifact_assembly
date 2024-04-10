@@ -70,7 +70,7 @@ const StageArea = ({stageRef, layerRef}) => {
             if ((e.key === "Delete" || e.key === 'Backspace')
                 && selectedElementsIndex.length > 0
                 && !isFilterInteracting) {
-                const newElements = elements.filter((element, index) => !selectedElementsIndex.includes(index));
+                const newElements = elements.filter((element, index) => !isSelected(index));
                 setElements(newElements);
                 deselectAll();
             }
