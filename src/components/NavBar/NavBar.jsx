@@ -327,7 +327,7 @@ const NavBar = ({stageRef}) => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}>
-                                        Open Similarity Metrics Window
+                                        View Similarity Metrics
                                     </button>
                                 </li>
                                 <li>

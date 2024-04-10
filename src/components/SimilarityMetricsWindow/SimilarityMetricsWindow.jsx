@@ -213,7 +213,7 @@ const SimilarityMetricsWindow = ({stageRef}) => {
         isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
             <div className="window-top">
-                <div className="window-top-left">Similarity Metrics Window</div>
+                <div className="window-top-left">Similarity Metrics</div>
                 <button className="square exit" onClick={() => setIsSimilarityMetricsWindowOpen(false)}></button>
             </div>
             <div className={"options-container"}>
