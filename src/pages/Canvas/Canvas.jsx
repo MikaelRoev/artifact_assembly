@@ -28,12 +28,12 @@ const Canvas = () => {
             <SelectContextProvider>
                 <LockedContextProvider>
                     <ImageFilterContextProvider>
-                        <ConfirmCloseModalContextProvider>
-                            <ExportImageModalContextProvider>
-                                <FilterWindowContextProvider>
-                                    <SimilarityMetricsWindowContextProvider>
-                                        <FilterInteractionContextProvider>
-                                            <StageRefContextProvider>
+                        <ExportImageModalContextProvider>
+                            <FilterWindowContextProvider>
+                                <SimilarityMetricsWindowContextProvider>
+                                    <FilterInteractionContextProvider>
+                                        <StageRefContextProvider>
+                                            <ConfirmCloseModalContextProvider>
                                                 <div className="stage-container">
                                                     <NavBar/>
                                                     <StageArea/>
@@ -42,12 +42,12 @@ const Canvas = () => {
                                                     <FilterWindow/>
                                                     <ConfirmCloseModal/>
                                                 </div>
-                                            </StageRefContextProvider>
-                                        </FilterInteractionContextProvider>
-                                    </SimilarityMetricsWindowContextProvider>
-                                </FilterWindowContextProvider>
-                            </ExportImageModalContextProvider>
-                        </ConfirmCloseModalContextProvider>
+                                            </ConfirmCloseModalContextProvider>
+                                        </StageRefContextProvider>
+                                    </FilterInteractionContextProvider>
+                                </SimilarityMetricsWindowContextProvider>
+                            </FilterWindowContextProvider>
+                        </ExportImageModalContextProvider>
                     </ImageFilterContextProvider>
                 </LockedContextProvider>
             </SelectContextProvider>

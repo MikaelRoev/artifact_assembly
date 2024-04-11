@@ -94,12 +94,11 @@ const NavBar = () => {
                 position = findFirstFreePosition(position);
                 const newImage = {
                     type: 'Image',
-                    fileName: file.split('\\')[file.split('\\').length - 1],
-                    filePath: file,
                     x: position.x,
                     y: position.y,
                     id: Date.now()+idAdder.toString(),
-                    // rotation?
+                    fileName: file.split('\\')[file.split('\\').length - 1],
+                    filePath: file,
                     // Other properties for the `shapeProps` object
                 };
                 idAdder++
@@ -308,7 +307,7 @@ const NavBar = () => {
                                                         .catch(() => {
                                                         })
                                                 });
-                                                setOnDoNotSave(() => goToLandingPage());
+                                                setOnDoNotSave(() => () => goToLandingPage());
                                                 setIsConfirmModalOpen(true);
                                             }}>
                                         Close Project

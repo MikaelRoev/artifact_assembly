@@ -15,12 +15,9 @@ export const ConfirmCloseModalContext = createContext(null);
  */
 export const ConfirmCloseModalContextProvider = ({children}) => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [onSave, setOnSave] = useState(() => () => {
-    });
-    const [onDoNotSave, setOnDoNotSave] = useState(() => () => {
-    });
-    const [onCancel, setOnCancel] = useState(() => () => {
-    });
+    const [onSave, setOnSave] = useState(() => () => {});
+    const [onDoNotSave, setOnDoNotSave] = useState(() => () => {});
+    const [onCancel, setOnCancel] = useState(() => () => {});
 
     const valueProp = {
         isConfirmModalOpen, setIsConfirmModalOpen,
