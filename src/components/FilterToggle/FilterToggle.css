@@ -1,9 +1,20 @@
+/* The whole toggle box */
+.toggle-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.toggle-group > p {
+    margin: 0 1px;
+}
+
 /* The switch - the box around the slider */
 .switch {
     position: relative;
     display: inline-block;
-    width: 56px;
-    height: 32px;
+    width: 48px;
+    height: 24px;
 }
 
 /* Hide default HTML checkbox */
@@ -30,8 +41,8 @@
 .slider:before {
     position: absolute;
     content: "";
-    height: 24px;
-    width: 24px;
+    height: 16px;
+    width: 18px;
     left: 4px;
     bottom: 2px;
     background: lightgrey;
@@ -44,7 +55,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-    transform: translateX(22px);
+    transform: translateX(20px);
 }
 
 .slider.rounded {

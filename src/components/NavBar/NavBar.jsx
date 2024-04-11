@@ -37,7 +37,8 @@ const NavBar = () => {
 
     const navigate = useNavigate();
 
-    const offset = 50;
+    const xOffset = 200;
+    const yOffset = 75;
 
     /**
      * Closes the project and returns to the landing page.
@@ -67,8 +68,8 @@ const NavBar = () => {
      */
     const findFirstFreePosition = (position) => {
         while (isAnyElementAtPosition(position)) {
-            position.x += offset;
-            position.y += offset;
+            position.x += xOffset;
+            position.y += yOffset;
         }
         return {x: position.x, y: position.y}
     }
@@ -102,13 +103,13 @@ const NavBar = () => {
                     // Other properties for the `shapeProps` object
                 };
                 idAdder++
-                position.x += offset;
-                position.y += offset;
+                position.x += xOffset;
+                position.y += yOffset;
                 return newImage
             });
             setElements([...elements, ...newImages]);
-            setIsLoading(false);
         }
+        setIsLoading(false);
         handleFileButtonClick()
     };
 
@@ -328,14 +329,14 @@ const NavBar = () => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}>
-                                        Open Similarity Metrics Window
+                                        View Similarity Metrics
                                     </button>
                                 </li>
                                 <li>
                                     <button
                                         className={"dropdownButton"}
                                         onClick={findWorkArea}>
-                                        Go To Work Area
+                                        Find Work Area
                                     </button>
                                 </li>
                                 {/*
