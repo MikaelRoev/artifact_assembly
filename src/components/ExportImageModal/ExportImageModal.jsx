@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useState} from "react";
-import "./ExportImageModal.css"
 import {exportCanvasAsImageDialog} from "../../util/FileHandling";
+import StageRefContext from "../../contexts/StageRefContext";
+import "./ExportImageModal.css"
 
 /**
  * The context for the export image modal.
@@ -26,14 +27,14 @@ export const ExportImageModalContextProvider = ({children}) => {
 
 /**
  * Component that is a dialog modal that will show up when the export image button is pressed in the file dropdown menu.
- * @param stageRef {MutableRefObject} the reference to the konva stage in the stage area.
  * @returns {JSX.Element} the dialog modal.
  * @constructor
  */
-const ExportImageModal = ({stageRef}) => {
+const ExportImageModal = () => {
     const [number, setNumber] = useState(1);
     const [isInfoVisible, setIsInfoVisible] = useState(false);
     const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
+    const {stageRef} = useContext(StageRefContext);
 
     /**
      * Gets the canvas as DataURL and send it to the export canvas as image dialog.

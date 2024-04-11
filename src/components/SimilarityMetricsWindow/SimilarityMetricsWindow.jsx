@@ -1,11 +1,12 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
-import ElementContext from "../../contexts/ElementContext";
-import "./SimilarityMetricsWindow.css"
-import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
-import Histogram from "../Histogram/Histogram";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
+import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
+import Histogram from "../Histogram/Histogram";
+import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
+import StageRefContext from "../../contexts/StageRefContext";
+import "./SimilarityMetricsWindow.css"
 
 /**
  * The context for the similarity metrics window.
@@ -42,13 +43,14 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
  * @returns {JSX.Element} the similarity metrics window
  * @constructor
  */
-const SimilarityMetricsWindow = ({stageRef}) => {
+const SimilarityMetricsWindow = () => {
     const {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
-    const {selectedElementsIndex} = useContext(SelectContext)
+    const {selectedElementsIndex} = useContext(SelectContext);
+    const {stageRef} = useContext(StageRefContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
 

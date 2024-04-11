@@ -1,11 +1,13 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
+import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
 import ElementContext from "../../contexts/ElementContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
+import StageRefContext from "../../contexts/StageRefContext";
 import "./FilterWindow.css"
-import {makeDraggable} from "../../util/WindowFunctionality";
+
 /**
  * The context for the filter window.
  * @type {React.Context<null>}
@@ -35,15 +37,15 @@ export const FilterWindowContextProvider = ({children}) => {
 
 /**
  * Component representing the window containing the filters for an image.
- * @param stageRef {MuteableRefObject} is the reference to KonvaStage
  * @returns {JSX.Element} the filter window.
  * @constructor
  */
-const FilterWindow = ({stageRef}) => {
+const FilterWindow = () => {
     const {elements, setElements} = useContext(ElementContext);
     const {filterImageIndex} = useContext(ImageFilterContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
+    const {stageRef} = useContext(StageRefContext);
 
     const hueMax = 359;
     const hueMin = 0;

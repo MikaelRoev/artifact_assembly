@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Group, Layer, Stage, Transformer} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
+import {getHueData} from "../../util/ImageManupulation";
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
@@ -8,21 +9,29 @@ import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
+import StageRefContext from "../../contexts/StageRefContext";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
-import {getHueData} from "../../util/ImageManupulation";
 
 /**
  * Component that represents the konva stage area in the canvas page.
- * @param stageRef{MutableRefObject} the reference for the konva stage.
- * @param layerRef{MutableRefObject} the reference for the layer inside the konva stage.
  * @returns {JSX.Element} the konva stage.
  * @constructor
  */
-const StageArea = ({stageRef, layerRef}) => {
+const StageArea = () => {
     const [ctrlPressed, setCtrlPressed] = useState(false);
     const [shiftPressed, setShiftPressed] = useState(false);
 
+    /**
+     * Reference to the konva transformer box.
+     * @type {React.MutableRefObject<Konva.Transformer>}
+     */
     const trRef = useRef();
+
+    /**
+     * Reference to the konva layer on the stage.
+     * @type {React.MutableRefObject<Konva.Layer>}
+     */
+    const layerRef = useRef();
 
     const {
         selectedElements,
@@ -36,6 +45,7 @@ const StageArea = ({stageRef, layerRef}) => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
+    const {stageRef} = useContext(StageRefContext);
     const {setFilterImageIndex} = useContext(ImageFilterContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);

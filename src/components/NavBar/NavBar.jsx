@@ -6,6 +6,7 @@ import LockedContext from "../../contexts/LockedContext";
 import ElementContext from "../../contexts/ElementContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import SelectContext from "../../contexts/SelectContext";
+import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
@@ -13,11 +14,10 @@ import "./NavBar.css";
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.
- * @param stageRef Reference to the canvas stage in the canvas page.
  * @returns {JSX.Element} the navigation bar.
  * @constructor
  */
-const NavBar = ({stageRef}) => {
+const NavBar = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
@@ -25,6 +25,7 @@ const NavBar = ({stageRef}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
+    const {stageRef} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {selectedElementsIndex} = useContext(SelectContext);
