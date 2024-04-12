@@ -23,7 +23,7 @@
     letter-spacing: 1px;
     font-size: 15px;
     padding: 5px;
-    margin: 5px;
+    margin: 0 5px;
     overflow-y: auto;
     box-sizing: content-box;
     flex-grow: 1;
@@ -84,6 +84,8 @@
     background-color: #202020;
     color: #f0f0f0;
     padding: 2px;
+    gap: 10px;
+    vertical-align: middle;
 }
 
 /* The update button */
@@ -178,4 +180,11 @@
 
 .score-table {
     width: fit-content;
+}
+
+.histInput {
+    width: 50px
+}
+.histInput::-webkit-inner-spin-button {
+    opacity: 1;
 }

@@ -7,7 +7,7 @@ import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import "./SimilarityMetricsWindow.css"
-import {useBlocker} from "react-router-dom";
+import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 
 /**
  * The context for the similarity metrics window.
@@ -45,6 +45,7 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
  * @constructor
  */
 const SimilarityMetricsWindow = () => {
+
     const {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
@@ -52,8 +53,17 @@ const SimilarityMetricsWindow = () => {
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
+    const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
+    const maxHistogramValue = 360
+    const [minInputValue, setMinInputValue] = useState(0)
+    const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue)
+    const [minCutOff, setMinCutOff] = useState(0)
+    const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue)
+
+
+
 
     /**
      * UseEffect to make the score window draggable on creation.
@@ -104,8 +114,10 @@ const SimilarityMetricsWindow = () => {
                     }
                 }
             }
-
         }
+        setMinCutOff(minInputValue)
+        setMaxCutOff(maxInputValue)
+
         setUpdate(false)
         await new Promise(resolve => setTimeout(resolve, 1));
         setUpdate(true)
@@ -236,7 +248,13 @@ const SimilarityMetricsWindow = () => {
         return probArray;
     }
 
-
+    /**
+     * Resets the values in the inputs to default.
+     */
+    function handleReset() {
+        setMinInputValue(0)
+        setMaxInputValue(maxHistogramValue)
+    }
     return (
         isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
@@ -246,6 +264,34 @@ const SimilarityMetricsWindow = () => {
             </div>
             <div className={"options-container"}>
                 <button className={"updateButton"} onClick={updateHistograms}>⟳</button>
+                <label htmlFor={"minNumber"}>Min  </label>
+                <input
+                    className={"histInput"}
+                    id={"minNumber"}
+                    type={"number"}
+                    min={0}
+                    max={maxHistogramValue}
+                    step={1}
+                    value={minInputValue}
+                    onChange={(e) => setMinInputValue(Number(e.target.value))}
+                    onFocus={() => setIsFilterInteracting(true)}
+                    onBlur={() => setIsFilterInteracting(false)}
+                />
+
+                <label htmlFor={"maxNumber"}>Max </label>
+                <input
+                    className={"histInput"}
+                    id={"maxNumber"}
+                    type={"number"}
+                    min={0}
+                    max={maxHistogramValue}
+                    step={1}
+                    value={maxInputValue}
+                    onChange={(e) => setMaxInputValue(Number(e.target.value))}
+                    onFocus={() => setIsFilterInteracting(true)}
+                    onBlur={() => setIsFilterInteracting(false)}
+                />
+                <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
                 {elements.length > 0 && update &&
@@ -265,8 +311,9 @@ const SimilarityMetricsWindow = () => {
                                             array={image.hueValues}
                                             widthProp={400}
                                             heightProp={300}
-                                            binsProp={360}
-                                            maxValue={359}
+                                            binsProp={maxCutOff - minCutOff}
+                                            minCutoff={minCutOff}
+                                            maxCutoff={maxCutOff}
                                         />
                                     </div>
                                     <div>

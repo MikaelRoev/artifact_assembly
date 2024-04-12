@@ -11,7 +11,7 @@ import * as d3 from "d3";
  * @returns {JSX.Element}
  * @constructor
  */
-const Histogram = ({array, widthProp, heightProp, binsProp, maxValue}) => {
+const Histogram = ({array, widthProp, heightProp, binsProp, minCutoff, maxCutoff}) => {
     const d3Container = useRef(null);
 
     /**
@@ -28,7 +28,7 @@ const Histogram = ({array, widthProp, heightProp, binsProp, maxValue}) => {
                 height = heightProp - margin.top - margin.bottom;
 
             const x = d3.scaleLinear()
-                .domain([0, maxValue])
+                .domain([minCutoff, maxCutoff])
                 .range([0, width])
 
             const bins = d3.histogram()
@@ -76,7 +76,7 @@ const Histogram = ({array, widthProp, heightProp, binsProp, maxValue}) => {
             g.append("g")
                 .call(d3.axisLeft(y));
         }
-    }, [array, widthProp, heightProp, binsProp, maxValue]);
+    }, [array, widthProp, heightProp, binsProp, minCutoff, maxCutoff]);
 
     return (
         <svg
