@@ -7,6 +7,7 @@ import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import "./SimilarityMetricsWindow.css"
+import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 
 /**
  * The context for the similarity metrics window.
@@ -44,6 +45,7 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
  * @constructor
  */
 const SimilarityMetricsWindow = () => {
+
     const {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
@@ -51,8 +53,17 @@ const SimilarityMetricsWindow = () => {
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
+    const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
+    const maxHistogramValue = 360
+    const [minInputValue, setMinInputValue] = useState(0)
+    const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue)
+    const [minCutOff, setMinCutOff] = useState(0)
+    const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue)
+
+
+
 
     /**
      * UseEffect to make the score window draggable on creation.
@@ -103,8 +114,10 @@ const SimilarityMetricsWindow = () => {
                     }
                 }
             }
-
         }
+        setMinCutOff(minInputValue)
+        setMaxCutOff(maxInputValue)
+
         setUpdate(false)
         await new Promise(resolve => setTimeout(resolve, 1));
         setUpdate(true)
@@ -124,10 +137,6 @@ const SimilarityMetricsWindow = () => {
     const getHistogramScores = (arrayA, arrayB) => {
         // Euclidean Distance
         let euclidean = 0
-        // Pearson Correlation
-        let meanA = arrayA.reduce((acc, val) => acc + val, 0) / arrayA.length;
-        let meanB = arrayB.reduce((acc, val) => acc + val, 0) / arrayB.length;
-        let numerator = 0, denominatorA = 0, denominatorB = 0;
         // Bhattacharyya Distance
         let coefficient = 0;
         // Histogram Intersection
@@ -136,11 +145,6 @@ const SimilarityMetricsWindow = () => {
         for (let i = 0; i < arrayA.length; i++) {
             // Euclidean
             euclidean += Math.pow(arrayA[i] - arrayB[i], 2)
-
-            // Pearson
-            numerator += (arrayA[i] - meanA) * (arrayB[i] - meanB)
-            denominatorA += Math.pow(arrayA[i] - meanA, 2);
-            denominatorB += Math.pow(arrayB[i] - meanB, 2);
 
             // Bhattacharyya
             coefficient += Math.sqrt(arrayA[i] * arrayB[i]);
@@ -151,42 +155,76 @@ const SimilarityMetricsWindow = () => {
 
         // Final calculation
         const euclideanDistance = Math.sqrt(euclidean);
-        const pearsonCorrelation = numerator / Math.sqrt(denominatorA + denominatorB);
         const bhattacharyyaDistance = -Math.log(coefficient)
-        const histogramIntersection = intersection
+        const histogramIntersection = (1 - intersection)
 
         return {
             euclideanDistance: euclideanDistance,
-            pearsonCorrelation: pearsonCorrelation,
             bhattacharyyaDistance: bhattacharyyaDistance,
-            histogramIntersection: histogramIntersection
+            histogramIntersection: histogramIntersection,
+            combined: (euclideanDistance + bhattacharyyaDistance + histogramIntersection) / 3
         }
     }
 
     /**
-     * Gets the similarity values from the selected elements and sets it to the window.
-     * @returns {*[]}
+     * Sets a table with the similarity scores between the selectedElement and every other element
+     * @param selectedElement
+     * @returns {Element} div element with a table of scores and the most similar element to selectedElement
      */
-    function setSimilarity() {
-        let similarities = []
-        selectedElementsIndex.forEach((index1Val, index1) => {
-            for (let index2 = index1 + 1; index2 < selectedElementsIndex.length; index2++){
-                const index2Val = selectedElementsIndex[index2];
-                if (index1Val !== index2Val) {
-                    const arrayA = countAndNormalizeValues(elements[index1Val].hueValues, 360)
-                    const arrayB = countAndNormalizeValues(elements[index2Val].hueValues, 360)
-                    const values = getHistogramScores(arrayA, arrayB)
-                    similarities.push(<div key={`${index1Val}-${index2Val}`}>
-                        <h3>Scores between {elements[index1Val].fileName} & {elements[index2Val].fileName}</h3>
-                        <p>Euclidean Distance: {values.euclideanDistance}</p>
-                        <p>Pearson Correlation: {values.pearsonCorrelation}</p>
-                        <p>Bhattacharyya Distance: {values.bhattacharyyaDistance}</p>
-                        <p>Histogram Intersection: {values.histogramIntersection}</p>
-                    </div>);
+    function setTable(selectedElement) {
+        let rows = [];
+        const arrayA = countAndNormalizeValues(selectedElement.hueValues, 360)
+        let lowest = Infinity
+        let lowestElement = null
+        elements.forEach((element) => {
+            if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
+                const arrayB = countAndNormalizeValues(element.hueValues, 360)
+                const values = getHistogramScores(arrayA, arrayB)
+                if (values.combined < lowest) {
+                    lowest = values.combined;
+                    lowestElement = element;
                 }
+                const path = convertFileSrc(element.filePath)
+                rows.push(
+                    <tr key={`${selectedElement.id}-${element.id}`}>
+                        <td className={"tableColumn1"}><img src={path} alt={"For table row"}/></td>
+                        <td>{values.combined.toFixed(3)}</td>
+                        <td>{values.euclideanDistance.toFixed(3)}</td>
+                        <td>{values.bhattacharyyaDistance.toFixed(3)}</td>
+                        <td>{values.histogramIntersection.toFixed(3)}</td>
+                    </tr>
+                );
             }
         })
-        return similarities;
+
+        const path = convertFileSrc(selectedElement.filePath)
+        const lowestPath = convertFileSrc(lowestElement.filePath)
+        return (
+            <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
+                <table className={"score-table"}>
+                    <thead>
+                    <tr>
+                        <th className={"tableColumn1"}><img src={path} alt={"For table header"}/></th>
+                        <th>Combined<br/>scores</th>
+                        <th>Euclidean<br/>Distance</th>
+                        <th>Bhattacharyya<br/>Distance</th>
+                        <th>Histogram<br/>Intersection</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {rows}
+                    </tbody>
+                </table>
+                <div className={"info-div"}>
+                    <p>The most similar element to</p>
+                    <img src={path} alt={"For information"}
+                         className={"info-image"}/>
+                    <p>is</p>
+                    <img src={lowestPath} alt={"For Information"}
+                         className={"info-image"}/>
+                </div>
+            </div>
+        )
     }
 
     /**
@@ -210,7 +248,13 @@ const SimilarityMetricsWindow = () => {
         return probArray;
     }
 
-
+    /**
+     * Resets the values in the inputs to default.
+     */
+    function handleReset() {
+        setMinInputValue(0)
+        setMaxInputValue(maxHistogramValue)
+    }
     return (
         isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
@@ -220,6 +264,34 @@ const SimilarityMetricsWindow = () => {
             </div>
             <div className={"options-container"}>
                 <button className={"updateButton"} onClick={updateHistograms}>⟳</button>
+                <label htmlFor={"minNumber"}>Min  </label>
+                <input
+                    className={"histInput"}
+                    id={"minNumber"}
+                    type={"number"}
+                    min={0}
+                    max={maxHistogramValue}
+                    step={1}
+                    value={minInputValue}
+                    onChange={(e) => setMinInputValue(Number(e.target.value))}
+                    onFocus={() => setIsFilterInteracting(true)}
+                    onBlur={() => setIsFilterInteracting(false)}
+                />
+
+                <label htmlFor={"maxNumber"}>Max </label>
+                <input
+                    className={"histInput"}
+                    id={"maxNumber"}
+                    type={"number"}
+                    min={0}
+                    max={maxHistogramValue}
+                    step={1}
+                    value={maxInputValue}
+                    onChange={(e) => setMaxInputValue(Number(e.target.value))}
+                    onFocus={() => setIsFilterInteracting(true)}
+                    onBlur={() => setIsFilterInteracting(false)}
+                />
+                <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
                 {elements.length > 0 && update &&
@@ -228,26 +300,31 @@ const SimilarityMetricsWindow = () => {
                         if (image.hueValues) {
                             const path = convertFileSrc(image.filePath)
                             return (
-                                <div className={"histogram-container"} key={index}>
-                                    <div className="histogram-info">
-                                        <img src={path} alt={"For histogram"}/>
-                                        <p>{image.fileName}</p>
+                                <div className={"element-container"} key={index}>
+                                    <div className="histogram-container">
+                                        <div className="histogram-info">
+                                            <img src={path} alt={"For histogram"}/>
+                                            <p>{image.fileName}</p>
+                                        </div>
+                                        <Histogram
+                                            key={index}
+                                            array={image.hueValues}
+                                            widthProp={400}
+                                            heightProp={300}
+                                            binsProp={maxCutOff - minCutOff}
+                                            minCutoff={minCutOff}
+                                            maxCutoff={maxCutOff}
+                                        />
                                     </div>
-                                    <Histogram
-                                        key={index}
-                                        array={image.hueValues}
-                                        widthProp={400}
-                                        heightProp={300}
-                                        binsProp={360}
-                                        maxValue={359}
-                                    />
+                                    <div>
+                                        {setTable(image)}
+                                    </div>
                                 </div>
                             )
                         }
                         return null;
                     })
                 }
-                {selectedElementsIndex.length > 1 && update && <div>{setSimilarity()}</div>}
                 {selectedElementsIndex.length === 0 &&
                     <p style={{
                         position: "absolute",

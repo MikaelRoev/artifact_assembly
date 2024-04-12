@@ -328,7 +328,7 @@ const NavBar = () => {
                                     <button
                                         className={"dropdownButton"}
                                         onClick={handleOpenScoreWindow}>
-                                        View Similarity Metrics
+                                        Similarity Metrics
                                     </button>
                                 </li>
                                 <li>
