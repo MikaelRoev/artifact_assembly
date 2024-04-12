@@ -57,10 +57,10 @@ const FilterWindow = () => {
     const contrastMin = -100;
     const thresholdMax = 350;
     const thresholdMin = 0;
-    const root = document.querySelector(':root');
+    const root = document.querySelector(":root");
 
     const images = useMemo(
-        () => selectedElementsIndex.map((index) => elements[index]).filter((element) => element.type === 'Image'),
+        () => selectedElementsIndex.map((index) => elements[index]).filter((element) => element.type === "Image"),
         [selectedElementsIndex, elements]);
 
     /**
@@ -94,8 +94,8 @@ const FilterWindow = () => {
      */
     useEffect(() => {
         if (!isFilterWindowOpen) return;
-        const element = document.querySelector('.filterWindow');
-        const dragFrom = element.querySelector('.filterWindowHeader');
+        const element = document.querySelector(".filterWindow");
+        const dragFrom = element.querySelector(".filterWindowHeader");
         const stage = stageRef.current;
         makeDraggable(element, dragFrom, stage);
     }, [stageRef, isFilterWindowOpen]);
@@ -104,9 +104,9 @@ const FilterWindow = () => {
      * On creation, adds prevent right-click on the filter window.
      */
     useEffect(() => {
-        let window = document.querySelector('#filter-window');
+        let window = document.querySelector("#filter-window");
         if (window) {
-            window.addEventListener('contextmenu', (event) => {
+            window.addEventListener("contextmenu", (event) => {
                 event.preventDefault();
             })
         }
@@ -213,7 +213,7 @@ const FilterWindow = () => {
 
     return (
         isFilterWindowOpen &&
-        <div id='filter-window' className={"filterWindow"}>
+        <div id="filter-window" className={"filterWindow"}>
             <div className={"filterWindowHeader"}>
                 <div className={"filterWindowTitle"}>Filter</div>
                 <button className={"square exit"} onClick={() => setIsFilterWindowOpen(false)}></button>

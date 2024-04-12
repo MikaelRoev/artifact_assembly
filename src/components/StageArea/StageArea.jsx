@@ -78,7 +78,7 @@ const StageArea = () => {
          * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === 'Backspace')
+            if ((e.key === "Delete" || e.key === "Backspace")
                 && selectedElementsIndex.length > 0
                 && !isFilterInteracting) {
                 const newElements = elements.filter((element, index) => !isSelected(index));
@@ -144,10 +144,10 @@ const StageArea = () => {
          * @param e{KeyboardEvent}
          */
         const handleSelectKeyDown = (e) => {
-            if (e.key === 'Control') {
+            if (e.key === "Control") {
                 setCtrlPressed(true);
             }
-            if (e.key === 'Shift') {
+            if (e.key === "Shift") {
                 setShiftPressed(true);
             }
         };
@@ -157,20 +157,20 @@ const StageArea = () => {
          * @param e{KeyboardEvent}
          */
         const handleSelectKeyUp = (e) => {
-            if (e.key === 'Control') {
+            if (e.key === "Control") {
                 setCtrlPressed(false);
             }
-            if (e.key === 'Shift') {
+            if (e.key === "Shift") {
                 setShiftPressed(false);
             }
         };
 
-        document.addEventListener('keydown', handleSelectKeyDown);
-        document.addEventListener('keyup', handleSelectKeyUp);
+        document.addEventListener("keydown", handleSelectKeyDown);
+        document.addEventListener("keyup", handleSelectKeyUp);
 
         return () => {
-            document.removeEventListener('keydown', handleSelectKeyDown);
-            document.removeEventListener('keyup', handleSelectKeyUp);
+            document.removeEventListener("keydown", handleSelectKeyDown);
+            document.removeEventListener("keyup", handleSelectKeyUp);
         };
     }, []);
 
@@ -277,11 +277,11 @@ const StageArea = () => {
             elements.length > 0 &&
             elements.map((element, index) => {
                 switch (element.type) {
-                    case 'Image':
+                    case "Image":
                         return (
                             renderImage(element, index)
                         );
-                    case 'Group':
+                    case "Group":
                         return (
                             renderGroup(element, index)
 
@@ -360,10 +360,10 @@ const StageArea = () => {
          * an image that needs its width and height updated.
          */
         if (layerRef.current && elements.length > 0) {
-            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === "Image")
                 .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
-                setImageDimensions(imageNodes).then(() => console.log('Information retrieved'));
+                setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
 
             }
         }

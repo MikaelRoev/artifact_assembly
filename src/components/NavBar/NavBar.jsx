@@ -45,7 +45,7 @@ const NavBar = () => {
      */
     const goToLandingPage = () => {
         setElements([]);
-        navigate('/');
+        navigate("/");
     }
 
     /**
@@ -83,7 +83,7 @@ const NavBar = () => {
         // open file explorer dialog window
         const result = await open({
             title: "Load Image",
-            filters: [{name: 'Images', extensions: ['jpg', 'png']}],
+            filters: [{name: "Images", extensions: ["jpg", "png"]}],
             multiple: true,
             //defaultPath: await appDataDir()
         });
@@ -93,11 +93,11 @@ const NavBar = () => {
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
-                    type: 'Image',
+                    type: "Image",
                     x: position.x,
                     y: position.y,
                     id: Date.now()+idAdder.toString(),
-                    fileName: file.split('\\')[file.split('\\').length - 1],
+                    fileName: file.split("\\")[file.split("\\").length - 1],
                     filePath: file,
                     // Other properties for the `shapeProps` object
                 };
@@ -180,7 +180,7 @@ const NavBar = () => {
 
     const handleLockPiecesTogether = () => {
         const newGroup = {
-            type: 'Group',
+            type: "Group",
             groupElements: []
         }
 

@@ -53,7 +53,7 @@ const ConfirmCloseModal = () => {
                 Do you want to save your changes?
             </p>
             <button
-                className='modalButton'
+                className="modalButton"
                 onClick={() => {
                     console.log("save button click")
                     setIsConfirmModalOpen(false);
@@ -62,7 +62,7 @@ const ConfirmCloseModal = () => {
                 Save
             </button>
             <button
-                className='modalButton'
+                className="modalButton"
                 onClick={() => {
                     onDoNotSave();
                     setIsConfirmModalOpen(false);
@@ -70,7 +70,7 @@ const ConfirmCloseModal = () => {
                 Do Not Save
             </button>
             <button
-                className='modalButton'
+                className="modalButton"
                 onClick={() => {
                     onCancel();
                     setIsConfirmModalOpen(false);

@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from "react-router-dom";
 import {appWindow} from "@tauri-apps/api/window";
 import {openProjectDialog} from "../../util/FileHandling";
 import ProjectList from "../../components/ProjectList/ProjectList";
@@ -30,9 +30,9 @@ const LandingPage = () => {
      */
     const handleOpenProjectClick = () => {
         openProjectDialog(setProject, setElements)
-            .then(() => navigate('/canvas'))
+            .then(() => navigate("/canvas"))
             .catch(error => {
-                if (error) console.error('Failed to open project:', error);
+                if (error) console.error("Failed to open project:", error);
             });
     };
 
@@ -40,7 +40,7 @@ const LandingPage = () => {
      * Opens the canvas page.
      */
     const handleNewProjectClick = () => {
-        navigate('/canvas')
+        navigate("/canvas")
     }
 
     return (

@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
+import React, {createContext, useContext, useEffect, useRef, useState} from "react";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
@@ -72,7 +72,7 @@ const SimilarityMetricsWindow = () => {
     useEffect(() => {
         if (!isSimilarityMetricsWindowOpen) return;
         const element = document.getElementById("scoreWindow");
-        const dragFrom = element.querySelector('.window-top');
+        const dragFrom = element.querySelector(".window-top");
         const stage = stageRef.current;
         makeDraggable(element, dragFrom, stage);
     }, [stageRef, isSimilarityMetricsWindowOpen]);
@@ -82,7 +82,7 @@ const SimilarityMetricsWindow = () => {
      */
     useEffect(() => {
         if (!isSimilarityMetricsWindowOpen) return;
-        makeResizable(document.getElementById('scoreWindow'), 10, stageRef.current);
+        makeResizable(document.getElementById("scoreWindow"), 10, stageRef.current);
     }, [stageRef, isSimilarityMetricsWindowOpen]);
 
 
@@ -90,9 +90,9 @@ const SimilarityMetricsWindow = () => {
      * useEffect to prevent right-click on the similarity metrics window
      */
     useEffect(() => {
-        let window = document.querySelector('#scoreWindow');
+        let window = document.querySelector("#scoreWindow");
         if (window) {
-            window.addEventListener('contextmenu', (event) => {
+            window.addEventListener("contextmenu", (event) => {
                 event.preventDefault();
             })
         }
@@ -103,7 +103,7 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = stageRef.current.getChildren()[0].getChildren().filter((child) => child.getClassName() === 'Image')
+        const imageNodes = stageRef.current.getChildren()[0].getChildren().filter((child) => child.getClassName() === "Image")
         for (const index of selectedElementsIndex) {
             for (const imageNode of imageNodes) {
                 if (elements[index].id === imageNode.attrs.id) {

@@ -14,8 +14,8 @@ const ProjectContext = createContext(null);
  */
 export const ProjectContextProvider = ({children}) => {
     const [project, setProject] = useState({
-        name: '',
-        description: '',
+        name: "",
+        description: "",
         x: 0,
         y: 0,
         zoom: 1,
