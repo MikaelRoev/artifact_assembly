@@ -175,12 +175,12 @@ const StageArea = () => {
     }, []);
 
     /**
-     * Deselects when the mouse clicks on an empty area on the canvas
+     * Deselects when the mouse left-clicks on an empty area on the canvas
      * and ctrl key is not pressed.
-     * @param e{MouseEvent} the event.
+     * @param e{KonvaEventObject<MouseEvent>} the event.
      */
     const checkDeselect = (e) => {
-        if (e.target === e.currentTarget && !ctrlPressed && !shiftPressed) {
+        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
             deselectAll();
         }
     };
@@ -244,6 +244,7 @@ const StageArea = () => {
      * @param index {number} of the element clicked on.
      */
     const handleElementClick = (e, index) => {
+        if (e.evt.button === 2) return;
         const element = e.target;
         element.moveToTop();
 
