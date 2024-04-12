@@ -75,19 +75,17 @@ const FilterWindow = () => {
     }
 
     /**
-     * Calculates and applies dynamic styles based on invert.
+     * Calculates and applies the style of the brightness slider based on invert.
+     * @param brightness {number} the brightness value of the selected images.
      * @param invert {boolean} whether the selected images is inverted or not.
      */
-    const updateStyles = (invert) => {
-        let valuePercent = mapToPercentage(getValue("value"), brightnessMin, brightnessMax);
-        let thresholdPercent = mapToPercentage(getValue("threshold"), thresholdMin, thresholdMax);
+    const updateBrightnessStyle = (brightness, invert) => {
+        let valuePercent = mapToPercentage(brightness, brightnessMin, brightnessMax);
         if (invert) {
             valuePercent = 100 - valuePercent;
-            thresholdPercent = 100 - thresholdPercent;
         }
         //Value is Brightness
         root.style.setProperty("--brightness", valuePercent);
-        root.style.setProperty("--mask", thresholdPercent);
     }
 
     /**
@@ -121,13 +119,7 @@ const FilterWindow = () => {
         root.style.setProperty("--hue", -getValue("hue"));
         root.style.setProperty("--saturation",
             mapToPercentage(getValue("saturation"), saturationMin, saturationMax));
-        /*
-        root.style.setProperty("--contrast",
-            mapToPercentage(getValue("contrast"), contrastMin, contrastMax));
-
-         */
-        updateStyles(getBool("invert"));
-
+        updateBrightnessStyle(getValue("value"), getBool("invert"));
         if (images.length > 0) {
             if (!isFilterWindowOpen) return;
             document.getElementById("grayscaleToggle")
@@ -156,11 +148,8 @@ const FilterWindow = () => {
         setValue("value", 0); //Value is Brightness
         setValue("contrast", 0);
         setValue("threshold", 0);
-        /*
-        newImage.grayscale = false;
-        newImage.invert = false;
-
-         */
+        setBool("grayscale", false);
+        setBool("invert", false);
         const checkboxes = document.querySelectorAll('input[name="toggleCheckbox"]');
         checkboxes.forEach((checkbox) => {
             checkbox.checked = false;
@@ -287,10 +276,7 @@ const FilterWindow = () => {
                         if (images.length === 0) return;
                         const brightness = parseFloat(bri);
                         setValue("value", brightness, overwrite);
-                        let valuePercent = mapToPercentage(brightness, brightnessMin, brightnessMax);
-                        if (getBool("invert")) valuePercent = 100 - valuePercent;
-                        //Value is Brightness
-                        root.style.setProperty("--brightness", valuePercent);
+                        updateBrightnessStyle(brightness, getBool("invert"));
                     }}
                 />
                 <FilterForm
@@ -303,9 +289,6 @@ const FilterWindow = () => {
                     setValue={(threshold, overwrite) => {
                         if (images.length === 0) return;
                         setValue("threshold", parseInt(threshold), overwrite);
-                        let thresholdPercent = mapToPercentage(getValue("threshold"), thresholdMin, thresholdMax);
-                        if (getBool("invert")) thresholdPercent = 100 - thresholdPercent;
-                        root.style.setProperty("--mask", thresholdPercent);
                     }}
                 />
                 <FilterToggle
@@ -323,7 +306,7 @@ const FilterWindow = () => {
                         if (images.length === 0) return;
                         const invert = getBool("invert");
                         setBool("invert", !invert);
-                        updateStyles();
+                        updateBrightnessStyle(getValue("value"), invert);
                         if (invert) {
                             root.style.setProperty("--invert-first", 100);
                             root.style.setProperty("--invert-last", 0);
@@ -345,7 +328,6 @@ const FilterWindow = () => {
                         {!filterEnabled ? "Enable Filters" : "Disable Filters"}
                     </button>
                 </div>
-
             </div>
         </div>
     );
