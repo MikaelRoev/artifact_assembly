@@ -196,9 +196,7 @@ const FilterWindow = () => {
      */
     const getBool = (parameter) => {
         if (images.length === 0) return false;
-        const bool = images.every(image => image[parameter]);
-        console.log("get ", parameter, bool);
-        return bool;
+        return images.every(image => image[parameter]);
     }
 
     /**
@@ -207,7 +205,6 @@ const FilterWindow = () => {
      * @param bool {boolean} the new value of the parameter.
      */
     const setBool = (parameter, bool) => {
-        console.log("set ", parameter, bool);
         selectedElementsIndex.forEach((index) => {
             elements[index][parameter] = bool;
         });
