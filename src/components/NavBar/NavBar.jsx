@@ -337,7 +337,6 @@ const NavBar = ({stageRef}) => {
                                         Go To Work Area
                                     </button>
                                 </li>
-                                {/*
                                 <li>
                                     <button
                                         className={"dropdownButton"}
@@ -345,7 +344,6 @@ const NavBar = ({stageRef}) => {
                                         Lock Selected Together
                                     </button>
                                 </li>
-                                */}
                                 <li>
                                     <button
                                         className={"dropdownButton"}
