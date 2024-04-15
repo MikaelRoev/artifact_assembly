@@ -301,8 +301,8 @@ const FilterWindow = () => {
                         id={"invertToggle"}
                         setValue={() => {
                             if (images.length === 0) return;
-                            const invert = getBool("invert");
-                            setBool("invert", !invert);
+                            const invert = !getBool("invert");
+                            setBool("invert", invert);
                             updateBrightnessStyle(getValue("value"), invert);
                             if (invert) {
                                 root.style.setProperty("--invert-first", 100);
