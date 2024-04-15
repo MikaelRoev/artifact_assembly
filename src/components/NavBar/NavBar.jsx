@@ -190,9 +190,9 @@ const NavBar = () => {
             groupElements: []
         }
 
-        for (let i= 0; i < selectedElementsIndex.length; i++) {
-            const groupElement = elements[selectedElementsIndex[i]];
-            newGroup.groupElements.push(groupElement)
+        for (const element of selectedElementsIndex) {
+            const groupElement = elements[element];
+            newGroup.groupElements.push(groupElement);
         }
 
         const newElements = elements.filter((element, index) =>
