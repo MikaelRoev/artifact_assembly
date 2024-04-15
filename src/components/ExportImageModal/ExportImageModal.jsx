@@ -81,7 +81,7 @@ const ExportImageModal = () => {
                     max={"10"}
                 />
                 <div className={"modalButtonDiv"}>
-                    <button className={"modalButton"} onClick={handleSave}>Open save window</button>
+                    <button className={"modalButton"} onClick={handleSave}>Save</button>
                     <button className={"modalButton"} onClick={() => setIsExportImageModalOpen(false)}>Cancel</button>
                 </div>
             </div>
