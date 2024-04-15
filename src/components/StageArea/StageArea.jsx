@@ -9,7 +9,6 @@ import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
-import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 
 /**
  * Component that represents the konva stage area in the canvas page.
@@ -46,7 +45,6 @@ const StageArea = () => {
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {stageRef} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
-    const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
@@ -259,16 +257,6 @@ const StageArea = () => {
         }
     }
 
-    /**
-     * Handles when an image is right-clicked and opens the filter window.
-     * @param e {KonvaEventObject<PointerEvent>} right-click event.
-     * @param index {number} the index of the image to add filters to.
-     */
-    const handleImageContextClick = (e, index) => {
-        e.evt.preventDefault();
-        setIsFilterWindowOpen(true);
-    }
-
     const renderElements = () => {
         return (
             elements.length > 0 &&
@@ -295,7 +283,6 @@ const StageArea = () => {
                 id={image.id}
                 imageProps={image}
                 onClick={(e) => handleElementClick(e, index)}
-                onContextMenu={(e) => handleImageContextClick(e, index)}
                 onChange={(newImage) => {
                     newElements[index] = newImage;
                     setElements(newElements);
@@ -310,7 +297,6 @@ const StageArea = () => {
                 key={index}
                 onClick={e => handleElementClick(e, index)}
                 onTap={e => handleElementClick(e, index)}
-                onContextMenu={e => handleImageContextClick(e, index)}
 
             >
                 {group.groupElements.map((groupElement, i) => {

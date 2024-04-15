@@ -63,8 +63,6 @@ const SimilarityMetricsWindow = () => {
     const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue)
 
 
-
-
     /**
      * UseEffect to make the score window draggable on creation.
      * And handle hiding the window when the exit button is pressed.
@@ -255,6 +253,7 @@ const SimilarityMetricsWindow = () => {
         setMinInputValue(0)
         setMaxInputValue(maxHistogramValue)
     }
+
     return (
         isSimilarityMetricsWindowOpen &&
         <div id="scoreWindow" className="window">
@@ -264,7 +263,7 @@ const SimilarityMetricsWindow = () => {
             </div>
             <div className={"options-container"}>
                 <button className={"updateButton"} onClick={updateHistograms}>⟳</button>
-                <label htmlFor={"minNumber"}>Min  </label>
+                <label htmlFor={"minNumber"}>Min </label>
                 <input
                     className={"histInput"}
                     id={"minNumber"}
@@ -294,47 +293,48 @@ const SimilarityMetricsWindow = () => {
                 <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
-                {elements.length > 0 && update &&
-                    selectedElementsIndex.map((index) => {
-                        const image = elements[index];
-                        if (image.hueValues) {
-                            const path = convertFileSrc(image.filePath)
-                            return (
-                                <div className={"element-container"} key={index}>
-                                    <div className="histogram-container">
-                                        <div className="histogram-info">
-                                            <img src={path} alt={"For histogram"}/>
-                                            <p>{image.fileName}</p>
+                {selectedElementsIndex.length > 0 ?
+                    (update &&
+                        selectedElementsIndex.map((index) => {
+                            const image = elements[index];
+                            if (image.hueValues) {
+                                const path = convertFileSrc(image.filePath)
+                                return (
+                                    <div className={"element-container"} key={index}>
+                                        <div className="histogram-container">
+                                            <div className="histogram-info">
+                                                <img src={path} alt={"For histogram"}/>
+                                                <p>{image.fileName}</p>
+                                            </div>
+                                            <Histogram
+                                                key={index}
+                                                array={image.hueValues}
+                                                widthProp={400}
+                                                heightProp={300}
+                                                binsProp={maxCutOff - minCutOff}
+                                                minCutoff={minCutOff}
+                                                maxCutoff={maxCutOff}
+                                            />
                                         </div>
-                                        <Histogram
-                                            key={index}
-                                            array={image.hueValues}
-                                            widthProp={400}
-                                            heightProp={300}
-                                            binsProp={maxCutOff - minCutOff}
-                                            minCutoff={minCutOff}
-                                            maxCutoff={maxCutOff}
-                                        />
+                                        <div>
+                                            {setTable(image)}
+                                        </div>
                                     </div>
-                                    <div>
-                                        {setTable(image)}
-                                    </div>
-                                </div>
-                            )
-                        }
-                        return null;
-                    })
-                }
-                {selectedElementsIndex.length === 0 &&
-                    <p style={{
+                                )
+                            }
+                            return null;
+                        })
+                    ) :
+                    (<p style={{
                         position: "absolute",
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)"
-                    }}>Info.<br/>Select one or more images to display their histogram</p>
+                    }}>
+                        Info.<br/>Select one or more images to display their histogram.
+                    </p>)
                 }
             </div>
-
         </div>);
 }
 

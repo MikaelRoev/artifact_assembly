@@ -10,6 +10,7 @@ import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
+import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 import "./NavBar.css";
 
 /**
@@ -29,6 +30,7 @@ const NavBar = () => {
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {selectedElementsIndex} = useContext(SelectContext);
+    const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {
         setIsConfirmModalOpen,
         setOnSave,
@@ -170,11 +172,18 @@ const NavBar = () => {
     }
 
     /**
-     * Function to open up the score window for all the images on the canvas.
-     * @returns Void
+     * Function to open up the similarity metrics window for all the selected images.
      */
     const handleOpenScoreWindow = async () => {
         setIsSimilarityMetricsWindowOpen(true);
+        handleToolsButtonClick();
+    };
+
+    /**
+     * Function to open up the filter window for all the selected images.
+     */
+    const handleOpenFilterWindow = async () => {
+        setIsFilterWindowOpen(true);
         handleToolsButtonClick();
     };
 
@@ -329,6 +338,13 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={handleOpenScoreWindow}>
                                         Similarity Metrics
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className="dropdownButton"
+                                        onClick={handleOpenFilterWindow}>
+                                        Filters
                                     </button>
                                 </li>
                                 <li>
