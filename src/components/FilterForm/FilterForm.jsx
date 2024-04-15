@@ -33,7 +33,7 @@ const FilterForm = ({label, min, max, step, value, setValue, id}) => {
                 step={step}
                 value={value}
                 onChange={(e) => setValue(e.target.value, true)}
-                onMouseDown={(e) => setValue(e.target.value, false)}
+                onMouseDown={(e) => setValue(e.target.value)}
             />
             <input
                 className="input-number-form"
@@ -42,13 +42,13 @@ const FilterForm = ({label, min, max, step, value, setValue, id}) => {
                 max={max}
                 step={step}
                 value={value}
-                onChange={(e) => setValue(e.target.value, false)}
+                onChange={(e) => setValue(e.target.value)}
                 onFocus={() => setIsFilterInteracting(true)}
                 onBlur={() => setIsFilterInteracting(false)}
             />
             <button
                 className="resetButton"
-                onClick={() => setValue('0', false)}>
+                onClick={() => setValue("0", false)}>
                 Reset
             </button>
         </div>

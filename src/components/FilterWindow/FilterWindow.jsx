@@ -1,11 +1,13 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
+import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
 import ElementContext from "../../contexts/ElementContext";
-import ImageFilterContext from "../../contexts/ImageFilterContext";
+import SelectContext from "../../contexts/SelectContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
+import StageRefContext from "../../contexts/StageRefContext";
 import "./FilterWindow.css"
-import {makeDraggable} from "../../util/WindowFunctionality";
+
 /**
  * The context for the filter window.
  * @type {React.Context<null>}
@@ -35,15 +37,15 @@ export const FilterWindowContextProvider = ({children}) => {
 
 /**
  * Component representing the window containing the filters for an image.
- * @param stageRef {MuteableRefObject} is the reference to KonvaStage
  * @returns {JSX.Element} the filter window.
  * @constructor
  */
-const FilterWindow = ({stageRef}) => {
+const FilterWindow = () => {
     const {elements, setElements} = useContext(ElementContext);
-    const {filterImageIndex} = useContext(ImageFilterContext);
+    const {selectedElementsIndex} = useContext(SelectContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
+    const {stageRef} = useContext(StageRefContext);
 
     const hueMax = 359;
     const hueMin = 0;
@@ -55,8 +57,36 @@ const FilterWindow = ({stageRef}) => {
     const contrastMin = -100;
     const thresholdMax = 350;
     const thresholdMin = 0;
-    const root = document.querySelector(':root');
+    const root = document.querySelector(":root");
 
+    const images = useMemo(
+        () => selectedElementsIndex.map((index) => elements[index]).filter((element) => element.type === "Image"),
+        [selectedElementsIndex, elements]);
+
+    /**
+     * Calculates the percentage representation of a value within a specified range.
+     * @param value {number} The value to be normalized.
+     * @param min {number} The value to be normalized.
+     * @param max {number} The maximum value of the range.
+     * @return {number} A percentage value representing where value falls within the range defined by min and max.
+     */
+    const mapToPercentage = (value, min, max) => {
+        return ((value - min) * 100) / (max - min);
+    }
+
+    /**
+     * Calculates and applies the style of the brightness slider based on invert.
+     * @param brightness {number} the brightness value of the selected images.
+     * @param invert {boolean} whether the selected images is inverted or not.
+     */
+    const updateBrightnessStyle = (brightness, invert) => {
+        let valuePercent = mapToPercentage(brightness, brightnessMin, brightnessMax);
+        if (invert) {
+            valuePercent = 100 - valuePercent;
+        }
+        //Value is Brightness
+        root.style.setProperty("--brightness", valuePercent);
+    }
 
     /**
      * Makes the filter window draggable on creation
@@ -64,20 +94,19 @@ const FilterWindow = ({stageRef}) => {
      */
     useEffect(() => {
         if (!isFilterWindowOpen) return;
-        const element = document.querySelector('.filterWindow');
-        const dragFrom = element.querySelector('.filterWindowHeader');
+        const element = document.querySelector(".filterWindow");
+        const dragFrom = element.querySelector(".filterWindowHeader");
         const stage = stageRef.current;
         makeDraggable(element, dragFrom, stage);
     }, [stageRef, isFilterWindowOpen]);
-
 
     /**
      * On creation, adds prevent right-click on the filter window.
      */
     useEffect(() => {
-        let window = document.querySelector('#filter-window');
+        let window = document.querySelector("#filter-window");
         if (window) {
-            window.addEventListener('contextmenu', (event) => {
+            window.addEventListener("contextmenu", (event) => {
                 event.preventDefault();
             })
         }
@@ -87,45 +116,15 @@ const FilterWindow = ({stageRef}) => {
      * Sets the sliders and toggles on the filter window when changing which fragment to filter.
      */
     useEffect(() => {
-        if (elements[filterImageIndex]) {
-            const image = elements[filterImageIndex];
-            if (image.hue !== undefined) {
-                root.style.setProperty("--hue", -image.hue);
-            } else {
-                root.style.setProperty("--hue", 0);
-            }
-            if (image.saturation !== undefined) {
-                root.style.setProperty("--saturation",
-                    ((image.saturation - saturationMin) / (saturationMax - saturationMin)) * (100));
-            } else {
-                root.style.setProperty("--saturation", 16.666);
-            }
-            if (image.value !== undefined) { //Value is Brightness
-                if (image.invert) {
-                    root.style.setProperty("--brightness",
-                        100 - (((image.value - brightnessMin) * 100) / (brightnessMax - brightnessMin)));
-                } else {
-                    root.style.setProperty("--brightness",
-                        ((image.value - brightnessMin) * 100) / (brightnessMax - brightnessMin));
-                }
-            } else {
-                root.style.setProperty("--brightness", 50);
-            }
-            if (image.threshold !== undefined) {
-                if (image.invert) {
-                    root.style.setProperty("--mask",
-                        100 - (((image.threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
-                } else {
-                    root.style.setProperty("--mask",
-                        ((image.threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
-                }
-            } else {
-                root.style.setProperty("--mask", 0)
-            }
+        root.style.setProperty("--hue", -getValue("hue"));
+        root.style.setProperty("--saturation",
+            mapToPercentage(getValue("saturation"), saturationMin, saturationMax));
+        updateBrightnessStyle(getValue("value"), getBool("invert"));
+        if (images.length > 0) {
             if (!isFilterWindowOpen) return;
             document.getElementById("grayscaleToggle")
-                .querySelector('input[name="toggleCheckbox"]').checked = !!image.grayscale;
-            if (image.invert) {
+                .querySelector('input[name="toggleCheckbox"]').checked = !!getBool("grayscale");
+            if (getBool("invert")) {
                 root.style.setProperty("--invert-first", 100);
                 root.style.setProperty("--invert-last", 0);
                 document.getElementById("invertToggle")
@@ -138,34 +137,19 @@ const FilterWindow = ({stageRef}) => {
             }
         }
 
-    }, [filterImageIndex]);
-
-    /**
-     * Checks if the filter image has a parameter.
-     * @param parameter the parameter to be checked.
-     * @return {number} returns the value of the parameter or 0 if the image do not have the parameter.
-     */
-    function checkValidValue(parameter) {
-        if (!elements[filterImageIndex] || isNaN(elements[filterImageIndex][parameter])) {
-            return 0;
-        } else {
-            return elements[filterImageIndex][parameter];
-        }
-    }
+    }, [selectedElementsIndex]);
 
     /**
      * Resets the filters on the filter image.
      */
     const resetFilter = () => {
-        const newImage = elements[filterImageIndex];
-        if (!newImage) return;
-        newImage.hue = 0;
-        newImage.saturation = 0;
-        newImage.value = 0; //Value is Brightness
-        newImage.contrast = 0;
-        newImage.threshold = 0;
-        newImage.grayscale = false;
-        newImage.invert = false;
+        setValue("hue", 0);
+        setValue("saturation", 0);
+        setValue("value", 0); //Value is Brightness
+        setValue("contrast", 0);
+        setValue("threshold", 0);
+        setBool("grayscale", false);
+        setBool("invert", false);
         const checkboxes = document.querySelectorAll('input[name="toggleCheckbox"]');
         checkboxes.forEach((checkbox) => {
             checkbox.checked = false;
@@ -177,13 +161,59 @@ const FilterWindow = ({stageRef}) => {
         root.style.setProperty("--mask", 0)
         root.style.setProperty("--invert-first", 0);
         root.style.setProperty("--invert-last", 100);
-        elements[filterImageIndex] = newImage;
-        setElements(elements);
     };
+
+    /**
+     * Gets the value of the parameter if the value is the same for all the selected images or 0 if not.
+     * @param parameter {string} the name of the parameter to get the value of.
+     * @return {number} the value if the value is the same for all the selected images or 0 if not.
+     */
+    const getValue = (parameter) => {
+        if (images.length === 0) return 0;
+        const firstValue = images[0][parameter];
+        if (!isNaN(firstValue) && images.every(image => image[parameter] === firstValue)) return firstValue;
+        return 0;
+    }
+
+    /**
+     * Sets the value of the parameter on all the selected images.
+     * @param parameter {string} the name of the parameter to set the value of.
+     * @param value {number} the new value of the parameter.
+     * @param overwrite {evt: boolean} whether it should overwrite the last state in the history
+     * or as default commit a new state.
+     */
+    const setValue = (parameter, value, overwrite = false) => {
+        selectedElementsIndex.forEach((index) => {
+            elements[index][parameter] = value;
+        });
+        setElements(elements, overwrite);
+    }
+
+    /**
+     * Gets true if all the selected are true else returns false.
+     * @param parameter {string} the name of the parameter to get the boolean value of.
+     * @return {number} true if all the selected are true else returns false.
+     */
+    const getBool = (parameter) => {
+        if (images.length === 0) return false;
+        return images.every(image => image[parameter]);
+    }
+
+    /**
+     * Sets the value of the parameter on all the selected images.
+     * @param parameter {string} the name of the parameter to set the value of.
+     * @param bool {boolean} the new value of the parameter.
+     */
+    const setBool = (parameter, bool) => {
+        selectedElementsIndex.forEach((index) => {
+            elements[index][parameter] = bool;
+        });
+        setElements(elements);
+    }
 
     return (
         isFilterWindowOpen &&
-        <div id='filter-window' className={"filterWindow"}>
+        <div id="filter-window" className={"filterWindow"}>
             <div className={"filterWindowHeader"}>
                 <div className={"filterWindowTitle"}>Filter</div>
                 <button className={"square exit"} onClick={() => setIsFilterWindowOpen(false)}></button>
@@ -195,13 +225,12 @@ const FilterWindow = ({stageRef}) => {
                     min={hueMin}
                     max={hueMax}
                     step={1}
-                    value={checkValidValue("hue")}
+                    value={getValue("hue")}
                     setValue={(hu, overwrite) => {
-                        if (!elements[filterImageIndex]) return;
+                        if (images.length === 0) return;
                         const hue = parseInt(hu);
-                        elements[filterImageIndex].hue = hue;
+                        setValue("hue", hue, overwrite);
                         root.style.setProperty("--hue", -hue);
-                        setElements(elements, overwrite);
                     }}
                 />
                 <FilterForm
@@ -210,14 +239,13 @@ const FilterWindow = ({stageRef}) => {
                     min={saturationMin}
                     max={saturationMax}
                     step={0.1}
-                    value={checkValidValue("saturation")}
+                    value={getValue("saturation")}
                     setValue={(sat, overwrite) => {
-                        if (!elements[filterImageIndex]) return;
+                        if (images.length === 0) return;
                         const saturation = parseFloat(sat);
-                        elements[filterImageIndex].saturation = saturation;
+                        setValue("saturation", saturation, overwrite);
                         root.style.setProperty("--saturation",
-                            ((saturation - saturationMin) / (saturationMax - saturationMin)) * (100));
-                        setElements(elements, overwrite);
+                            mapToPercentage(saturation, saturationMin, saturationMax));
                     }}
                 />
                 <FilterForm
@@ -226,11 +254,12 @@ const FilterWindow = ({stageRef}) => {
                     min={contrastMin}
                     max={contrastMax}
                     step={1}
-                    value={checkValidValue("contrast")}
+                    value={getValue("contrast")}
                     setValue={(contrast, overwrite) => {
-                        if (!elements[filterImageIndex]) return;
-                        elements[filterImageIndex].contrast = parseFloat(contrast);
-                        setElements(elements, overwrite);
+                        if (images.length === 0) return;
+                        setValue("contrast", parseFloat(contrast), overwrite);
+                        root.style.setProperty("--contrast",
+                            mapToPercentage(contrast, contrastMin, contrastMax));
                     }}
                 />
                 <FilterForm
@@ -239,19 +268,12 @@ const FilterWindow = ({stageRef}) => {
                     min={brightnessMin}
                     max={brightnessMax}
                     step={0.05}
-                    value={checkValidValue("value")}
+                    value={getValue("value")}
                     setValue={(bri, overwrite) => {
-                        if (!elements[filterImageIndex]) return;
+                        if (images.length === 0) return;
                         const brightness = parseFloat(bri);
-                        elements[filterImageIndex].value = brightness;
-                        if (elements[filterImageIndex].invert) {
-                            root.style.setProperty("--brightness",
-                                100 - (((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin)));
-                        } else {
-                            root.style.setProperty("--brightness",
-                                ((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin));
-                        }
-                        setElements(elements, overwrite);
+                        setValue("value", brightness, overwrite);
+                        updateBrightnessStyle(brightness, getBool("invert"));
                     }}
                 />
                 <FilterForm
@@ -260,55 +282,35 @@ const FilterWindow = ({stageRef}) => {
                     min={thresholdMin}
                     max={thresholdMax}
                     step={1}
-                    value={checkValidValue("threshold")}
+                    value={getValue("threshold")}
                     setValue={(threshold, overwrite) => {
-                        if (!elements[filterImageIndex]) return;
-                        elements[filterImageIndex].threshold = parseInt(threshold);
-                        if (elements[filterImageIndex].invert) {
-                            root.style.setProperty("--mask",
-                                100 - (((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
-                        } else {
-                            root.style.setProperty("--mask",
-                                ((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
-                        }
-                        setElements(elements, overwrite);
+                        if (images.length === 0) return;
+                        setValue("threshold", parseInt(threshold), overwrite);
                     }}
                 />
                 <FilterToggle
                     label="Grayscale"
                     id={"grayscaleToggle"}
                     setValue={() => {
-                        if (!elements[filterImageIndex]) return;
-                        elements[filterImageIndex].grayscale = !elements[filterImageIndex].grayscale;
-                        setElements(elements);
+                        if (images.length === 0) return;
+                        setBool("grayscale", !getBool("grayscale"));
                     }}
                 />
                 <FilterToggle
                     label="Invert"
                     id={"invertToggle"}
                     setValue={() => {
-                        if (!elements[filterImageIndex]) return;
-                        elements[filterImageIndex].invert = !elements[filterImageIndex].invert;
-                        const brightness =
-                            isNaN(elements[filterImageIndex].value) ? 0 : elements[filterImageIndex].value;
-                        const threshold =
-                            isNaN(elements[filterImageIndex].threshold) ? 0 : elements[filterImageIndex].threshold;
-                        if (elements[filterImageIndex].invert) {
+                        if (images.length === 0) return;
+                        const invert = getBool("invert");
+                        setBool("invert", !invert);
+                        updateBrightnessStyle(getValue("value"), invert);
+                        if (invert) {
                             root.style.setProperty("--invert-first", 100);
                             root.style.setProperty("--invert-last", 0);
-                            root.style.setProperty("--brightness",
-                                100 - (((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin)));
-                            root.style.setProperty("--mask",
-                                100 - (((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin)));
                         } else {
                             root.style.setProperty("--invert-first", 0);
                             root.style.setProperty("--invert-last", 100);
-                            root.style.setProperty("--brightness",
-                                ((brightness - brightnessMin) * 100) / (brightnessMax - brightnessMin));
-                            root.style.setProperty("--mask",
-                                ((threshold - thresholdMin) * 100) / (thresholdMax - thresholdMin));
                         }
-                        setElements(elements);
                     }}
                 />
                 <div className={"bottomButtons"}>
@@ -323,7 +325,6 @@ const FilterWindow = ({stageRef}) => {
                         {!filterEnabled ? "Enable Filters" : "Disable Filters"}
                     </button>
                 </div>
-
             </div>
         </div>
     );

@@ -39,18 +39,18 @@ export function makeDraggable(element, dragFrom, stage) {
         previousPosY = e.clientY;
         // Set the element's new position
         if (element.offsetTop - currentPosY < 0) {
-            element.style.top = 0 + 'px';
+            element.style.top = 0 + "px";
         } else if (element.offsetTop + element.clientHeight > stage.height()) {
-            element.style.top = (stage.height() - element.clientHeight) + 'px';
+            element.style.top = (stage.height() - element.clientHeight) + "px";
         } else {
-            element.style.top = (element.offsetTop - currentPosY) + 'px';
+            element.style.top = (element.offsetTop - currentPosY) + "px";
         }
         if (element.offsetLeft - currentPosX < 0) {
-            element.style.left = 0 + 'px';
+            element.style.left = 0 + "px";
         } else if (element.offsetLeft + element.clientWidth > stage.width()) {
-            element.style.left = (stage.width() - element.clientWidth) + 'px';
+            element.style.left = (stage.width() - element.clientWidth) + "px";
         } else {
-            element.style.left = (element.offsetLeft - currentPosX) + 'px';
+            element.style.left = (element.offsetLeft - currentPosX) + "px";
         }
     }
 
@@ -87,10 +87,10 @@ export function makeResizable(element, distance, stage) {
             direction = {right: nearRightEdge, left: nearLeftEdge, bottom: nearBottomEdge};
             isResizing = true;
 
-            document.documentElement.addEventListener('mousemove', function (e) {
+            document.documentElement.addEventListener("mousemove", function (e) {
                 doDrag(e, stage)
             }, false);
-            document.documentElement.addEventListener('mouseup', stopDrag, false);
+            document.documentElement.addEventListener("mouseup", stopDrag, false);
         }
     }
 
@@ -121,18 +121,18 @@ export function makeResizable(element, distance, stage) {
 
         if (direction.right) {
             if (newWidth > 400) {
-                resizable.style.width = newWidth + 'px';
-                resizable.style.left = (posX - resizable.clientWidth) + 'px'
+                resizable.style.width = newWidth + "px";
+                resizable.style.left = (posX - resizable.clientWidth) + "px"
             }
         }
         if (direction.bottom) {
-            resizable.style.height = newHeight + 'px';
+            resizable.style.height = newHeight + "px";
         }
         if (direction.left) {
             const newWidth = startWidth - (posX - startX);
             if (newWidth > 400) {
-                resizable.style.width = newWidth + 'px';
-                resizable.style.left = posX + 'px';
+                resizable.style.width = newWidth + "px";
+                resizable.style.left = posX + "px";
             }
         }
 
@@ -143,17 +143,17 @@ export function makeResizable(element, distance, stage) {
         const nearRightEdge = Math.abs(e.clientX - right) < distance;
         const nearBottomEdge = Math.abs(e.clientY - bottom) < distance;
 
-        if (nearBottomEdge && nearLeftEdge) return 'sw-resize';
-        if (nearBottomEdge && nearRightEdge) return 'se-resize';
-        if (nearRightEdge || nearLeftEdge) return 'ew-resize';
-        if (nearBottomEdge) return 'ns-resize';
-        return 'default';
+        if (nearBottomEdge && nearLeftEdge) return "sw-resize";
+        if (nearBottomEdge && nearRightEdge) return "se-resize";
+        if (nearRightEdge || nearLeftEdge) return "ew-resize";
+        if (nearBottomEdge) return "ns-resize";
+        return "default";
     }
 
     function stopDrag() {
         isResizing = false;
-        resizable.removeEventListener('mousemove', doDrag, false);
-        resizable.removeEventListener('mouseup', stopDrag, false);
+        resizable.removeEventListener("mousemove", doDrag, false);
+        resizable.removeEventListener("mouseup", stopDrag, false);
     }
 
     resizable.addEventListener("mousemove", function (e) {
@@ -161,5 +161,5 @@ export function makeResizable(element, distance, stage) {
         resizable.style.cursor = getCursor(e, left, right, bottom, distance);
     }, false)
 
-    resizable.addEventListener('mousedown', initDrag, false);
+    resizable.addEventListener("mousedown", initDrag, false);
 }
