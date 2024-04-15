@@ -251,17 +251,17 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <div className={"fileDiv navDiv"}>
-                    <button className={"navButton"} onClick={handleFileButtonClick}>
+                <div className="fileDiv navDiv">
+                    <button className="navButton" onClick={handleFileButtonClick}>
                         File
                     </button>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {fileDropdownVisible && (
-                        <div className={"dropdown"}>
+                        <div className="dropdown">
                             <ul>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, elements)
                                                 .then(handleFileButtonClick)
@@ -273,7 +273,7 @@ const NavBar = () => {
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={() => {
                                             openProjectDialog(setProject, setElements)
                                                 .then(handleFileButtonClick)
@@ -285,20 +285,20 @@ const NavBar = () => {
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleImageUpload}>
                                         Load Image
                                     </button>
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleImageOfCanvasExport}>
                                         Export As Image
                                     </button>
                                 </li>
                                 <li>
-                                    <button className={"dropdownButton"}
+                                    <button className="dropdownButton"
                                             onClick={() => {
                                                 setFileDropdownVisible(false);
                                                 setOnSave(() => () => {
@@ -317,23 +317,23 @@ const NavBar = () => {
                         </div>
                     )}
                 </div>
-                <div className={"toolsDiv navDiv"}>
-                    <button className={"navButton"} onClick={handleToolsButtonClick}>
+                <div className="toolsDiv navDiv">
+                    <button className="navButton" onClick={handleToolsButtonClick}>
                         Tools
                     </button>
                     {toolsDropdownVisible && (
-                        <div className={"dropdown"}>
+                        <div className="dropdown">
                             <ul>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleOpenScoreWindow}>
                                         Similarity Metrics
                                     </button>
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={findWorkArea}>
                                         Find Work Area
                                     </button>
@@ -341,7 +341,7 @@ const NavBar = () => {
                                 {/*
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleLockPiecesTogether}>
                                         Lock Selected Together
                                     </button>
@@ -349,7 +349,7 @@ const NavBar = () => {
                                 */}
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleLockCanvasClick}>
                                         {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                                 </li>
@@ -358,8 +358,8 @@ const NavBar = () => {
                     )}
                 </div>
                 <div>
-                    <button className={"navButton undoRedo"} onClick={undo}>⭯</button>
-                    <button className={"navButton undoRedo"} onClick={redo}>⭮</button>
+                    <button className="navButton undoRedo" onClick={undo}>⭯</button>
+                    <button className="navButton undoRedo" onClick={redo}>⭮</button>
                 </div>
             </div>
             <div className="nav-right">
