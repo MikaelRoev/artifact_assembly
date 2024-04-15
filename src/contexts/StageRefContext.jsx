@@ -31,6 +31,18 @@ export const StageRefContextProvider = ({children}) => {
         return getElements().filter((child)=> child.getClassName() == 'Image')
     }
 
+    const getGroup = () => {
+        return getElements().filter((child) => child.getClassName() == 'Group')
+    }
+
+    const getElementsInGroup = () => {
+        return getGroup().getChildren()
+    }
+
+    const getImagesInGroup = () => {
+        return getElementsInGroup().filter((child)=> child.getClassName() == 'Image')
+    }
+
     return (
         <StageRefContext.Provider value={{stageRef, getStage, getLayer, getElements, getImages}}>
             {children}
