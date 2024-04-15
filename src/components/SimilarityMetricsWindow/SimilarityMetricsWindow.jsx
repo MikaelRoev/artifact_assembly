@@ -45,7 +45,6 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
  * @constructor
  */
 const SimilarityMetricsWindow = () => {
-
     const {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
@@ -57,11 +56,10 @@ const SimilarityMetricsWindow = () => {
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
     const maxHistogramValue = 360
-    const [minInputValue, setMinInputValue] = useState(0)
-    const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue)
-    const [minCutOff, setMinCutOff] = useState(0)
-    const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue)
-
+    const [minInputValue, setMinInputValue] = useState(0);
+    const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue);
+    const [minCutOff, setMinCutOff] = useState(0);
+    const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue);
 
     /**
      * UseEffect to make the score window draggable on creation.
@@ -116,9 +114,9 @@ const SimilarityMetricsWindow = () => {
         setMinCutOff(minInputValue)
         setMaxCutOff(maxInputValue)
 
-        setUpdate(false)
+        setUpdate(false);
         await new Promise(resolve => setTimeout(resolve, 1));
-        setUpdate(true)
+        setUpdate(true);
     }
 
     /**
@@ -142,7 +140,7 @@ const SimilarityMetricsWindow = () => {
 
         for (let i = 0; i < arrayA.length; i++) {
             // Euclidean
-            euclidean += Math.pow(arrayA[i] - arrayB[i], 2)
+            euclidean += Math.pow(arrayA[i] - arrayB[i], 2);
 
             // Bhattacharyya
             coefficient += Math.sqrt(arrayA[i] * arrayB[i]);
@@ -153,8 +151,8 @@ const SimilarityMetricsWindow = () => {
 
         // Final calculation
         const euclideanDistance = Math.sqrt(euclidean);
-        const bhattacharyyaDistance = -Math.log(coefficient)
-        const histogramIntersection = (1 - intersection)
+        const bhattacharyyaDistance = -Math.log(coefficient);
+        const histogramIntersection = (1 - intersection);
 
         return {
             euclideanDistance: euclideanDistance,
@@ -182,7 +180,7 @@ const SimilarityMetricsWindow = () => {
                     lowest = values.combined;
                     lowestElement = element;
                 }
-                const path = convertFileSrc(element.filePath)
+                const path = convertFileSrc(element.filePath);
                 rows.push(
                     <tr key={`${selectedElement.id}-${element.id}`}>
                         <td className={"tableColumn1"}><img src={path} alt={"For table row"}/></td>
@@ -194,9 +192,8 @@ const SimilarityMetricsWindow = () => {
                 );
             }
         })
-
-        const path = convertFileSrc(selectedElement.filePath)
-        const lowestPath = convertFileSrc(lowestElement.filePath)
+        const path = convertFileSrc(selectedElement.filePath);
+        const lowestPath = convertFileSrc(lowestElement.filePath);
         return (
             <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
                 <table className={"score-table"}>
@@ -232,16 +229,16 @@ const SimilarityMetricsWindow = () => {
      * @returns {any[]}
      */
     const countAndNormalizeValues = (array, maxValue) => {
-        const probArray = new Array(maxValue + 1).fill(0)
+        const probArray = new Array(maxValue + 1).fill(0);
         array.forEach(value => {
             if (value >= 0 && value <= maxValue) {
-                probArray[Math.floor(value)]++
+                probArray[Math.floor(value)]++;
             }
-        })
+        });
         const totalCount = array.length;
         probArray.forEach((value, index, arr) => {
-            arr[index] = value / totalCount
-        })
+            arr[index] = value / totalCount;
+        });
 
         return probArray;
     }
@@ -250,8 +247,8 @@ const SimilarityMetricsWindow = () => {
      * Resets the values in the inputs to default.
      */
     function handleReset() {
-        setMinInputValue(0)
-        setMaxInputValue(maxHistogramValue)
+        setMinInputValue(0);
+        setMaxInputValue(maxHistogramValue);
     }
 
     return (
