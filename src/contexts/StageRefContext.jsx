@@ -28,7 +28,7 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     const getImages = () => {
-    return getElements().filter((child)=> child.getClassName() == 'Image');
+        return getElements().filter((child)=> child.getClassName() == 'Image');
     }
 
     return (

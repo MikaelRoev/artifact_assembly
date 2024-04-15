@@ -55,7 +55,7 @@ const SimilarityMetricsWindow = () => {
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
-    const maxHistogramValue = 360
+    const maxHistogramValue = 360;
     const [minInputValue, setMinInputValue] = useState(0);
     const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue);
     const [minCutOff, setMinCutOff] = useState(0);
@@ -102,7 +102,7 @@ const SimilarityMetricsWindow = () => {
         for (const index of selectedElementsIndex) {
             for (const imageNode of getImages()) {
                 if (elements[index].id === imageNode.attrs.id) {
-                    const newHues = await getHueData(imageNode.toDataURL())
+                    const newHues = await getHueData(imageNode.toDataURL());
                     elements[index] = {
                         ...elements[index],
                         hueValues: newHues,
@@ -110,8 +110,8 @@ const SimilarityMetricsWindow = () => {
                 }
             }
         }
-        setMinCutOff(minInputValue)
-        setMaxCutOff(maxInputValue)
+        setMinCutOff(minInputValue);
+        setMaxCutOff(maxInputValue);
 
         setUpdate(false);
         await new Promise(resolve => setTimeout(resolve, 1));
@@ -131,7 +131,7 @@ const SimilarityMetricsWindow = () => {
      */
     const getHistogramScores = (arrayA, arrayB) => {
         // Euclidean Distance
-        let euclidean = 0
+        let euclidean = 0;
         // Bhattacharyya Distance
         let coefficient = 0;
         // Histogram Intersection
@@ -168,13 +168,13 @@ const SimilarityMetricsWindow = () => {
      */
     function setTable(selectedElement) {
         let rows = [];
-        const arrayA = countAndNormalizeValues(selectedElement.hueValues, 360)
-        let lowest = Infinity
-        let lowestElement = null
+        const arrayA = countAndNormalizeValues(selectedElement.hueValues, maxHistogramValue);
+        let lowest = Infinity;
+        let lowestElement = null;
         elements.forEach((element) => {
             if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
-                const arrayB = countAndNormalizeValues(element.hueValues, 360)
-                const values = getHistogramScores(arrayA, arrayB)
+                const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
+                const values = getHistogramScores(arrayA, arrayB);
                 if (values.combined < lowest) {
                     lowest = values.combined;
                     lowestElement = element;
