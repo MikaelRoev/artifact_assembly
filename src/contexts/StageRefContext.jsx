@@ -28,11 +28,11 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     const getImages = () => {
-    return getElements().filter((child)=> child.getClassName() == 'Image')
+        return getElements().filter((child)=> child.getClassName() == 'Image')
     }
 
     return (
-        <StageRefContext.Provider value={{stageRef}}>
+        <StageRefContext.Provider value={{stageRef, getStage, getLayer, getElements, getImages}}>
             {children}
         </StageRefContext.Provider>
     )
