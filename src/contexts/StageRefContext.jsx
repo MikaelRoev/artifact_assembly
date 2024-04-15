@@ -24,15 +24,15 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     const getElements = () => {
-        return getLayer().getChildren()
+        return getLayer().getChildren();
     }
 
     const getImages = () => {
-    return getElements().filter((child)=> child.getClassName() == 'Image')
+    return getElements().filter((child)=> child.getClassName() == 'Image');
     }
 
     return (
-        <StageRefContext.Provider value={{stageRef}}>
+        <StageRefContext.Provider value={{stageRef, getStage, getLayer, getElements, getImages}}>
             {children}
         </StageRefContext.Provider>
     )
