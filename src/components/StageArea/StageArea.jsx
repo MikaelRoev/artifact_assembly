@@ -7,7 +7,6 @@ import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
-import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
@@ -46,7 +45,6 @@ const StageArea = () => {
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {stageRef} = useContext(StageRefContext);
-    const {setFilterImageIndex} = useContext(ImageFilterContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
 
@@ -269,7 +267,6 @@ const StageArea = () => {
     const handleImageContextClick = (e, index) => {
         e.evt.preventDefault();
         setIsFilterWindowOpen(true);
-        setFilterImageIndex(index);
     }
 
     const renderElements = () => {
