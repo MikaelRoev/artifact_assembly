@@ -160,9 +160,6 @@ const NavBar = () => {
         }
     }, [toolsDropdownVisible]);
 
-
-
-
     /**
      * Function to handle exporting an image of the canvas
      */

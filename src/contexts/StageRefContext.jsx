@@ -15,6 +15,22 @@ const StageRefContext = createContext(null);
 export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef();
 
+    const getStage = () => {
+        return stageRef.current;
+    }
+
+    const getLayer = () => {
+        return getStage().getChildren()[0];
+    }
+
+    const getElements = () => {
+        return getLayer().getChildren()
+    }
+
+    const getImages = () => {
+    return getElements().filter((child)=> child.getClassName() == 'Image')
+    }
+
     return (
         <StageRefContext.Provider value={{stageRef}}>
             {children}

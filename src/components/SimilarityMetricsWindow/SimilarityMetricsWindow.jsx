@@ -52,7 +52,7 @@ const SimilarityMetricsWindow = () => {
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
-    const {stageRef} = useContext(StageRefContext);
+    const {stageRef, getImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
@@ -101,7 +101,7 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = stageRef.current.getChildren()[0].getChildren().filter((child) => child.getClassName() === "Image")
+        const imageNodes = getImages
         for (const index of selectedElementsIndex) {
             for (const imageNode of imageNodes) {
                 if (elements[index].id === imageNode.attrs.id) {
