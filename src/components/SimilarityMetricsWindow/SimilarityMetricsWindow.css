@@ -1,3 +1,4 @@
+/* The whole window */
 .window {
     position: fixed;
     display: flex;
@@ -18,14 +19,17 @@
     background: #fff;
     color: #000;
     height: calc(100% - 30px);
-    font-family: monospace;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    font-size: 15px;
     padding: 5px;
-    margin: 5px;
+    margin: 0 5px;
     overflow-y: auto;
     box-sizing: content-box;
     flex-grow: 1;
 }
 
+/* The top row, containing the headline */
 .window-top {
     cursor: move;
     height: 30px;
@@ -36,32 +40,12 @@
     color: #f0f0f0;
 }
 
+/* The headline */
 .window-top-left {
     float: left;
 }
 
-.options-container {
-    display: flex;
-    background-color: #202020;
-    color: #f0f0f0;
-    padding: 2px;
-}
-.options-container button {
-    width: auto;
-    color: #f0f0f0;
-    transition: 100ms ease-in;
-    background-color: #202020;
-    cursor: pointer;
-    border-radius: 6px;
-    user-select: none;
-    border: none;
-}
-
-.options-container button:hover {
-    background-color: #323842;
-}
-
-
+/* The exit button */
 .square {
     float: right;
     height: 20px;
@@ -87,25 +71,62 @@
     color: #f0f0f0;
 }
 
+/* When hovering over the exit button */
 .exit:hover {
     cursor: pointer;
     background-color: red;
 }
 
-.histogram-container {
+
+/* The next row, with the update button */
+.options-container {
     display: flex;
-    flex-direction: row;
+    background-color: #202020;
+    color: #f0f0f0;
+    padding: 2px;
+    gap: 10px;
+    vertical-align: middle;
+}
+
+/* The update button */
+.options-container button {
+    width: auto;
+    color: #f0f0f0;
+    transition: 100ms ease-in;
+    background-color: #202020;
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    border: none;
+}
+
+/* When hovering over the update button */
+.options-container button:hover {
+    background-color: #323842;
+}
+/* The box containing the histogram box and the score table*/
+.element-container {
+    display: flex;
+    flex-direction: column;
     width: fit-content;
-    align-items: flex-start;
+    padding: 10px;
     margin-block: 10px;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.5), -1px 1px 4px rgba(0,0,0,0.5);
 }
 
+/* The box with the histogram including the info on the side */
+.histogram-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+/* The image with text besides the histogram */
 .histogram-info {
     display: flex;
     flex-direction: column;
     width: 100px;
-    margin: 5px 0 0 5px;
+    margin: 5px 10px 0 10px;
 }
 
 .histogram-info img {
@@ -116,4 +137,54 @@
     width: 100%;
     text-align: center;
     hyphens: auto;
+}
+
+.tableDiv {
+    margin-block: 15px;
+}
+
+.tableDiv table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableDiv th,
+.tableDiv td {
+    border: 2px solid #000;
+    padding: 8px;
+    text-align: left;
+}
+
+.tableDiv th {
+    background-color: #f4f4f4;
+}
+
+.tableColumn1 {
+    height: 100px
+}
+
+.tableColumn1 img {
+    height: 100%;
+    width: auto;
+}
+
+.info-div * {
+    display: inline-block;
+    vertical-align: middle;
+    margin-inline: 10px;
+}
+
+.info-image {
+    height: 100px;
+}
+
+.score-table {
+    width: fit-content;
+}
+
+.histInput {
+    width: 50px
+}
+.histInput::-webkit-inner-spin-button {
+    opacity: 1;
 }

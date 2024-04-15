@@ -6,18 +6,19 @@ import LockedContext from "../../contexts/LockedContext";
 import ElementContext from "../../contexts/ElementContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import SelectContext from "../../contexts/SelectContext";
+import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
+import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 import "./NavBar.css";
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.
- * @param stageRef Reference to the canvas stage in the canvas page.
  * @returns {JSX.Element} the navigation bar.
  * @constructor
  */
-const NavBar = ({stageRef}) => {
+const NavBar = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
@@ -25,9 +26,11 @@ const NavBar = ({stageRef}) => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
+    const {stageRef} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {selectedElementsIndex, selectOnly} = useContext(SelectContext);
+    const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {
         setIsConfirmModalOpen,
         setOnSave,
@@ -36,14 +39,15 @@ const NavBar = ({stageRef}) => {
 
     const navigate = useNavigate();
 
-    const offset = 50;
+    const xOffset = 200;
+    const yOffset = 75;
 
     /**
      * Closes the project and returns to the landing page.
      */
     const goToLandingPage = () => {
         setElements([]);
-        navigate('/');
+        navigate("/");
     }
 
     /**
@@ -66,8 +70,8 @@ const NavBar = ({stageRef}) => {
      */
     const findFirstFreePosition = (position) => {
         while (isAnyElementAtPosition(position)) {
-            position.x += offset;
-            position.y += offset;
+            position.x += xOffset;
+            position.y += yOffset;
         }
         return {x: position.x, y: position.y}
     }
@@ -81,7 +85,7 @@ const NavBar = ({stageRef}) => {
         // open file explorer dialog window
         const result = await open({
             title: "Load Image",
-            filters: [{name: 'Images', extensions: ['jpg', 'png']}],
+            filters: [{name: "Images", extensions: ["jpg", "png"]}],
             multiple: true,
             //defaultPath: await appDataDir()
         });
@@ -91,23 +95,22 @@ const NavBar = ({stageRef}) => {
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
-                    type: 'Image',
-                    fileName: file.split('\\')[file.split('\\').length - 1],
-                    filePath: file,
+                    type: "Image",
                     x: position.x,
                     y: position.y,
                     id: Date.now()+idAdder.toString(),
-                    // rotation?
+                    fileName: file.split("\\")[file.split("\\").length - 1],
+                    filePath: file,
                     // Other properties for the `shapeProps` object
                 };
                 idAdder++
-                position.x += offset;
-                position.y += offset;
+                position.x += xOffset;
+                position.y += yOffset;
                 return newImage
             });
             setElements([...elements, ...newImages]);
-            setIsLoading(false);
         }
+        setIsLoading(false);
         handleFileButtonClick()
     };
 
@@ -169,17 +172,24 @@ const NavBar = ({stageRef}) => {
     }
 
     /**
-     * Function to open up the score window for all the images on the canvas.
-     * @returns Void
+     * Function to open up the similarity metrics window for all the selected images.
      */
     const handleOpenScoreWindow = async () => {
         setIsSimilarityMetricsWindowOpen(true);
         handleToolsButtonClick();
     };
 
+    /**
+     * Function to open up the filter window for all the selected images.
+     */
+    const handleOpenFilterWindow = async () => {
+        setIsFilterWindowOpen(true);
+        handleToolsButtonClick();
+    };
+
     const handleLockPiecesTogether = () => {
         const newGroup = {
-            type: 'Group',
+            type: "Group",
             groupElements: []
         }
 
@@ -249,17 +259,17 @@ const NavBar = ({stageRef}) => {
     return (
         <nav className="navbar">
             <div className="nav-left">
-                <div className={"fileDiv navDiv"}>
-                    <button className={"navButton"} onClick={handleFileButtonClick}>
+                <div className="fileDiv navDiv">
+                    <button className="navButton" onClick={handleFileButtonClick}>
                         File
                     </button>
                     {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {fileDropdownVisible && (
-                        <div className={"dropdown"}>
+                        <div className="dropdown">
                             <ul>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, elements)
                                                 .then(handleFileButtonClick)
@@ -271,7 +281,7 @@ const NavBar = ({stageRef}) => {
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={() => {
                                             openProjectDialog(setProject, setElements)
                                                 .then(handleFileButtonClick)
@@ -283,20 +293,20 @@ const NavBar = ({stageRef}) => {
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleImageUpload}>
                                         Load Image
                                     </button>
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleImageOfCanvasExport}>
                                         Export As Image
                                     </button>
                                 </li>
                                 <li>
-                                    <button className={"dropdownButton"}
+                                    <button className="dropdownButton"
                                             onClick={() => {
                                                 setFileDropdownVisible(false);
                                                 setOnSave(() => () => {
@@ -305,7 +315,7 @@ const NavBar = ({stageRef}) => {
                                                         .catch(() => {
                                                         })
                                                 });
-                                                setOnDoNotSave(() => goToLandingPage());
+                                                setOnDoNotSave(() => () => goToLandingPage());
                                                 setIsConfirmModalOpen(true);
                                             }}>
                                         Close Project
@@ -315,37 +325,44 @@ const NavBar = ({stageRef}) => {
                         </div>
                     )}
                 </div>
-                <div className={"toolsDiv navDiv"}>
-                    <button className={"navButton"} onClick={handleToolsButtonClick}>
+                <div className="toolsDiv navDiv">
+                    <button className="navButton" onClick={handleToolsButtonClick}>
                         Tools
                     </button>
                     {toolsDropdownVisible && (
-                        <div className={"dropdown"}>
+                        <div className="dropdown">
                             <ul>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleOpenScoreWindow}>
-                                        Open Similarity Metrics Window
+                                        Similarity Metrics
                                     </button>
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
+                                        onClick={handleOpenFilterWindow}>
+                                        Filters
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className="dropdownButton"
                                         onClick={findWorkArea}>
-                                        Go To Work Area
+                                        Find Work Area
                                     </button>
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleLockPiecesTogether}>
                                         Lock Selected Together
                                     </button>
                                 </li>
                                 <li>
                                     <button
-                                        className={"dropdownButton"}
+                                        className="dropdownButton"
                                         onClick={handleLockCanvasClick}>
                                         {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                                 </li>
@@ -354,8 +371,8 @@ const NavBar = ({stageRef}) => {
                     )}
                 </div>
                 <div>
-                    <button className={"navButton undoRedo"} onClick={undo}>⭯</button>
-                    <button className={"navButton undoRedo"} onClick={redo}>⭮</button>
+                    <button className="navButton undoRedo" onClick={undo}>⭯</button>
+                    <button className="navButton undoRedo" onClick={redo}>⭮</button>
                 </div>
             </div>
             <div className="nav-right">

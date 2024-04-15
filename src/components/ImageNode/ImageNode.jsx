@@ -41,9 +41,9 @@ import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
     const imageRef = useRef();
 
-    const [url, setUrl] = useState('');
+    const [url, setUrl] = useState("");
 
-    const [image] = useImage(url, 'anonymous');
+    const [image] = useImage(url, "anonymous");
 
     const {filterEnabled} = useContext(FilterEnabledContext);
 

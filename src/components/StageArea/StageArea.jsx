@@ -1,28 +1,35 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Group, Layer, Stage, Transformer} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
+import {getHueData} from "../../util/ImageManupulation";
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
-import ImageFilterContext from "../../contexts/ImageFilterContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
-import {FilterWindowContext} from "../FilterWindow/FilterWindow";
-import {getHueData} from "../../util/ImageManupulation";
+import StageRefContext from "../../contexts/StageRefContext";
 
 /**
  * Component that represents the konva stage area in the canvas page.
- * @param stageRef{MutableRefObject} the reference for the konva stage.
- * @param layerRef{MutableRefObject} the reference for the layer inside the konva stage.
  * @returns {JSX.Element} the konva stage.
  * @constructor
  */
-const StageArea = ({stageRef, layerRef}) => {
+const StageArea = () => {
     const [ctrlPressed, setCtrlPressed] = useState(false);
     const [shiftPressed, setShiftPressed] = useState(false);
 
+    /**
+     * Reference to the konva transformer box.
+     * @type {React.MutableRefObject<Konva.Transformer>}
+     */
     const trRef = useRef();
+
+    /**
+     * Reference to the konva layer on the stage.
+     * @type {React.MutableRefObject<Konva.Layer>}
+     */
+    const layerRef = useRef();
 
     const {
         selectedElements,
@@ -36,9 +43,8 @@ const StageArea = ({stageRef, layerRef}) => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {setFilterImageIndex} = useContext(ImageFilterContext);
+    const {stageRef} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
-    const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
@@ -68,7 +74,7 @@ const StageArea = ({stageRef, layerRef}) => {
          * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === 'Backspace')
+            if ((e.key === "Delete" || e.key === "Backspace")
                 && selectedElementsIndex.length > 0
                 && !isFilterInteracting) {
                 const newElements = elements.filter((element, index) => !isSelected(index));
@@ -134,10 +140,10 @@ const StageArea = ({stageRef, layerRef}) => {
          * @param e{KeyboardEvent}
          */
         const handleSelectKeyDown = (e) => {
-            if (e.key === 'Control') {
+            if (e.key === "Control") {
                 setCtrlPressed(true);
             }
-            if (e.key === 'Shift') {
+            if (e.key === "Shift") {
                 setShiftPressed(true);
             }
         };
@@ -147,30 +153,30 @@ const StageArea = ({stageRef, layerRef}) => {
          * @param e{KeyboardEvent}
          */
         const handleSelectKeyUp = (e) => {
-            if (e.key === 'Control') {
+            if (e.key === "Control") {
                 setCtrlPressed(false);
             }
-            if (e.key === 'Shift') {
+            if (e.key === "Shift") {
                 setShiftPressed(false);
             }
         };
 
-        document.addEventListener('keydown', handleSelectKeyDown);
-        document.addEventListener('keyup', handleSelectKeyUp);
+        document.addEventListener("keydown", handleSelectKeyDown);
+        document.addEventListener("keyup", handleSelectKeyUp);
 
         return () => {
-            document.removeEventListener('keydown', handleSelectKeyDown);
-            document.removeEventListener('keyup', handleSelectKeyUp);
+            document.removeEventListener("keydown", handleSelectKeyDown);
+            document.removeEventListener("keyup", handleSelectKeyUp);
         };
     }, []);
 
     /**
-     * Deselects when the mouse clicks on an empty area on the canvas
+     * Deselects when the mouse left-clicks on an empty area on the canvas
      * and ctrl key is not pressed.
-     * @param e{MouseEvent} the event.
+     * @param e{KonvaEventObject<MouseEvent>} the event.
      */
     const checkDeselect = (e) => {
-        if (e.target === e.currentTarget && !ctrlPressed && !shiftPressed) {
+        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
             deselectAll();
         }
     };
@@ -234,6 +240,7 @@ const StageArea = ({stageRef, layerRef}) => {
      * @param index {number} of the element clicked on.
      */
     const handleElementClick = (e, index) => {
+        if (e.evt.button === 2) return;
         const element = e.target;
         element.moveToTop();
 
@@ -250,27 +257,16 @@ const StageArea = ({stageRef, layerRef}) => {
         }
     }
 
-    /**
-     * Handles when an image is right-clicked and opens the filter window.
-     * @param e {KonvaEventObject<PointerEvent>} right-click event.
-     * @param index {number} the index of the image to add filters to.
-     */
-    const handleImageContextClick = (e, index) => {
-        e.evt.preventDefault();
-        setIsFilterWindowOpen(true);
-        setFilterImageIndex(index);
-    }
-
     const renderElements = () => {
         return (
             elements.length > 0 &&
             elements.map((element, index) => {
                 switch (element.type) {
-                    case 'Image':
+                    case "Image":
                         return (
                             renderImage(element, index)
                         );
-                    case 'Group':
+                    case "Group":
                         return (
                             renderGroup(element, index)
 
@@ -287,7 +283,6 @@ const StageArea = ({stageRef, layerRef}) => {
                 id={image.id}
                 imageProps={image}
                 onClick={(e) => handleElementClick(e, index)}
-                onContextMenu={(e) => handleImageContextClick(e, index)}
                 onChange={(newImage) => {
                     newElements[index] = newImage;
                     setElements(newElements);
@@ -302,7 +297,6 @@ const StageArea = ({stageRef, layerRef}) => {
                 key={index}
                 onClick={e => handleElementClick(e, index)}
                 onTap={e => handleElementClick(e, index)}
-                onContextMenu={e => handleImageContextClick(e, index)}
 
             >
                 {group.groupElements.map((groupElement, i) => {
@@ -349,10 +343,10 @@ const StageArea = ({stageRef, layerRef}) => {
          * an image that needs its width and height updated.
          */
         if (layerRef.current && elements.length > 0) {
-            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === 'Image')
+            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === "Image")
                 .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
-                setImageDimensions(imageNodes).then(() => console.log('Information retrieved'));
+                setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
 
             }
         }

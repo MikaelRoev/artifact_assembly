@@ -7,8 +7,8 @@ import {invoke} from "@tauri-apps/api/tauri";
  * @param filePath {string} the path to the file including the file name and type.
  */
 async function saveToFile(content, filePath) {
-    await invoke('save_file', {filePath: filePath, content: content})
-        .catch((error) => console.error('Error when saving to file: ', error));
+    await invoke("save_file", {filePath: filePath, content: content})
+        .catch((error) => console.error("Error when saving to file: ", error));
 }
 
 /**
@@ -18,12 +18,12 @@ async function saveToFile(content, filePath) {
  */
 function readFile(filePath) {
     return new Promise((resolve, reject) => {
-        invoke('read_file', {filePath: filePath})
+        invoke("read_file", {filePath: filePath})
             .then((content) => {
                 resolve(content);
             })
             .catch((error) => {
-                console.error('Error reading from file: ', error);
+                console.error("Error reading from file: ", error);
                 reject(error);
             });
     });
@@ -40,7 +40,7 @@ export const openProjectDialog = async (setProject, setElements) => {
         const filePath = await dialog.open({
             title: "Open Project",
             multiple: false,
-            filters: [{name: 'JSON Files', extensions: ['json']}]
+            filters: [{name: "JSON Files", extensions: ["json"]}]
         });
 
         if (!filePath) return Promise.reject(Error("no file selected or operation cancelled"));
@@ -69,8 +69,8 @@ export const saveProjectDialog = async (project, setProject, elements) => {
     })
     try {
         const filePath = await dialog.save({
-            title: 'Save Project As',
-            filters: [{name: 'JSON Files', extensions: ['json']}]
+            title: "Save Project As",
+            filters: [{name: "JSON Files", extensions: ["json"]}]
         });
 
         if (!filePath) return Promise.reject(Error("no file selected or operation cancelled"));
@@ -78,14 +78,14 @@ export const saveProjectDialog = async (project, setProject, elements) => {
         let newProject = {
             ...project,
             // get the project name from the file path.
-            name: filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, '$1')
+            name: filePath.replace(/^.*[\\/](.*?)\.[^.]+$/, "$1")
         };
         setProject(newProject);
         newProject = {...newProject, elements: elements}
 
         await saveToFile(JSON.stringify(newProject), filePath);
     } catch (error) {
-        console.error('Error during file save dialog: ', error);
+        console.error("Error during file save dialog: ", error);
     }
 };
 /**
@@ -94,7 +94,7 @@ export const saveProjectDialog = async (project, setProject, elements) => {
  * @returns {Promise<void>}
  */
 export const exportCanvasAsImageDialog = async (image) => {
-    const base64 = image.split(',')[1];
+    const base64 = image.split(",")[1];
     const binary = atob(base64);
     const len = binary.length;
     const bytes = new Uint8Array(len);
@@ -102,8 +102,8 @@ export const exportCanvasAsImageDialog = async (image) => {
         bytes[i] = binary.charCodeAt(i);
     }
     const filePath = await dialog.save({
-        title: 'Export Canvas as image',
-        filters: [{name: 'PNG Images', extensions: ['png']}]
+        title: "Export Canvas as image",
+        filters: [{name: "PNG Images", extensions: ["png"]}]
     });
     try {
         if (!filePath) return Promise.reject(); //no file selected or operation cancelled
@@ -111,11 +111,11 @@ export const exportCanvasAsImageDialog = async (image) => {
             path: filePath,
             contents: bytes
         })
-        console.log('Image saved successfully to ', filePath);
+        console.log("Image saved successfully to ", filePath);
     } catch (error) {
-        console.error('Error during export of Canvas as image: ', error);
+        console.error("Error during export of Canvas as image: ", error);
         alert("The program encountered an error.\n" +
             "The exported image is too large for the program to write to file.\n" +
-            "Try selecting a lower number")
+            "Try selecting a lower number");
     }
 }
