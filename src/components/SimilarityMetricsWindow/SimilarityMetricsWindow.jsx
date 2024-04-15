@@ -51,7 +51,7 @@ const SimilarityMetricsWindow = () => {
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
-    const {stageRef, getImages} = useContext(StageRefContext);
+    const {getStage, getImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
@@ -69,17 +69,16 @@ const SimilarityMetricsWindow = () => {
         if (!isSimilarityMetricsWindowOpen) return;
         const element = document.getElementById("scoreWindow");
         const dragFrom = element.querySelector(".window-top");
-        const stage = stageRef.current;
-        makeDraggable(element, dragFrom, stage);
-    }, [stageRef, isSimilarityMetricsWindowOpen]);
+        makeDraggable(element, dragFrom, getStage());
+    }, [getStage, isSimilarityMetricsWindowOpen]);
 
     /**
      * Resizes the window.
      */
     useEffect(() => {
         if (!isSimilarityMetricsWindowOpen) return;
-        makeResizable(document.getElementById("scoreWindow"), 10, stageRef.current);
-    }, [stageRef, isSimilarityMetricsWindowOpen]);
+        makeResizable(document.getElementById("scoreWindow"), 10, getStage());
+    }, [getStage, isSimilarityMetricsWindowOpen]);
 
 
     /**

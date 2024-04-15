@@ -43,7 +43,7 @@ const StageArea = () => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef} = useContext(StageRefContext);
+    const {stageRef, getStage} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
@@ -56,12 +56,12 @@ const StageArea = () => {
      * Update the stage according to the project.
      */
     useEffect(() => {
-        const stage = stageRef.current;
+        const stage = getStage();
         if (!stage) return;
         stage.position({x: project.x, y: project.y});
         stage.scale({x: project.zoom, y: project.zoom});
         stage.batchDraw();
-    }, [project, stageRef]);
+    }, [project, getStage]);
 
 
     /**
@@ -189,7 +189,7 @@ const StageArea = () => {
     const zoomStage = (e) => {
         e.evt.preventDefault();
 
-        const stage = stageRef.current;
+        const stage = getStage();
         if (!stage) {
             return;
         }

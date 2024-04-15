@@ -34,13 +34,13 @@ const ExportImageModal = () => {
     const [number, setNumber] = useState(1);
     const [isInfoVisible, setIsInfoVisible] = useState(false);
     const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
-    const {stageRef} = useContext(StageRefContext);
+    const {getStage} = useContext(StageRefContext);
 
     /**
      * Gets the canvas as DataURL and send it to the export canvas as image dialog.
      */
     function handleSave() {
-        let image = stageRef.current.toDataURL({pixelRatio: number});
+        let image = getStage().toDataURL({pixelRatio: number});
         exportCanvasAsImageDialog(image)
             .then(() => setIsExportImageModalOpen(false))
             .catch(() => setIsExportImageModalOpen(false));

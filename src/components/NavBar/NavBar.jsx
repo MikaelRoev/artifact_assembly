@@ -26,7 +26,7 @@ const NavBar = () => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {stageRef} = useContext(StageRefContext);
+    const {getStage} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {selectedElementsIndex, selectOnly} = useContext(SelectContext);
@@ -210,8 +210,8 @@ const NavBar = () => {
      */
     const findWorkArea = () => {
         let nearestElement = null;
-        let shortestDistance = Infinity
-        let stage = stageRef.current
+        let shortestDistance = Infinity;
+        const stage = getStage();
         const stageWidth = stage.width();
         const stageHeight = stage.height();
 
@@ -246,7 +246,7 @@ const NavBar = () => {
                 scaleY: 1,
                 duration: 0.5,
                 onFinish: () => {
-                    project.zoom = 1
+                    project.zoom = 1;
                 }
             })
         }
@@ -310,7 +310,7 @@ const NavBar = () => {
                                                     saveProjectDialog(project, setProject, elements)
                                                         .then(goToLandingPage)
                                                         .catch(() => {
-                                                        })
+                                                        });
                                                 });
                                                 setOnDoNotSave(() => () => goToLandingPage());
                                                 setIsConfirmModalOpen(true);
