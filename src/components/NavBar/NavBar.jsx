@@ -27,7 +27,7 @@ const NavBar = ({stageRef}) => {
     const {project, setProject} = useContext(ProjectContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
-    const {selectedElementsIndex} = useContext(SelectContext);
+    const {selectedElementsIndex, selectOnly} = useContext(SelectContext);
     const {
         setIsConfirmModalOpen,
         setOnSave,
@@ -193,8 +193,7 @@ const NavBar = ({stageRef}) => {
         )
         setElements([...newElements, newGroup])
 
-        // TODO deselect selected elements
-
+        selectOnly();
 
         handleFileButtonClick()
     }
