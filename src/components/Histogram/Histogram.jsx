@@ -23,7 +23,7 @@ const Histogram = ({array, widthProp, heightProp, binsProp, minCutoff, maxCutoff
 
             svg.selectAll("*").remove();
 
-            const margin = {top: 20, right: 20, bottom: 50, left: 60},
+            const margin = {top: 20, right: 20, bottom: 50, left: 70},
                 width = widthProp - margin.left - margin.right,
                 height = heightProp - margin.top - margin.bottom;
 
