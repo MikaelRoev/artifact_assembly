@@ -1,9 +1,7 @@
 import React, {createContext, useRef} from "react";
+import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
-import Konva from "konva";
 import useHistory from "../hooks/useHistory";
-import {Layer, Transformer} from "react-konva";
-import Konva from "konva";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -50,10 +48,10 @@ export const StageRefContextProvider = ({children}) => {
 
     /**
      * Getter for the images in the layer, excluding other elements
-     * @return images
+     * @return {Konva.Image[]} the images in the layer.
      */
     const getImages = () => {
-        return getElements().filter((child)=> child.getClassName() === 'Image');
+        return getElements().filter((child)=> child instanceof Konva.Image);
     }
 
     /**
@@ -61,7 +59,7 @@ export const StageRefContextProvider = ({children}) => {
      * @return the groups
      */
     const getGroups = () => {
-        return getElements().filter((child) => child.getClassName() === 'Group');
+        return getElements().filter((child) => child instanceof Konva.Group);
     }
 
     /**
@@ -69,7 +67,11 @@ export const StageRefContextProvider = ({children}) => {
      * @return the elements in all groups
      */
     const getElementsInAllGroups = () => {
-        return getGroups().forEach().getChildren();
+        const elements = [];
+        getGroups().forEach((group) => {
+            elements.push(group.getChildren());
+        });
+        return elements;
     }
 
     /**
@@ -77,8 +79,14 @@ export const StageRefContextProvider = ({children}) => {
      * @return the images in all groups
      */
     const getImagesInAllGroups = () => {
-        return getElementsInAllGroups().filter((child)=> child.getClassName() === 'Image');
+        return getElementsInAllGroups().filter((child)=> child instanceof Konva.Image);
 
+    }
+
+    const getAllImages = () => {
+        const allImages = getImages();
+        allImages.concat(getImagesInAllGroups());
+        return allImages;
     }
 
     /**
@@ -113,9 +121,14 @@ export const StageRefContextProvider = ({children}) => {
             image.setAttrs({
                 ...imageState,
                 fileName: splitFilePath[splitFilePath.length - 1],
-                draggable: false,
+                draggable: true,
                 perfectDrawEnabled: false,
             })
+
+            image.on('dragend', function() {
+                console.log('Image dragged ended at position:', this.position());
+                // You can perform actions here based on the drag end event
+            });
 
             getLayer().add(image);
         })
