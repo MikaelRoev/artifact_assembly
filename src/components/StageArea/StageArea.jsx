@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Group, Layer, Stage, Transformer} from "react-konva";
+import {Group, Stage} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
 import {getHueData} from "../../util/ImageManupulation";
 import ImageNode from "../ImageNode/ImageNode";

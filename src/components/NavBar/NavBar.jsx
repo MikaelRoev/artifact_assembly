@@ -94,7 +94,14 @@ const NavBar = () => {
             let idAdder = 0 //For when multiple images are loaded at the same time
             result.forEach((file) => {
                 position = findFirstFreePosition(position);
-                addImage((Date.now() + idAdder).toString(), position, file);
+                const imageState = {
+                    type: "Image",
+                    id: (Date.now() + idAdder).toString(),
+                    x: position.x,
+                    y: position.y,
+                    filePath: file,
+                };
+                addImage(imageState);
                 idAdder++
                 position.x += xOffset;
                 position.y += yOffset;

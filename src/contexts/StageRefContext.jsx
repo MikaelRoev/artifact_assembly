@@ -41,19 +41,40 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     /**
-     * Getter for the layer
-     * @return the first child of the stage AKA the layer
+     * Getter for the layer.
+     * @return the first child of the stage AKA the layer.
      */
     const getLayer = () => {
         return getStage().getChildren()[0];
     }
 
     /**
-     * Getter for the elements in the layer
-     * @return the children AKA all the elements
+     * Getter for the select layer.
+     * @return the second child of the stage AKA the select layer.
+     */
+    const getSelectLayer = () => {
+        return getStage().getChildren()[1];
+    }
+
+    /**
+     * Getter for the elements in the layer.
+     * @return the children AKA all the elements.
      */
     const getElements = () => {
         return getLayer().getChildren();
+    }
+
+    const setElements = (elementStates) => {
+        getLayer().destroyChildren();
+        getSelectLayer().destroyChildren();
+        elementStates.forEach((elementState) => {
+            if (elementState.type === "Image") {
+                addImage(elementState);
+            }
+            else if (elementState.type === "Group") {
+
+            }
+        });
     }
 
     /**
@@ -107,22 +128,16 @@ export const StageRefContextProvider = ({children}) => {
     const findIndexInState = (id) => state.findIndex((element) => element.id === id());
 
     /**
-     * Makes and adds an image.
-     * @param id {string} the unique identification of the image.
-     * @param position {{x: number, y: number}} on the stage of the image.
-     * @param filePath {string} the path to the image file.
-     * @param filterValues {{}} Object that contains all the values used by filters.
+     * Makes and adds a konva image.
+     * @param imageState {{
+     * id: {string}
+     * x: {number}
+     * y: {number}
+     * filePath: {string}
+     * }} is the state values of the image that is needed to create a konva image.
      */
-    const addImage = (id, position, filePath, filterValues) => {
-        const imageState = {
-            type: "Image",
-            id: id,
-            x: position.x,
-            y: position.y,
-            filePath: filePath,
-            ...filterValues,
-        };
-
+    const addImage = (imageState) => {
+        const filePath = imageState.filePath;
         const url = convertFileSrc(filePath);
         Konva.Image.fromURL(url,(image) => {
             const splitFilePath = filePath.split("\\");
@@ -192,6 +207,7 @@ export const StageRefContextProvider = ({children}) => {
         getStage,
         getLayer,
         getElements,
+        setElements,
         getImages,
         getElementsInAllGroups,
         getImagesInAllGroups,
