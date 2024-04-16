@@ -46,12 +46,6 @@ const StageArea = () => {
 
     let newElements = [...elements];
 
-    useEffect(() => {
-        if (getStage()) {
-            initializeStage();
-        }
-    }, [getStage, initializeStage])
-
     /**
      * Update the stage according to the project.
      */

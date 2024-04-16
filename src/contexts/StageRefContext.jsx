@@ -23,6 +23,16 @@ export const StageRefContextProvider = ({children}) => {
     let newState = state;
 
     /**
+     * Initializes the stage, by creating it, and creating the two layers
+     */
+    const initializeStage = () => {
+        const layer = new Konva.Layer();
+        const selectLayer = new Konva.Layer();
+        getStage().add(layer, selectLayer);
+        console.log(getStage().getChildren());
+    }
+
+    /**
      * Getter for the whole stage
      * @return the stage
      */
@@ -87,15 +97,6 @@ export const StageRefContextProvider = ({children}) => {
         const allImages = getImages();
         allImages.concat(getImagesInAllGroups());
         return allImages;
-    }
-
-    /**
-     * Initializes the stage, by creating it, and creating the two layers
-     */
-    const initializeStage = () => {
-        const layer = new Konva.Layer();
-        const selectLayer = new Konva.Layer();
-        getStage().add(layer, selectLayer);
     }
 
     /**
