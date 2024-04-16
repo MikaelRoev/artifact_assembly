@@ -35,6 +35,20 @@ export const StageRefContextProvider = ({children}) => {
         console.log(getStage().getChildren());
     }
 
+    /*
+    <Transformer
+        ref={trRef}l
+        boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 5 || newBox.height < 5) {
+                return oldBox;
+            }
+            return newBox;
+        }}
+        resizeEnabled={false}
+        rotateEnabled={!isLocked}
+    />
+     */
 
 
     /**
@@ -120,6 +134,7 @@ export const StageRefContextProvider = ({children}) => {
             filePath: filePath,
             ...filterValues,
         };
+
         const url = convertFileSrc(filePath);
         Konva.Image.fromURL(url,(image) => {
             const splitFilePath = filePath.split("\\");
@@ -141,23 +156,6 @@ export const StageRefContextProvider = ({children}) => {
         newState = [...newState, imageState];
         setState(newState);
     }
-
-
-
-    /*
-    <Transformer
-        ref={trRef}
-        boundBoxFunc={(oldBox, newBox) => {
-            // limit resize
-            if (newBox.width < 5 || newBox.height < 5) {
-                return oldBox;
-            }
-            return newBox;
-        }}
-        resizeEnabled={false}
-        rotateEnabled={!isLocked}
-    />
-     */
 
     const providerValues = {
         stageRef,
