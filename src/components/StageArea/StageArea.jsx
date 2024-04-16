@@ -348,7 +348,7 @@ const StageArea = () => {
         if (getStage) {
             initializeStage();
         }
-    }, [getStage, initializeStage]);
+    }, []);
     
     return (
         <Stage

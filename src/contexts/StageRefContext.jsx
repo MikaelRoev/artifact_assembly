@@ -126,9 +126,15 @@ export const StageRefContextProvider = ({children}) => {
                 perfectDrawEnabled: false,
             })
 
-            image.on('dragend', function() {
-                console.log('Image dragged ended at position:', this.position());
-                // You can perform actions here based on the drag end event
+            image.on('dragend', function(e) {
+                const index = newState.findIndex((element) => {
+                    return element.id === image.id();});
+                newState[index] = {
+                    ...imageState,
+                    x: e.target.x(),
+                    y: e.target.y(),
+                };
+                setState(newState);
             });
 
             getLayer().add(image);
