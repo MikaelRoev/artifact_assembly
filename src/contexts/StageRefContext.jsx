@@ -1,4 +1,6 @@
 import React, {createContext, useRef} from "react";
+import {Layer, Transformer} from "react-konva";
+import Konva from "konva";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -70,6 +72,12 @@ export const StageRefContextProvider = ({children}) => {
     const getImagesInAllGroups = () => {
         return getElementsInAllGroups().filter((child)=> child.getClassName() === 'Image');
 
+    }
+
+    const initializeStage = () => {
+        const layer = new Konva.Layer();
+        const selectLayer = new Konva.Layer();
+        getStage().add(layer, selectLayer)
     }
 
     return (

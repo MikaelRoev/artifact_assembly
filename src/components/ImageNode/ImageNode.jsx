@@ -98,9 +98,8 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
 			onClick={onClick}
 			onTap={onClick}
 			onContextMenu={onContextMenu}
-			x={imageProps.x}
-			y={imageProps.y}
 			draggable={false}
+            perfectDrawEnabled={false}
 			onDragEnd={(e) => {
 				onChange({
 					...imageProps,
@@ -131,7 +130,6 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
                 const container = e.target.getStage().container();
                 container.style.cursor = "default";
             }}
-            perfectDrawEnabled={false}
         />
     );
 };
