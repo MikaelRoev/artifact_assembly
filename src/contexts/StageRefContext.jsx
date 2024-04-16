@@ -2,6 +2,8 @@ import React, {createContext, useRef} from "react";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import Konva from "konva";
 import useHistory from "../hooks/useHistory";
+import {Layer, Transformer} from "react-konva";
+import Konva from "konva";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -77,6 +79,15 @@ export const StageRefContextProvider = ({children}) => {
     const getImagesInAllGroups = () => {
         return getElementsInAllGroups().filter((child)=> child.getClassName() === 'Image');
 
+    }
+
+    /**
+     * Initializes the stage, by creating it, and creating the two layers
+     */
+    const initializeStage = () => {
+        const layer = new Konva.Layer();
+        const selectLayer = new Konva.Layer();
+        getStage().add(layer, selectLayer)
     }
 
     /**

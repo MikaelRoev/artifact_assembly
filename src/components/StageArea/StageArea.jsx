@@ -373,6 +373,9 @@ const StageArea = () => {
                     />
                 }
             </Layer>
+
+            <Layer>
+            </Layer>
         </Stage>
     );
 };
