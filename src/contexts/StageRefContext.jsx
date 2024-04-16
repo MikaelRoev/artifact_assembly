@@ -95,7 +95,7 @@ export const StageRefContextProvider = ({children}) => {
     const initializeStage = () => {
         const layer = new Konva.Layer();
         const selectLayer = new Konva.Layer();
-        getStage().add(layer, selectLayer)
+        getStage().add(layer, selectLayer);
     }
 
     /**
@@ -146,6 +146,7 @@ export const StageRefContextProvider = ({children}) => {
         getElementsInAllGroups,
         getImagesInAllGroups,
         addImage,
+        initializeStage,
     }
 
     return (

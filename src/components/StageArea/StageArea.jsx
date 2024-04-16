@@ -37,7 +37,7 @@ const StageArea = () => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef, getStage, getImages, getLayer} = useContext(StageRefContext);
+    const {stageRef, getStage, getImages, getLayer, initializeStage} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
@@ -45,6 +45,12 @@ const StageArea = () => {
     const zoomMax = 300; //zoom in limit
 
     let newElements = [...elements];
+
+    useEffect(() => {
+        if (getStage()) {
+            initializeStage();
+        }
+    }, [getStage, initializeStage])
 
     /**
      * Update the stage according to the project.
@@ -344,17 +350,23 @@ const StageArea = () => {
         }
     }, [elements.length, getLayer, elements, getImages]);
 
+    useEffect(() => {
+        if (getStage) {
+            initializeStage();
+        }
+    }, [getStage, initializeStage]);
+    
     return (
         <Stage
+            ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
             draggable
             className="stage"
             onWheel={zoomStage}
             onMouseDown={checkDeselect}
-            onTouchStart={checkDeselect}
-            ref={stageRef}>
-            <Layer
+            onTouchStart={checkDeselect}>
+            {/*<Layer
                 className="layer">
                 {renderElements()}
                 {
@@ -372,10 +384,7 @@ const StageArea = () => {
                         rotateEnabled={!isLocked}
                     />
                 }
-            </Layer>
-
-            <Layer>
-            </Layer>
+            </Layer>*/}
         </Stage>
     );
 };
