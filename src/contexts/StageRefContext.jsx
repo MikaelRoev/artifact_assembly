@@ -28,9 +28,28 @@ export const StageRefContextProvider = ({children}) => {
     const initializeStage = () => {
         const layer = new Konva.Layer();
         const selectLayer = new Konva.Layer();
+        const transformer = new Konva.Transformer();
+        selectLayer.add(transformer);
         getStage().add(layer, selectLayer);
+
         console.log(getStage().getChildren());
     }
+
+    /*
+    <Transformer
+        ref={trRef}l
+        boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 5 || newBox.height < 5) {
+                return oldBox;
+            }
+            return newBox;
+        }}
+        resizeEnabled={false}
+        rotateEnabled={!isLocked}
+    />
+     */
+
 
     /**
      * Getter for the whole stage
