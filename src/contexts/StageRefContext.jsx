@@ -74,6 +74,9 @@ export const StageRefContextProvider = ({children}) => {
 
     }
 
+    /**
+     * Initializes the stage, by creating it, and creating the two layers
+     */
     const initializeStage = () => {
         const layer = new Konva.Layer();
         const selectLayer = new Konva.Layer();
