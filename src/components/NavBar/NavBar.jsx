@@ -26,7 +26,7 @@ const NavBar = () => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage} = useContext(StageRefContext);
+    const {getStage, addImage} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {selectedElementsIndex, selectOnly} = useContext(SelectContext);
@@ -77,7 +77,7 @@ const NavBar = () => {
     }
 
     /**
-     * Asynchronous function for uploading of an image.
+     * Asynchronous function for uploading of images.
      * @returns {Promise<void>}
      */
     const handleImageUpload = async () => {
@@ -92,23 +92,13 @@ const NavBar = () => {
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
             let idAdder = 0 //For when multiple images are loaded at the same time
-            const newImages = result.map((file) => {
+            result.forEach((file) => {
                 position = findFirstFreePosition(position);
-                const newImage = {
-                    type: "Image",
-                    x: position.x,
-                    y: position.y,
-                    id: Date.now()+idAdder.toString(),
-                    fileName: file.split("\\")[file.split("\\").length - 1],
-                    filePath: file,
-                    // Other properties for the `shapeProps` object
-                };
+                addImage((Date.now() + idAdder).toString(), position, file);
                 idAdder++
                 position.x += xOffset;
                 position.y += yOffset;
-                return newImage
             });
-            setElements([...elements, ...newImages]);
         }
         setIsLoading(false);
         handleFileButtonClick()

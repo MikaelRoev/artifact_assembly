@@ -1,4 +1,7 @@
 import React, {createContext, useRef} from "react";
+import {convertFileSrc} from "@tauri-apps/api/tauri";
+import Konva from "konva";
+import useHistory from "../hooks/useHistory";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -14,6 +17,10 @@ const StageRefContext = createContext(null);
  */
 export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef();
+
+    const [state, setState, undo, redo] = useHistory([], 20);
+
+    let newState = state;
 
     /**
      * Getter for the whole stage
@@ -72,9 +79,53 @@ export const StageRefContextProvider = ({children}) => {
 
     }
 
+    /**
+     * Makes and adds an image.
+     * @param id {string} the unique identification of the image.
+     * @param position {{x: number, y: number}} on the stage of the image.
+     * @param filePath {string} the path to the image file.
+     * @param filterValues {{}} Object that contains all the values used by filters.
+     */
+    const addImage = (id, position, filePath, filterValues) => {
+        const imageState = {
+            type: "Image",
+            id: id,
+            x: position.x,
+            y: position.y,
+            filePath: filePath,
+            ...filterValues,
+        };
+
+        const url = convertFileSrc(filePath);
+        Konva.Image.fromURL(url,(image) => {
+            const splitFilePath = filePath.split("\\");
+            image.setAttrs({
+                ...imageState,
+                fileName: splitFilePath[splitFilePath.length - 1],
+                draggable: false,
+                perfectDrawEnabled: false,
+            })
+
+            getLayer().add(image);
+        })
+
+        newState = [...newState, imageState];
+        setState(newState);
+    }
+
+    const providerValues = {
+        stageRef,
+        getStage,
+        getLayer,
+        getElements,
+        getImages,
+        getElementsInAllGroups,
+        getImagesInAllGroups,
+        addImage,
+    }
+
     return (
-        <StageRefContext.Provider value={{stageRef, getStage, getLayer, getElements, getImages,
-            getElementsInGroup: getElementsInAllGroups, getImagesInGroups: getImagesInAllGroups}}>
+        <StageRefContext.Provider value={providerValues}>
             {children}
         </StageRefContext.Provider>
     )
