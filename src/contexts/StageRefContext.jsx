@@ -122,11 +122,14 @@ export const StageRefContextProvider = ({children}) => {
             image.setAttrs({
                 ...imageState,
                 fileName: splitFilePath[splitFilePath.length - 1],
-                draggable: true,
+                draggable: false,
                 perfectDrawEnabled: false,
-            })
+            });
 
-            image.on('dragend', function(e) {
+            /**
+             * Saves the changes to history when move end.
+             */
+            image.on('dragend', (e) => {
                 const index = newState.findIndex((element) => {
                     return element.id === image.id();});
                 newState[index] = {
@@ -137,8 +140,43 @@ export const StageRefContextProvider = ({children}) => {
                 setState(newState);
             });
 
+            /**
+             * Saves the changes to history when rotation end.
+             */
+            image.on('transformend', (e) => {
+                const index = newState.findIndex((element) => {
+                    return element.id === image.id();});
+                newState[index] = {
+                    ...imageState,
+                    rotation: e.target.rotation(),
+                };
+                console.log(newState)
+                setState(newState);
+            });
+
+            /**
+             * Moves the image to the top (z-index)
+             */
+            image.on('mousedown', (e) => {
+                e.target.moveToTop();
+            });
+
+            /**
+             * Change to pinter cursor when hovering over the image.
+             */
+            image.on('mouseenter', (e) => {
+                document.body.style.cursor = 'pointer';
+            });
+
+            /**
+             * Change to default cursor when exiting the image.
+             */
+            image.on('mouseleave', (e) => {
+                document.body.style.cursor = 'default';
+            });
+
             getLayer().add(image);
-        })
+        });
 
         newState = [...newState, imageState];
         setState(newState);
