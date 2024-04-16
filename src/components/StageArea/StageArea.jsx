@@ -25,12 +25,6 @@ const StageArea = () => {
      */
     const trRef = useRef();
 
-    /**
-     * Reference to the konva layer on the stage.
-     * @type {React.MutableRefObject<Konva.Layer>}
-     */
-    const layerRef = useRef();
-
     const {
         selectedElements,
         selectedElementsIndex,
@@ -43,7 +37,7 @@ const StageArea = () => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef, getStage} = useContext(StageRefContext);
+    const {stageRef, getStage, getImages, getLayer} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
@@ -86,7 +80,7 @@ const StageArea = () => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [elements, selectedElementsIndex, setElements, isFilterInteracting, deselectAll]);
+    }, [elements, selectedElementsIndex, setElements, isFilterInteracting, deselectAll, isSelected]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -342,15 +336,13 @@ const StageArea = () => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (layerRef.current && elements.length > 0) {
-            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === "Image")
-                .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
+        if (getLayer() && elements.length > 0) {
+            const imageNodes = getImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
                 setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
-
             }
         }
-    }, [elements.length, layerRef, elements]);
+    }, [elements.length, getLayer, elements, getImages]);
 
     return (
         <Stage
@@ -363,8 +355,7 @@ const StageArea = () => {
             onTouchStart={checkDeselect}
             ref={stageRef}>
             <Layer
-                className="layer"
-                ref={layerRef}>
+                className="layer">
                 {renderElements()}
                 {
                     selectedElements.length > 0 &&
