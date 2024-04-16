@@ -100,6 +100,13 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     /**
+     * Finds the index of the element in the state by id.
+     * @param id {string} unique identifier of the element.
+     * @return {number} the index of the element in the state.
+     */
+    const findIndexInState = (id) => state.findIndex((element) => element.id === id());
+
+    /**
      * Makes and adds an image.
      * @param id {string} the unique identification of the image.
      * @param position {{x: number, y: number}} on the stage of the image.
@@ -130,9 +137,8 @@ export const StageRefContextProvider = ({children}) => {
              * Saves the changes to history when move end.
              */
             image.on('dragend', (e) => {
-                const index = newState.findIndex((element) => {
-                    return element.id === image.id();});
-                newState[index] = {
+                const index = findIndexInState(image.id());
+                state[index] = {
                     ...imageState,
                     x: e.target.x(),
                     y: e.target.y(),
@@ -144,14 +150,13 @@ export const StageRefContextProvider = ({children}) => {
              * Saves the changes to history when rotation end.
              */
             image.on('transformend', (e) => {
-                const index = newState.findIndex((element) => {
-                    return element.id === image.id();});
-                newState[index] = {
+                const index = findIndexInState(image.id());
+                state[index] = {
                     ...imageState,
                     rotation: e.target.rotation(),
                 };
-                console.log(newState)
-                setState(newState);
+                console.log(state)
+                setState(state);
             });
 
             /**
