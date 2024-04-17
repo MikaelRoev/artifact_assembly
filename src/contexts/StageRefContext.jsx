@@ -58,6 +58,15 @@ export const StageRefContextProvider = ({children}) => {
      */
     const getSelectLayer = useCallback(() => getStage().getChildren()[1], [getStage]);
 
+    /**
+     * Getter for the selected elements.
+     */
+    const getSelectedElements = useCallback(() => getSelectLayer().getChildren()
+        .filter(child => !(child instanceof Konva.Transformer)), [getSelectLayer]);
+
+    /**
+     * Getter for the select transformer box.
+     */
     const getSelectTransformer = useCallback(() => getSelectLayer().getChildren()[0], [getSelectLayer]);
 
     /**
@@ -65,6 +74,7 @@ export const StageRefContextProvider = ({children}) => {
      */
     useEffect(() => {
         getSelectTransformer().rotateEnabled(!isLocked);
+        getSelectLayer()
     }, [getSelectTransformer, isLocked]);
 
     /**
@@ -79,8 +89,7 @@ export const StageRefContextProvider = ({children}) => {
         elementStates.forEach((elementState) => {
             if (elementState.type === "Image") {
                 addImage(elementState);
-            }
-            else if (elementState.type === "Group") {
+            } else if (elementState.type === "Group") {
 
             }
         });
@@ -90,13 +99,13 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the images in the layer, excluding other elements
      * @return {Konva.Image[]} the images in the layer.
      */
-    const getImages = () => getElements().filter((child)=> child instanceof Konva.Image);
+    const getImages = () => getElements().filter(child => child instanceof Konva.Image);
 
     /**
      * Getter for elements in the layer that are groups
      * @return the groups
      */
-    const getGroups = () => getElements().filter((child) => child instanceof Konva.Group);
+    const getGroups = () => getElements().filter(child => child instanceof Konva.Group);
 
     /**
      * Getter for all elements in all groups
@@ -114,7 +123,7 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for all images in all groups
      * @return the images in all groups
      */
-    const getImagesInAllGroups = () => getElementsInAllGroups().filter((child)=> child instanceof Konva.Image);
+    const getImagesInAllGroups = () => getElementsInAllGroups().filter((child) => child instanceof Konva.Image);
 
     const getAllImages = () => {
         const allImages = getImages();
@@ -141,7 +150,7 @@ export const StageRefContextProvider = ({children}) => {
     const addImage = (imageState) => {
         const filePath = imageState.filePath;
         const url = convertFileSrc(filePath);
-        Konva.Image.fromURL(url,(image) => {
+        Konva.Image.fromURL(url, (image) => {
             const splitFilePath = filePath.split("\\");
             image.setAttrs({
                 ...imageState,
@@ -231,16 +240,20 @@ export const StageRefContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      */
     const select = (element) => {
-        //setSelectedElements([...selectedElements, element]);
-        //setSelectedElementsIndex([...selectedElementsIndex, index]);
-
         const previousSelected = getSelectTransformer().nodes();
         getSelectTransformer().nodes([...previousSelected, element]);
         element.moveTo(getSelectLayer());
         element.draggable(!isLocked);
+    }
 
-        console.log("static", getStaticLayer().getChildren());
-        console.log("select", getSelectLayer().getChildren());
+    /**
+     * Deselects an element.
+     * @param element {Shape | Stage} the element to be deselected.
+     */
+    const deselect = (element) => {
+        element.draggable(false);
+        element.moveTo(getStaticLayer());
+        getSelectTransformer().detach(element);
     }
 
     const providerValues = {
