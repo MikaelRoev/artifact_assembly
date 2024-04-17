@@ -151,6 +151,20 @@ export const StageRefContextProvider = ({children}) => {
             });
 
             /**
+             * Selects the image when clicked on
+             */
+            image.on("click", () => {
+                select(image);
+            });
+
+            /**
+             * Selects the image when tapped on
+             */
+            image.on("tap", () => {
+                select(image);
+            });
+
+            /**
              * Saves the changes to history when move end.
              */
             image.on('dragend', (e) => {
@@ -202,6 +216,14 @@ export const StageRefContextProvider = ({children}) => {
 
         newState = [...newState, imageState];
         setState(newState);
+    }
+
+    const select = (element) => {
+        // setSelectedElements([...selectedElements, element]);
+        // setSelectedElementsIndex([...selectedElementsIndex, index]);
+
+        const previousSelected = getSelectTransformer().nodes();
+        getSelectTransformer().nodes(...previousSelected, element);
     }
 
     const providerValues = {
