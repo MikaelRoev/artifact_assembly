@@ -3,7 +3,7 @@ import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import LockedContext from "./LockedContext";
-import {makeDraggable} from "../util/WindowFunctionality";
+import FilterInteractionContext from "./FilterInteractionContext";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -21,6 +21,7 @@ export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef();
 
     const {isLocked} = useContext(LockedContext);
+    const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
 
@@ -293,9 +294,34 @@ export const StageRefContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be checked.
      * @return {boolean} true if element is selected, false if not.
      */
-        // Function to check if an element is selected
     const isSelected = (element) => getSelectedElements()
             .some(selectedElement => selectedElement.id() === element.id());
+
+    /**
+     * Sets up and cleans up the delete event listener.
+     */
+    useEffect(() => {
+
+        /**
+         * Deletes the selected elements if the delete key is pressed.
+         * @param e{KeyboardEvent} the event.
+         */
+        const handleDeletePressed = (e) => {
+            if ((e.key === "Delete" || e.key === "Backspace") && getSelectedElements().length > 0
+                && !isFilterInteracting) {
+
+                getSelectedElements().forEach(function(element) {
+                    element.destroy();
+                })
+
+                getSelectTransformer().nodes([]);
+            }
+        };
+        document.addEventListener("keydown", handleDeletePressed);
+        return () => {
+            document.removeEventListener("keydown", handleDeletePressed);
+        };
+    }, [isFilterInteracting, deselectAll, isSelected]);
 
     const providerValues = {
         stageRef,
