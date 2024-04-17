@@ -18,7 +18,7 @@ const StageRefContext = createContext(null);
  */
 export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef();
-    
+
     const {isLocked} = useContext(LockedContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
@@ -29,13 +29,15 @@ export const StageRefContextProvider = ({children}) => {
      * Initializes the stage, by creating it, and creating the two layers
      */
     const initializeStage = () => {
-        const newStaticLayer = new Konva.Layer();
-        const newSelectLayer = new Konva.Layer();
+        const layer = new Konva.Layer();
+        const selectLayer = new Konva.Layer();
+
         const transformer = new Konva.Transformer();
         transformer.resizeEnabled(false);
         transformer.rotateEnabled(!isLocked);
-        newSelectLayer.add(transformer);
-        getStage().add(newStaticLayer, newSelectLayer);
+
+        selectLayer.add(transformer);
+        getStage().add(layer, selectLayer);
     }
 
     /**
