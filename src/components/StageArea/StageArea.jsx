@@ -355,7 +355,7 @@ const StageArea = () => {
             ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
-            draggable
+            draggable={false}
             className="stage"
             onWheel={zoomStage}
             onMouseDown={checkDeselect}
