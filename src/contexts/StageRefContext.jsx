@@ -223,7 +223,7 @@ export const StageRefContextProvider = ({children}) => {
         // setSelectedElementsIndex([...selectedElementsIndex, index]);
 
         const previousSelected = getSelectTransformer().nodes();
-        getSelectTransformer().nodes(...previousSelected, element);
+        getSelectTransformer().nodes([...previousSelected, element]);
     }
 
     const providerValues = {
