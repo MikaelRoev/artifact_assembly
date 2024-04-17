@@ -163,7 +163,7 @@ export const StageRefContextProvider = ({children}) => {
         const element = e.target;
         element.moveToTop();
 
-        console.log(ctrlPressed, shiftPressed)
+        console.log("control: ", ctrlPressed, "shift: ",  shiftPressed)
         if (ctrlPressed || shiftPressed) {
             if (isSelected(element)) {
                 // already selected
@@ -321,17 +321,20 @@ export const StageRefContextProvider = ({children}) => {
      * Set up and cleans up the select key check.
      */
     useEffect(() => {
+        //TODO: fix bug!!
+
         /**
          * The selection keys down event handler.
          * @param e{KeyboardEvent}
          */
         const handleSelectKeyDown = (e) => {
+            setCtrlPressed(true);
             if (e.key === "Control") {
-                console.log("control");
+                console.log("control down");
                 setCtrlPressed(true);
             }
             if (e.key === "Shift") {
-                console.log("shift");
+                console.log("shift down");
                 setShiftPressed(true);
             }
         };
@@ -342,11 +345,11 @@ export const StageRefContextProvider = ({children}) => {
          */
         const handleSelectKeyUp = (e) => {
             if (e.key === "Control") {
-                console.log("control");
+                console.log("control up");
                 setCtrlPressed(false);
             }
             if (e.key === "Shift") {
-                console.log("shift");
+                console.log("shift up");
                 setShiftPressed(false);
             }
         };
