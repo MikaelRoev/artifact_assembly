@@ -42,13 +42,13 @@ export const StageRefContextProvider = ({children}) => {
 
     /**
      * Getter for the whole stage
-     * @return the stage
+     * @return {funcition: Konva.Stage} the stage
      */
     const getStage = useCallback(() => stageRef.current, [stageRef]);
 
     /**
      * Getter for the layer.
-     * @return the first child of the stage AKA the layer.
+     * @return {Konva.Layer} the first child of the stage AKA the layer.
      */
     const getStaticLayer = () => getStage().getChildren()[0];
 
@@ -142,15 +142,12 @@ export const StageRefContextProvider = ({children}) => {
     /**
      * Event handler for element clicking. This will check the selection of the element.
      * @param e {KonvaEventObject<MouseEvent>} click event.
-     * @param index {number} of the element clicked on.
      */
     const handleElementClick = (e) => {
         if (e.evt.button === 2) return;
         const element = e.target;
         element.moveToTop();
 
-        console.log("is selected", isSelected(element));
-        console.log("transformer", getSelectTransformer().nodes())
         if (
             true
             //ctrlPressed || shiftPressed
@@ -165,8 +162,6 @@ export const StageRefContextProvider = ({children}) => {
         } else {
             //selectOnly(element, index);
         }
-        console.log("static", getStaticLayer().getChildren());
-        console.log("select", getSelectLayer().getChildren());
     }
 
     /**
@@ -222,7 +217,6 @@ export const StageRefContextProvider = ({children}) => {
                     ...imageState,
                     rotation: e.target.rotation(),
                 };
-                console.log(state)
                 setState(state);
             });
 
@@ -272,7 +266,9 @@ export const StageRefContextProvider = ({children}) => {
     const deselect = (element) => {
         element.draggable(false);
         element.moveTo(getStaticLayer());
-        getSelectTransformer().detach(element);
+
+        const updatedNodes = getSelectTransformer().nodes().filter(node => node.id() !== element.id());
+        getSelectTransformer().nodes(updatedNodes);
     }
 
     /**
