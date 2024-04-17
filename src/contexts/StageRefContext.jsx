@@ -58,6 +58,18 @@ export const StageRefContextProvider = ({children}) => {
      */
     const getSelectLayer = useCallback(() => getStage().getChildren()[1], [getStage]);
 
+    /**
+     * Getter for all selected elements
+     * @return {*}
+     */
+    const getSelectedElements = () => {
+        return getSelectLayer().getChildren().filter((child) => !(child instanceof Konva.Transformer));
+    }
+
+    /**
+     * Getter for the transformer of the selected elements
+     * @type {function(): *}
+     */
     const getSelectTransformer = useCallback(() => getSelectLayer().getChildren()[0], [getSelectLayer]);
 
     /**
@@ -238,9 +250,41 @@ export const StageRefContextProvider = ({children}) => {
         getSelectTransformer().nodes([...previousSelected, element]);
 
         element.moveTo(getSelectLayer());
+        element.draggable(!isLocked);
 
         console.log("static", getStaticLayer().getChildren());
         console.log("select", getSelectLayer().getChildren());
+    }
+
+    /**
+     * Deselects an element.
+     * @param element {shape | stage} the element to be deselected.
+     */
+    const deselect = (element) => {
+        /*
+        const indexIndex = selectedElementsIndex.indexOf(index);
+
+        element.draggable(false);
+
+        element.moveTo(getStaticLayer());
+
+        const newSelected = [...selectedElements];
+        newSelected.splice(indexIndex, 1);
+        setSelectedElements(newSelected);
+         */
+
+        /*
+        remove from transformer
+        move to static layer
+        make not draggable
+         */
+    }
+
+    /**
+     * Deselects all selected elements
+     */
+    const deselectAll = () => {
+        getSelectedElements().forEach(deselect);
     }
 
     const providerValues = {
