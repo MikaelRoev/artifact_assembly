@@ -70,12 +70,12 @@ export const StageRefContextProvider = ({children}) => {
     const getSelectTransformer = useCallback(() => getSelectLayer().getChildren()[0], [getSelectLayer]);
 
     /**
-     * Changes the ability to rotate the selected elements when isLocked changes.
+     * Changes the ability to rotate and drag the selected elements when isLocked changes.
      */
     useEffect(() => {
         getSelectTransformer().rotateEnabled(!isLocked);
-        getSelectLayer()
-    }, [getSelectTransformer, isLocked]);
+        getSelectedElements().forEach(element => element.draggable(!isLocked));
+    }, [getSelectLayer, getSelectTransformer, isLocked]);
 
     /**
      * Getter for the elements in the layer.
@@ -139,6 +139,36 @@ export const StageRefContextProvider = ({children}) => {
     const findIndexInState = (id) => state.findIndex((element) => element.id === id());
 
     /**
+     * Event handler for element clicking. This will check the selection of the element.
+     * @param e {KonvaEventObject<MouseEvent>} click event.
+     * @param index {number} of the element clicked on.
+     */
+    const handleElementClick = (e) => {
+        if (e.evt.button === 2) return;
+        const element = e.target;
+        element.moveToTop();
+
+        console.log("is selected", isSelected(element));
+        console.log("transformer", getSelectTransformer().nodes())
+        if (
+            true
+            //ctrlPressed || shiftPressed
+        ) {
+            if (isSelected(element)) {
+                // already selected
+                deselect(element);
+            } else {
+                // not already selected
+                select(element);
+            }
+        } else {
+            //selectOnly(element, index);
+        }
+        console.log("static", getStaticLayer().getChildren());
+        console.log("select", getSelectLayer().getChildren());
+    }
+
+    /**
      * Makes and adds a konva image.
      * @param imageState {{
      * id: {string}
@@ -162,24 +192,12 @@ export const StageRefContextProvider = ({children}) => {
             /**
              * Selects the image when clicked on
              */
-            image.on("click", () => {
-                select(image);
-            });
+            image.on("click", handleElementClick);
 
             /**
              * Selects the image when tapped on
              */
-            image.on("tap", () => {
-                select(image);
-            });
-
-            image.on("click", () => {
-                select(image);
-            });
-
-            image.on("tap", () => {
-                select(image);
-            });
+            image.on("tap", handleElementClick);
 
             /**
              * Saves the changes to history when move end.
@@ -255,6 +273,15 @@ export const StageRefContextProvider = ({children}) => {
         element.moveTo(getStaticLayer());
         getSelectTransformer().detach(element);
     }
+
+    /**
+     * Checks if an element is selected.
+     * @param element {Shape | Stage} the element to be checked.
+     * @return {boolean} true if element is selected, false if not.
+     */
+        // Function to check if an element is selected
+    const isSelected = (element) => getSelectedElements()
+            .some(selectedElement => selectedElement.id() === element.id());
 
     const providerValues = {
         stageRef,
