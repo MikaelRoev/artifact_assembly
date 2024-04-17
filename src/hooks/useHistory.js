@@ -24,7 +24,7 @@ const useHistory = (initialState, maxSteps) => {
     /**
      * Updates the state.
      * @param action {Function|Object} a callback that returns a new state or a new state object
-     * @param overwrite {boolean}
+     * @param overwrite {evt: boolean}
      *  true - overwrites the previous history commit.
      *  false (default) - makes a new history commit.
      */

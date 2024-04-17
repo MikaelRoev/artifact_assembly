@@ -315,6 +315,9 @@ export const StageRefContextProvider = ({children}) => {
                 })
 
                 getSelectTransformer().nodes([]);
+
+                const newState = state.filter((elementState) => !isSelected(elementState));
+                setState(newState);
             }
         };
         document.addEventListener("keydown", handleDeletePressed);
