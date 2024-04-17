@@ -237,6 +237,8 @@ export const StageRefContextProvider = ({children}) => {
         const previousSelected = getSelectTransformer().nodes();
         getSelectTransformer().nodes([...previousSelected, element]);
 
+        element.moveTo(getSelectLayer());
+
         console.log("static", getStaticLayer().getChildren());
         console.log("select", getSelectLayer().getChildren());
     }
