@@ -3,6 +3,7 @@ import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import LockedContext from "./LockedContext";
+import {makeDraggable} from "../util/WindowFunctionality";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -275,7 +276,16 @@ export const StageRefContextProvider = ({children}) => {
      * Deselects all selected elements.
      */
     const deselectAll = () => {
-        getSelectedElements().forEach(deselect);
+        console.log("Is deselecting all")
+
+        getSelectedElements().forEach(function(element) {
+            element.draggable(false);
+            element.moveTo(getStaticLayer());
+        });
+
+        getSelectTransformer().nodes([]);
+
+        //BEFORE: getSelectedElements().forEach(deselect);
     }
 
     /**
@@ -312,6 +322,7 @@ export const StageRefContextProvider = ({children}) => {
         addImage,
         initializeStage,
         select,
+        deselectAll,
     }
 
     return (
