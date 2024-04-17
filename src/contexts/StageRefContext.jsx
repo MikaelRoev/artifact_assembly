@@ -89,7 +89,8 @@ export const StageRefContextProvider = ({children}) => {
         elementStates.forEach((elementState) => {
             if (elementState.type === "Image") {
                 addImage(elementState);
-            } else if (elementState.type === "Group") {
+            }
+            else if (elementState.type === "Group") {
 
             }
         });
@@ -272,6 +273,13 @@ export const StageRefContextProvider = ({children}) => {
         element.draggable(false);
         element.moveTo(getStaticLayer());
         getSelectTransformer().detach(element);
+    }
+
+    /**
+     * Deselects all selected elements
+     */
+    const deselectAll = () => {
+        getSelectedElements().forEach(deselect);
     }
 
     /**
