@@ -1,9 +1,8 @@
-import React, {createContext, useCallback, useContext, useEffect, useRef} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import LockedContext from "./LockedContext";
-import {makeDraggable} from "../util/WindowFunctionality";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -18,6 +17,9 @@ const StageRefContext = createContext(null);
  * @constructor
  */
 export const StageRefContextProvider = ({children}) => {
+    const [ctrlPressed, setCtrlPressed] = useState(false);
+    const [shiftPressed, setShiftPressed] = useState(false);
+
     const stageRef = useRef();
 
     const {isLocked} = useContext(LockedContext);
@@ -39,7 +41,20 @@ export const StageRefContextProvider = ({children}) => {
 
         selectLayer.add(transformer);
         getStage().add(layer, selectLayer);
+        getStage().on("mousedown", checkDeselect);
+        getStage().on("touchstart", checkDeselect);
     }
+
+    /**
+     * Deselects when the mouse left-clicks on an empty area on the canvas
+     * and ctrl key is not pressed.
+     * @param e{KonvaEventObject<MouseEvent>} the event.
+     */
+    const checkDeselect = (e) => {
+        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
+            deselectAll();
+        }
+    };
 
     /**
      * Getter for the whole stage
@@ -90,8 +105,7 @@ export const StageRefContextProvider = ({children}) => {
         elementStates.forEach((elementState) => {
             if (elementState.type === "Image") {
                 addImage(elementState);
-            }
-            else if (elementState.type === "Group") {
+            } else if (elementState.type === "Group") {
 
             }
         });
@@ -149,10 +163,8 @@ export const StageRefContextProvider = ({children}) => {
         const element = e.target;
         element.moveToTop();
 
-        if (
-            true
-            //ctrlPressed || shiftPressed
-        ) {
+        console.log(ctrlPressed, shiftPressed)
+        if (ctrlPressed || shiftPressed) {
             if (isSelected(element)) {
                 // already selected
                 deselect(element);
@@ -161,7 +173,7 @@ export const StageRefContextProvider = ({children}) => {
                 select(element);
             }
         } else {
-            //selectOnly(element, index);
+            selectOnly(element);
         }
     }
 
@@ -278,7 +290,7 @@ export const StageRefContextProvider = ({children}) => {
     const deselectAll = () => {
         console.log("Is deselecting all")
 
-        getSelectedElements().forEach(function(element) {
+        getSelectedElements().forEach(function (element) {
             element.draggable(false);
             element.moveTo(getStaticLayer());
         });
@@ -309,6 +321,49 @@ export const StageRefContextProvider = ({children}) => {
         // Function to check if an element is selected
     const isSelected = (element) => getSelectedElements()
             .some(selectedElement => selectedElement.id() === element.id());
+
+    /**
+     * Set up and cleans up the select key check.
+     */
+    useEffect(() => {
+        /**
+         * The selection keys down event handler.
+         * @param e{KeyboardEvent}
+         */
+        const handleSelectKeyDown = (e) => {
+            if (e.key === "Control") {
+                console.log("control");
+                setCtrlPressed(true);
+            }
+            if (e.key === "Shift") {
+                console.log("shift");
+                setShiftPressed(true);
+            }
+        };
+
+        /**
+         * The select key up event handler.
+         * @param e{KeyboardEvent}
+         */
+        const handleSelectKeyUp = (e) => {
+            if (e.key === "Control") {
+                console.log("control");
+                setCtrlPressed(false);
+            }
+            if (e.key === "Shift") {
+                console.log("shift");
+                setShiftPressed(false);
+            }
+        };
+
+        document.addEventListener("keydown", handleSelectKeyDown);
+        document.addEventListener("keyup", handleSelectKeyUp);
+
+        return () => {
+            document.removeEventListener("keydown", handleSelectKeyDown);
+            document.removeEventListener("keyup", handleSelectKeyUp);
+        };
+    }, []);
 
     const providerValues = {
         stageRef,

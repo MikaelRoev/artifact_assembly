@@ -355,9 +355,7 @@ const StageArea = () => {
             height={window.innerHeight}
             draggable={false}
             className="stage"
-            onWheel={zoomStage}
-            onMouseDown={checkDeselect}
-            onTouchStart={checkDeselect}>
+            onWheel={zoomStage}>
             {/*<Layer
                 className="layer">
                 {renderElements()}
