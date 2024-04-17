@@ -28,7 +28,6 @@ const StageArea = () => {
     const {
         selectedElements,
         selectedElementsIndex,
-        select,
         deselect,
         deselectAll,
         selectOnly,
@@ -37,7 +36,7 @@ const StageArea = () => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef, getStage, getImages, getLayer, initializeStage} = useContext(StageRefContext);
+    const {stageRef, getStage, getImages, getStaticLayer, initializeStage, select} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
@@ -336,13 +335,13 @@ const StageArea = () => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (getLayer() && elements.length > 0) {
+        if (getStaticLayer() && elements.length > 0) {
             const imageNodes = getImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
                 setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
             }
         }
-    }, [elements.length, getLayer, elements, getImages]);
+    }, [elements.length, getStaticLayer, elements, getImages]);
 
     useEffect(() => {
         if (getStage) {
@@ -355,7 +354,7 @@ const StageArea = () => {
             ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
-            draggable
+            draggable={false}
             className="stage"
             onWheel={zoomStage}
             onMouseDown={checkDeselect}

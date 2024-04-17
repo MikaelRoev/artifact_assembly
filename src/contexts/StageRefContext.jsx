@@ -50,7 +50,7 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the layer.
      * @return the first child of the stage AKA the layer.
      */
-    const getLayer = () => getStage().getChildren()[0];
+    const getStaticLayer = () => getStage().getChildren()[0];
 
     /**
      * Getter for the select layer.
@@ -71,10 +71,10 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the elements in the layer.
      * @return the children AKA all the elements.
      */
-    const getElements = () => getLayer().getChildren();
+    const getElements = () => getStaticLayer().getChildren();
 
     const setElements = (elementStates) => {
-        getLayer().destroyChildren();
+        getStaticLayer().destroyChildren();
         getSelectLayer().destroyChildren();
         elementStates.forEach((elementState) => {
             if (elementState.type === "Image") {
@@ -164,6 +164,14 @@ export const StageRefContextProvider = ({children}) => {
                 select(image);
             });
 
+            image.on("click", () => {
+                select(image);
+            });
+
+            image.on("tap", () => {
+                select(image);
+            });
+
             /**
              * Saves the changes to history when move end.
              */
@@ -211,25 +219,32 @@ export const StageRefContextProvider = ({children}) => {
                 document.body.style.cursor = 'default';
             });
 
-            getLayer().add(image);
+            getStaticLayer().add(image);
         });
 
         newState = [...newState, imageState];
         setState(newState);
     }
 
+    /**
+     * Selects an element.
+     * @param element {Shape | Stage} the element to be selected.
+     */
     const select = (element) => {
-        // setSelectedElements([...selectedElements, element]);
-        // setSelectedElementsIndex([...selectedElementsIndex, index]);
+        //setSelectedElements([...selectedElements, element]);
+        //setSelectedElementsIndex([...selectedElementsIndex, index]);
 
         const previousSelected = getSelectTransformer().nodes();
-        getSelectTransformer().nodes(...previousSelected, element);
+        getSelectTransformer().nodes([...previousSelected, element]);
+
+        console.log("static", getStaticLayer().getChildren());
+        console.log("select", getSelectLayer().getChildren());
     }
 
     const providerValues = {
         stageRef,
         getStage,
-        getLayer,
+        getStaticLayer,
         getElements,
         setElements,
         getImages,
@@ -237,6 +252,7 @@ export const StageRefContextProvider = ({children}) => {
         getImagesInAllGroups,
         addImage,
         initializeStage,
+        select,
     }
 
     return (
