@@ -272,10 +272,23 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     /**
-     * Deselects all selected elements
+     * Deselects all selected elements.
      */
     const deselectAll = () => {
         getSelectedElements().forEach(deselect);
+    }
+
+    /**
+     * Deselects all selected elements and selects an element.
+     * @param element {Shape | Stage} the element to be selected.
+     */
+    const selectOnly = (element) => {
+        getSelectedElements().forEach((selectedElement) => {
+            if (selectedElement.id() !== element.id()) return;
+            selectedElement.draggable(false);
+            selectedElement.moveTo(getStaticLayer())
+        });
+        getSelectTransformer().nodes([element]);
     }
 
     /**
