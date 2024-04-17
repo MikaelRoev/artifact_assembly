@@ -57,19 +57,40 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     /**
-     * Getter for the layer
-     * @return the first child of the stage AKA the layer
+     * Getter for the layer.
+     * @return the first child of the stage AKA the layer.
      */
     const getLayer = () => {
         return getStage().getChildren()[0];
     }
 
     /**
-     * Getter for the elements in the layer
-     * @return the children AKA all the elements
+     * Getter for the select layer.
+     * @return the second child of the stage AKA the select layer.
+     */
+    const getSelectLayer = () => {
+        return getStage().getChildren()[1];
+    }
+
+    /**
+     * Getter for the elements in the layer.
+     * @return the children AKA all the elements.
      */
     const getElements = () => {
         return getLayer().getChildren();
+    }
+
+    const setElements = (elementStates) => {
+        getLayer().destroyChildren();
+        getSelectLayer().destroyChildren();
+        elementStates.forEach((elementState) => {
+            if (elementState.type === "Image") {
+                addImage(elementState);
+            }
+            else if (elementState.type === "Group") {
+
+            }
+        });
     }
 
     /**
@@ -116,39 +137,82 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     /**
-     * Makes and adds an image.
-     * @param id {string} the unique identification of the image.
-     * @param position {{x: number, y: number}} on the stage of the image.
-     * @param filePath {string} the path to the image file.
-     * @param filterValues {{}} Object that contains all the values used by filters.
+     * Finds the index of the element in the state by id.
+     * @param id {string} unique identifier of the element.
+     * @return {number} the index of the element in the state.
      */
-    const addImage = (id, position, filePath, filterValues) => {
-        const imageState = {
-            type: "Image",
-            id: id,
-            x: position.x,
-            y: position.y,
-            filePath: filePath,
-            ...filterValues,
-        };
+    const findIndexInState = (id) => state.findIndex((element) => element.id === id());
 
+    /**
+     * Makes and adds a konva image.
+     * @param imageState {{
+     * id: {string}
+     * x: {number}
+     * y: {number}
+     * filePath: {string}
+     * }} is the state values of the image that is needed to create a konva image.
+     */
+    const addImage = (imageState) => {
+        const filePath = imageState.filePath;
         const url = convertFileSrc(filePath);
         Konva.Image.fromURL(url,(image) => {
             const splitFilePath = filePath.split("\\");
             image.setAttrs({
                 ...imageState,
                 fileName: splitFilePath[splitFilePath.length - 1],
-                draggable: true,
+                draggable: false,
                 perfectDrawEnabled: false,
-            })
+            });
 
-            image.on('dragend', function() {
-                console.log('Image dragged ended at position:', this.position());
-                // You can perform actions here based on the drag end event
+            /**
+             * Saves the changes to history when move end.
+             */
+            image.on('dragend', (e) => {
+                const index = findIndexInState(image.id());
+                state[index] = {
+                    ...imageState,
+                    x: e.target.x(),
+                    y: e.target.y(),
+                };
+                setState(newState);
+            });
+
+            /**
+             * Saves the changes to history when rotation end.
+             */
+            image.on('transformend', (e) => {
+                const index = findIndexInState(image.id());
+                state[index] = {
+                    ...imageState,
+                    rotation: e.target.rotation(),
+                };
+                console.log(state)
+                setState(state);
+            });
+
+            /**
+             * Moves the image to the top (z-index)
+             */
+            image.on('mousedown', (e) => {
+                e.target.moveToTop();
+            });
+
+            /**
+             * Change to pinter cursor when hovering over the image.
+             */
+            image.on('mouseenter', (e) => {
+                document.body.style.cursor = 'pointer';
+            });
+
+            /**
+             * Change to default cursor when exiting the image.
+             */
+            image.on('mouseleave', (e) => {
+                document.body.style.cursor = 'default';
             });
 
             getLayer().add(image);
-        })
+        });
 
         newState = [...newState, imageState];
         setState(newState);
@@ -159,6 +223,7 @@ export const StageRefContextProvider = ({children}) => {
         getStage,
         getLayer,
         getElements,
+        setElements,
         getImages,
         getElementsInAllGroups,
         getImagesInAllGroups,
