@@ -155,7 +155,7 @@ export const StageRefContextProvider = ({children}) => {
      * @param id {string} unique identifier of the element.
      * @return {number} the index of the element in the state.
      */
-    const findIndexInState = (id) => state.findIndex((element) => element.id === id());
+    const findIndexInState = (id) => state.findIndex((element) => element.id === id);
 
     /**
      * Event handler for element clicking. This will check the selection of the element.
