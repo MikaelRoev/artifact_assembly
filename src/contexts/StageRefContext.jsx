@@ -266,10 +266,12 @@ export const StageRefContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      */
     const select = (element) => {
+        element.draggable(!isLocked);
+
+        element.moveTo(getSelectLayer());
+
         const previousSelected = getSelectTransformer().nodes();
         getSelectTransformer().nodes([...previousSelected, element]);
-        element.moveTo(getSelectLayer());
-        element.draggable(!isLocked);
     }
 
     /**
@@ -278,6 +280,7 @@ export const StageRefContextProvider = ({children}) => {
      */
     const deselect = (element) => {
         element.draggable(false);
+
         element.moveTo(getStaticLayer());
 
         const updatedNodes = getSelectTransformer().nodes().filter(node => node.id() !== element.id());
@@ -288,16 +291,13 @@ export const StageRefContextProvider = ({children}) => {
      * Deselects all selected elements.
      */
     const deselectAll = () => {
-        console.log("Is deselecting all")
-
         getSelectedElements().forEach(function (element) {
             element.draggable(false);
+
             element.moveTo(getStaticLayer());
         });
 
         getSelectTransformer().nodes([]);
-
-        //BEFORE: getSelectedElements().forEach(deselect);
     }
 
     /**
@@ -305,12 +305,8 @@ export const StageRefContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      */
     const selectOnly = (element) => {
-        getSelectedElements().forEach((selectedElement) => {
-            if (selectedElement.id() !== element.id()) return;
-            selectedElement.draggable(false);
-            selectedElement.moveTo(getStaticLayer())
-        });
-        getSelectTransformer().nodes([element]);
+        deselectAll();
+        select(element);
     }
 
     /**
@@ -318,7 +314,6 @@ export const StageRefContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be checked.
      * @return {boolean} true if element is selected, false if not.
      */
-        // Function to check if an element is selected
     const isSelected = (element) => getSelectedElements()
             .some(selectedElement => selectedElement.id() === element.id());
 
