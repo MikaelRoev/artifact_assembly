@@ -261,23 +261,7 @@ export const StageRefContextProvider = ({children}) => {
      * @param element {shape | stage} the element to be deselected.
      */
     const deselect = (element) => {
-        /*
-        const indexIndex = selectedElementsIndex.indexOf(index);
 
-        element.draggable(false);
-
-        element.moveTo(getStaticLayer());
-
-        const newSelected = [...selectedElements];
-        newSelected.splice(indexIndex, 1);
-        setSelectedElements(newSelected);
-         */
-
-        /*
-        remove from transformer
-        move to static layer
-        make not draggable
-         */
     }
 
     /**
