@@ -1,7 +1,8 @@
-import React, {createContext, useRef} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
+import LockedContext from "./LockedContext";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -17,6 +18,8 @@ const StageRefContext = createContext(null);
  */
 export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef();
+    
+    const {isLocked} = useContext(LockedContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
 
@@ -26,62 +29,47 @@ export const StageRefContextProvider = ({children}) => {
      * Initializes the stage, by creating it, and creating the two layers
      */
     const initializeStage = () => {
-        const layer = new Konva.Layer();
-        const selectLayer = new Konva.Layer();
+        const newStaticLayer = new Konva.Layer();
+        const newSelectLayer = new Konva.Layer();
         const transformer = new Konva.Transformer();
-        selectLayer.add(transformer);
-        getStage().add(layer, selectLayer);
-
-        console.log(getStage().getChildren());
+        transformer.resizeEnabled(false);
+        transformer.rotateEnabled(!isLocked);
+        newSelectLayer.add(transformer);
+        getStage().add(newStaticLayer, newSelectLayer);
     }
-
-    /*
-    <Transformer
-        ref={trRef}l
-        boundBoxFunc={(oldBox, newBox) => {
-            // limit resize
-            if (newBox.width < 5 || newBox.height < 5) {
-                return oldBox;
-            }
-            return newBox;
-        }}
-        resizeEnabled={false}
-        rotateEnabled={!isLocked}
-    />
-     */
-
 
     /**
      * Getter for the whole stage
      * @return the stage
      */
-    const getStage = () => {
-        return stageRef.current;
-    }
+    const getStage = useCallback(() => stageRef.current, [stageRef]);
 
     /**
      * Getter for the layer.
      * @return the first child of the stage AKA the layer.
      */
-    const getLayer = () => {
-        return getStage().getChildren()[0];
-    }
+    const getLayer = () => getStage().getChildren()[0];
 
     /**
      * Getter for the select layer.
      * @return the second child of the stage AKA the select layer.
      */
-    const getSelectLayer = () => {
-        return getStage().getChildren()[1];
-    }
+    const getSelectLayer = useCallback(() => getStage().getChildren()[1], [getStage]);
+
+    const getSelectTransformer = useCallback(() => getSelectLayer().getChildren()[0], [getSelectLayer]);
+
+    /**
+     * Changes the ability to rotate the selected elements when isLocked changes.
+     */
+    useEffect(() => {
+        getSelectTransformer().rotateEnabled(!isLocked);
+    }, [getSelectTransformer, isLocked]);
 
     /**
      * Getter for the elements in the layer.
      * @return the children AKA all the elements.
      */
-    const getElements = () => {
-        return getLayer().getChildren();
-    }
+    const getElements = () => getLayer().getChildren();
 
     const setElements = (elementStates) => {
         getLayer().destroyChildren();
@@ -100,17 +88,13 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the images in the layer, excluding other elements
      * @return {Konva.Image[]} the images in the layer.
      */
-    const getImages = () => {
-        return getElements().filter((child)=> child instanceof Konva.Image);
-    }
+    const getImages = () => getElements().filter((child)=> child instanceof Konva.Image);
 
     /**
      * Getter for elements in the layer that are groups
      * @return the groups
      */
-    const getGroups = () => {
-        return getElements().filter((child) => child instanceof Konva.Group);
-    }
+    const getGroups = () => getElements().filter((child) => child instanceof Konva.Group);
 
     /**
      * Getter for all elements in all groups
@@ -128,10 +112,7 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for all images in all groups
      * @return the images in all groups
      */
-    const getImagesInAllGroups = () => {
-        return getElementsInAllGroups().filter((child)=> child instanceof Konva.Image);
-
-    }
+    const getImagesInAllGroups = () => getElementsInAllGroups().filter((child)=> child instanceof Konva.Image);
 
     const getAllImages = () => {
         const allImages = getImages();
