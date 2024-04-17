@@ -29,14 +29,13 @@ const StageArea = () => {
         selectedElements,
         selectedElementsIndex,
         deselect,
-        deselectAll,
         selectOnly,
         isSelected
     } = useContext(SelectContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef, getStage, getImages, getStaticLayer, initializeStage, select} = useContext(StageRefContext);
+    const {stageRef, getStage, getImages, getStaticLayer, initializeStage, select, deselectAll} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
