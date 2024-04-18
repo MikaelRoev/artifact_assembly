@@ -3,6 +3,7 @@ import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import LockedContext from "./LockedContext";
+import FilterInteractionContext from "./FilterInteractionContext";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -23,6 +24,7 @@ export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
     const {isLocked} = useContext(LockedContext);
+    const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
 
@@ -103,12 +105,13 @@ export const StageRefContextProvider = ({children}) => {
         getSelectedElements().forEach(element => element.draggable(!isLocked));
     }, [getStage, getSelectTransformer, isLocked, getSelectedElements]);
 
+
     /**
      * Finds the index of the element in the state by id.
      * @param id {string} unique identifier of the element.
      * @return {number} the index of the element in the state.
      */
-    const findIndexInState = (id) => state.findIndex((element) => element.id === id());
+    const findIndexInState = (id) => state.findIndex((element) => element.id === id);
 
     /**
      * Makes and adds a konva image.
@@ -252,6 +255,36 @@ export const StageRefContextProvider = ({children}) => {
         }
     }, [ctrlPressed, deselectAll, shiftPressed]);
 
+
+    /**
+     * Sets up and cleans up the delete event listener.
+     */
+    useEffect(() => {
+
+        /**
+         * Deletes the selected elements if the delete key is pressed.
+         * @param e{KeyboardEvent} the event.
+         */
+        const handleDeletePressed = (e) => {
+            if ((e.key === "Delete" || e.key === "Backspace") && getSelectedElements().length > 0
+                && !isFilterInteracting) {
+
+                getSelectedElements().forEach(function(element) {
+                    element.destroy();
+                })
+
+                getSelectTransformer().nodes([]);
+
+                const newState = state.filter((elementState) => !isSelected(elementState));
+                setState(newState);
+            }
+        };
+
+        document.addEventListener("keydown", handleDeletePressed);
+        return () => {
+            document.removeEventListener("keydown", handleDeletePressed);
+        };
+    }, [isFilterInteracting, deselectAll, isSelected]);
 
     /**
      * Set up and cleans up the select key check.
