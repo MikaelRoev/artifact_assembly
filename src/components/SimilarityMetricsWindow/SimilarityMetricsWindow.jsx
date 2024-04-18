@@ -98,8 +98,9 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
+        const imageNodes = getAllImages();
         for (const index of selectedElementsIndex) {
-            for (const imageNode of getAllImages()) {
+            for (const imageNode of imageNodes) {
                 if (elements[index].id === imageNode.attrs.id) {
                     const newHues = await getHueData(imageNode.toDataURL());
                     elements[index] = {

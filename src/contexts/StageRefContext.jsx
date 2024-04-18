@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -18,9 +18,6 @@ const StageRefContext = createContext(null);
  * @constructor
  */
 export const StageRefContextProvider = ({children}) => {
-    const [ctrlPressed, setCtrlPressed] = useState(false);
-    const [shiftPressed, setShiftPressed] = useState(false);
-
     const stageRef = useRef(null);
 
     const {isLocked} = useContext(LockedContext);
@@ -83,7 +80,6 @@ export const StageRefContextProvider = ({children}) => {
      */
     const getSelectTransformer = useCallback(() => {
         const selectLayer = getSelectLayer();
-        console.log(selectLayer);
         return selectLayer ? selectLayer.findOne("#select-transformer") : null;
     }, [getSelectLayer]);
 
@@ -97,14 +93,13 @@ export const StageRefContextProvider = ({children}) => {
     }, [getStage]);
 
     /**
-     * Changes the ability to rotate and drag the selected elements when isLocked changes.
+     * Getter for all the elements in the stage.
+     * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
-    useEffect(() => {
-        if (!getStage()) return;
-        getSelectTransformer().rotateEnabled(!isLocked);
-        getSelectedElements().forEach(element => element.draggable(!isLocked));
-    }, [getStage, getSelectTransformer, isLocked, getSelectedElements]);
-
+    const getAllElements = useCallback(() => {
+        const stage = getStage();
+        return stage ? [...getSelectedElements(), getStaticLayer().getChildren()] : [];
+    }, [getSelectedElements, getStage, getStaticLayer]);
 
     /**
      * Finds the index of the element in the state by id.
@@ -245,16 +240,18 @@ export const StageRefContextProvider = ({children}) => {
         , [getSelectedElements]);
 
     /**
-     * Deselects when the mouse left-clicks on an empty area on the canvas
-     * and ctrl key is not pressed.
-     * @param e{KonvaEventObject<MouseEvent>} the event.
+     * Delete all selected elements.
      */
-    const checkDeselect = useCallback((e) => {
-        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
-            deselectAll();
-        }
-    }, [ctrlPressed, deselectAll, shiftPressed]);
+    const deleteSelected = useCallback((element) => {
+        getSelectedElements().forEach(function(element) {
+            element.destroy();
+        })
 
+        const newState = state.filter((elementState) => !isSelected(elementState));
+        setState(newState);
+
+        getSelectTransformer().nodes([]);
+    })
 
     /**
      * Sets up and cleans up the delete event listener.
@@ -284,98 +281,7 @@ export const StageRefContextProvider = ({children}) => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [isFilterInteracting, deselectAll, isSelected]);
-
-    /**
-     * Set up and cleans up the select key check.
-     */
-    useEffect(() => {
-        //TODO: fix bug!!
-
-        /**
-         * The selection keys down event handler.
-         * @param e{KeyboardEvent}
-         */
-        const handleSelectKeyDown = (e) => {
-            console.log(e.key);
-            if (e.key === "Control") {
-                setCtrlPressed(true);
-            }
-            if (e.key === "Shift") {
-                setShiftPressed(true);
-            }
-        };
-
-        /**
-         * The select key up event handler.
-         * @param e{KeyboardEvent}
-         */
-        const handleSelectKeyUp = (e) => {
-            if (e.key === "Control") {
-                setCtrlPressed(false);
-            }
-            if (e.key === "Shift") {
-                setShiftPressed(false);
-            }
-        };
-
-        document.addEventListener("keydown", handleSelectKeyDown);
-        document.addEventListener("keyup", handleSelectKeyUp);
-
-        return () => {
-            document.removeEventListener("keydown", handleSelectKeyDown);
-            document.removeEventListener("keyup", handleSelectKeyUp);
-        };
-    }, []);
-
-    /**
-     * Set up and cleans up the on click functions of the images.
-     */
-    useEffect(() => {
-
-        /**
-         * Event handler for element clicking. This will check the selection of the element.
-         * @param e {KonvaEventObject<MouseEvent>} click event.
-         */
-        const handleElementClick = (e) => {
-            if (e.evt.button === 2) return;
-            const element = e.target;
-            element.moveToTop();
-
-            console.log("control: ", ctrlPressed, "shift: ", shiftPressed)
-            if (ctrlPressed || shiftPressed) {
-                if (isSelected(element)) {
-                    // already selected
-                    deselect(element);
-                } else {
-                    // not already selected
-                    select(element);
-                }
-            } else {
-                selectOnly(element);
-            }
-        }
-
-        for (const image of getAllImages()) {
-            console.log("in images")
-            /**
-             * Selects the image when clicked on
-             */
-            image.on("click", handleElementClick);
-
-            /**
-             * Selects the image when tapped on
-             */
-            image.on("tap", handleElementClick);
-        }
-
-        return () => {
-            for (const image of getAllImages()) {
-                image.off("click", handleElementClick);
-                image.off("tap", handleElementClick);
-            }
-        };
-    }, [ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
+    }, [isFilterInteracting, deselectAll, isSelected, getSelectedElements, getSelectTransformer, state, setState]);
 
     /**
      * Initializes the stage, by creating it, and creating the two layers
@@ -390,19 +296,27 @@ export const StageRefContextProvider = ({children}) => {
 
         selectLayer.add(selectTransformer);
         getStage().add(staticLayer, selectLayer);
-        getStage().on("mousedown", checkDeselect);
-        getStage().on("touchstart", checkDeselect);
-    }, [checkDeselect, getStage, isLocked]);
+    }, [getStage, isLocked]);
 
     const providerValues = {
         stageRef,
         getStage,
+        getStaticLayer,
+        getSelectTransformer,
+        getSelectedElements,
+        getAllElements,
         addImage,
         getAllImages,
-        getStaticLayer,
-        initializeStage,
+
         select,
-        deselectAll
+        deselect,
+        deselectAll,
+        selectOnly,
+        isSelected,
+        deleteSelected,
+
+        undo,
+        redo,
     }
 
     return (

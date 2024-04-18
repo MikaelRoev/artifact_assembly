@@ -1,12 +1,10 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
-import {Group, Stage} from "react-konva";
+import React, {useCallback, useContext, useEffect, useState} from "react";
+import {Stage} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
 import {getHueData} from "../../util/ImageManupulation";
-import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import ElementContext from "../../contexts/ElementContext";
-import SelectContext from "../../contexts/SelectContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
 
@@ -19,30 +17,33 @@ const StageArea = () => {
     const [ctrlPressed, setCtrlPressed] = useState(false);
     const [shiftPressed, setShiftPressed] = useState(false);
 
-    /**
-     * Reference to the konva transformer box.
-     * @type {React.MutableRefObject<Konva.Transformer>}
-     */
-    const trRef = useRef();
-
     const {
-        selectedElements,
-        selectedElementsIndex,
+        stageRef,
+        getStage,
+        getStaticLayer,
+        getSelectTransformer,
+        getSelectedElements,
+        getAllElements,
+        getAllImages,
+
+        select,
         deselect,
+        deselectAll,
         selectOnly,
-        isSelected
-    } = useContext(SelectContext);
+        isSelected,
+        deleteSelected,
+
+        undo,
+        redo
+    } = useContext(StageRefContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef, getStage, getAllImages, getStaticLayer, initializeStage, select, deselectAll} = useContext(StageRefContext);
+    const {elements} = useContext(ElementContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
     const zoomMax = 300; //zoom in limit
-
-    let newElements = [...elements];
 
     /**
      * Update the stage according to the project.
@@ -55,6 +56,14 @@ const StageArea = () => {
         stage.batchDraw();
     }, [project, getStage]);
 
+    /**
+     * Changes the ability to rotate and drag the selected elements when isLocked changes.
+     */
+    useEffect(() => {
+        if (!getStage()) return;
+        getSelectTransformer().rotateEnabled(!isLocked);
+        getSelectedElements().forEach(element => element.draggable(!isLocked));
+    }, [getStage, getSelectTransformer, isLocked, getSelectedElements]);
 
     /**
      * Sets up and cleans up the delete event listener.
@@ -66,19 +75,17 @@ const StageArea = () => {
          * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === "Backspace")
-                && selectedElementsIndex.length > 0
+            if ((e.key === "Delete" || e.key === "Backspace") && getSelectedElements().length > 0
                 && !isFilterInteracting) {
-                const newElements = elements.filter((element, index) => !isSelected(index));
-                setElements(newElements);
-                deselectAll();
+                deleteSelected();
             }
         };
+
         document.addEventListener("keydown", handleDeletePressed);
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [elements, selectedElementsIndex, setElements, isFilterInteracting, deselectAll, isSelected]);
+    }, [deleteSelected, getSelectedElements, isFilterInteracting]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -167,11 +174,11 @@ const StageArea = () => {
      * and ctrl key is not pressed.
      * @param e{KonvaEventObject<MouseEvent>} the event.
      */
-    const checkDeselect = (e) => {
+    const checkDeselect = useCallback((e) => {
         if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
             deselectAll();
         }
-    };
+    }, [ctrlPressed, deselectAll, shiftPressed]);
 
     /**
      * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
@@ -215,93 +222,25 @@ const StageArea = () => {
     };
 
     /**
-     * Updates the transformer to selected elements.
-     */
-    useEffect(() => {
-        if (trRef.current && selectedElements.length > 0) {
-            trRef.current.nodes(selectedElements);
-            trRef.current.moveToTop();
-            trRef.current.getLayer().batchDraw();
-            selectedElements.forEach((element) => element.draggable(!isLocked));
-        }
-    }, [selectedElements, isLocked]);
-
-    /**
      * Event handler for element clicking. This will check the selection of the element.
      * @param e {KonvaEventObject<MouseEvent>} click event.
-     * @param index {number} of the element clicked on.
      */
-    const handleElementClick = (e, index) => {
+    const handleElementClick = (e) => {
         if (e.evt.button === 2) return;
         const element = e.target;
         element.moveToTop();
 
         if (ctrlPressed || shiftPressed) {
-            if (isSelected(index)) {
+            if (isSelected(element)) {
                 // already selected
-                deselect(index);
+                deselect(element);
             } else {
                 // not already selected
-                select(element, index);
+                select(element);
             }
         } else {
-            selectOnly(element, index);
+            selectOnly(element);
         }
-    }
-
-    const renderElements = () => {
-        return (
-            elements.length > 0 &&
-            elements.map((element, index) => {
-                switch (element.type) {
-                    case "Image":
-                        return (
-                            renderImage(element, index)
-                        );
-                    case "Group":
-                        return (
-                            renderGroup(element, index)
-
-                        );
-                }
-            })
-        );
-    }
-
-    const renderImage = (image, index) => {
-        return (
-            <ImageNode
-                key={image.id}
-                id={image.id}
-                imageProps={image}
-                onClick={(e) => handleElementClick(e, index)}
-                onChange={(newImage) => {
-                    newElements[index] = newImage;
-                    setElements(newElements);
-                }}
-            />
-        );
-    }
-
-    const renderGroup = (group, index) => {
-        return (
-            <Group
-                key={index}
-                onClick={e => handleElementClick(e, index)}
-                onTap={e => handleElementClick(e, index)}
-
-            >
-                {group.groupElements.map((groupElement, i) => {
-                    console.log("Rendering Image:", groupElement); // Add console.log here
-                    return (
-                        <ImageNode
-                            key={i}
-                            imageProps={groupElement}
-                        />
-                    );
-                })}
-            </Group>
-        );
     }
 
     /**
@@ -343,19 +282,31 @@ const StageArea = () => {
     }, [elements.length, getStaticLayer, elements, getAllImages]);
 
     useEffect(() => {
-        if (getStage) {
-            initializeStage();
+        const images = getAllImages();
+        images.forEach(image => {
+            image.on("click", handleElementClick);
+            image.on("tap", handleElementClick);
+        })
+
+        return () => {
+            images.forEach(image => {
+                image.off("click");
+                image.off("tap");
+            })
         }
-    }, []);
-    
+    }, [ctrlPressed, getAllImages, handleElementClick, shiftPressed]);
+
     return (
         <Stage
             ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
-            draggable={false}
+            draggable={false} //TODO: make true
             className="stage"
-            onWheel={zoomStage}>
+            onWheel={zoomStage}
+            onMouseDown={checkDeselect}
+            onTouchStart={checkDeselect}>
+
             {/*<Layer
                 className="layer">
                 {renderElements()}
