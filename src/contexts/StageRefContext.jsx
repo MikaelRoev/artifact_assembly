@@ -20,7 +20,7 @@ export const StageRefContextProvider = ({children}) => {
     const [ctrlPressed, setCtrlPressed] = useState(false);
     const [shiftPressed, setShiftPressed] = useState(false);
 
-    const stageRef = useRef();
+    const stageRef = useRef(null);
 
     const {isLocked} = useContext(LockedContext);
 
@@ -28,124 +28,80 @@ export const StageRefContextProvider = ({children}) => {
 
     let newState = state;
 
-    /**
-     * Initializes the stage, by creating it, and creating the two layers
-     */
-    const initializeStage = () => {
-        const layer = new Konva.Layer();
-        const selectLayer = new Konva.Layer();
-
-        const transformer = new Konva.Transformer();
-        transformer.resizeEnabled(false);
-        transformer.rotateEnabled(!isLocked);
-
-        selectLayer.add(transformer);
-        getStage().add(layer, selectLayer);
-        getStage().on("mousedown", checkDeselect);
-        getStage().on("touchstart", checkDeselect);
-    }
+    let initializeStage: function;
 
     /**
-     * Deselects when the mouse left-clicks on an empty area on the canvas
-     * and ctrl key is not pressed.
-     * @param e{KonvaEventObject<MouseEvent>} the event.
-     */
-    const checkDeselect = (e) => {
-        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
-            deselectAll();
-        }
-    };
-
-    /**
-     * Getter for the whole stage
-     * @return {funcition: Konva.Stage} the stage
+     * Getter for the whole stage.
+     * @return {Konva.Stage | null} the stage.
      */
     const getStage = useCallback(() => stageRef.current, [stageRef]);
 
     /**
-     * Getter for the layer.
-     * @return {Konva.Layer} the first child of the stage AKA the layer.
+     * Getter for the select layer.
+     * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
-    const getStaticLayer = () => getStage().getChildren()[0];
+    const getSelectLayer = useCallback(() => {
+        const stage = getStage();
+        if (!stage) return null;
+        let selectLayer = stage.findOne("#select-layer");
+        if (!selectLayer) {
+            initializeStage();
+            selectLayer = stage.findOne("#select-layer");
+        }
+        return selectLayer;
+    }, [getStage, initializeStage]);
 
     /**
-     * Getter for the select layer.
-     * @return the second child of the stage AKA the select layer.
+     * Getter for the static layer.
+     * @return {Konva.Layer | null} the static layer in the stage or null if it could not find it.
      */
-    const getSelectLayer = useCallback(() => getStage().getChildren()[1], [getStage]);
+    const getStaticLayer = useCallback(() => {
+        const stage = getStage();
+        if (!stage) return null;
+        let staticLayer = stage.findOne("#static-layer");
+        if (!staticLayer) {
+            initializeStage();
+            staticLayer = stage.findOne("#static-layer");
+        }
+        return staticLayer;
+    }, [getStage, initializeStage]);
 
     /**
      * Getter for the selected elements.
+     * @return {Konva.Node[]} the elements in the selected layer excluding transformers.
      */
-    const getSelectedElements = useCallback(() => getSelectLayer().getChildren()
-        .filter(child => !(child instanceof Konva.Transformer)), [getSelectLayer]);
+    const getSelectedElements = useCallback(() => {
+        const selectLayer = getSelectLayer();
+        return selectLayer ? selectLayer.find(node => !(node instanceof Konva.Transformer)) : [];
+    }, [getSelectLayer]);
 
     /**
      * Getter for the select transformer box.
+     * @return {Konva.Transformer | null} the select transformer.
      */
-    const getSelectTransformer = useCallback(() => getSelectLayer().getChildren()[0], [getSelectLayer]);
+    const getSelectTransformer = useCallback(() => {
+        const selectLayer = getSelectLayer();
+        console.log(selectLayer);
+        return selectLayer ? selectLayer.findOne("#select-transformer") : null;
+    }, [getSelectLayer]);
+
+    /**
+     * Getter for all the images in the stage.
+     * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
+     */
+    const getAllImages = useCallback(() => {
+        const stage = getStage();
+        return stage ? getStage().find(node => node instanceof Konva.Image) : [];
+    }, [getStage]);
 
     /**
      * Changes the ability to rotate and drag the selected elements when isLocked changes.
      */
     useEffect(() => {
+        if (!getStage()) return;
         getSelectTransformer().rotateEnabled(!isLocked);
         getSelectedElements().forEach(element => element.draggable(!isLocked));
-    }, [getSelectLayer, getSelectTransformer, isLocked]);
-
-    /**
-     * Getter for the elements in the layer.
-     * @return the children AKA all the elements.
-     */
-    const getElements = () => getStaticLayer().getChildren();
-
-    const setElements = (elementStates) => {
-        getStaticLayer().destroyChildren();
-        getSelectLayer().destroyChildren();
-        elementStates.forEach((elementState) => {
-            if (elementState.type === "Image") {
-                addImage(elementState);
-            } else if (elementState.type === "Group") {
-
-            }
-        });
-    }
-
-    /**
-     * Getter for the images in the layer, excluding other elements
-     * @return {Konva.Image[]} the images in the layer.
-     */
-    const getImages = () => getElements().filter(child => child instanceof Konva.Image);
-
-    /**
-     * Getter for elements in the layer that are groups
-     * @return the groups
-     */
-    const getGroups = () => getElements().filter(child => child instanceof Konva.Group);
-
-    /**
-     * Getter for all elements in all groups
-     * @return the elements in all groups
-     */
-    const getElementsInAllGroups = () => {
-        const elements = [];
-        getGroups().forEach((group) => {
-            elements.push(group.getChildren());
-        });
-        return elements;
-    }
-
-    /**
-     * Getter for all images in all groups
-     * @return the images in all groups
-     */
-    const getImagesInAllGroups = () => getElementsInAllGroups().filter((child) => child instanceof Konva.Image);
-
-    const getAllImages = () => {
-        const allImages = getImages();
-        allImages.concat(getImagesInAllGroups());
-        return allImages;
-    }
+    }, [getStage, getSelectTransformer, isLocked, getSelectedElements]);
 
     /**
      * Finds the index of the element in the state by id.
@@ -153,29 +109,6 @@ export const StageRefContextProvider = ({children}) => {
      * @return {number} the index of the element in the state.
      */
     const findIndexInState = (id) => state.findIndex((element) => element.id === id());
-
-    /**
-     * Event handler for element clicking. This will check the selection of the element.
-     * @param e {KonvaEventObject<MouseEvent>} click event.
-     */
-    const handleElementClick = (e) => {
-        if (e.evt.button === 2) return;
-        const element = e.target;
-        element.moveToTop();
-
-        console.log("control: ", ctrlPressed, "shift: ",  shiftPressed)
-        if (ctrlPressed || shiftPressed) {
-            if (isSelected(element)) {
-                // already selected
-                deselect(element);
-            } else {
-                // not already selected
-                select(element);
-            }
-        } else {
-            selectOnly(element);
-        }
-    }
 
     /**
      * Makes and adds a konva image.
@@ -199,22 +132,12 @@ export const StageRefContextProvider = ({children}) => {
             });
 
             /**
-             * Selects the image when clicked on
-             */
-            image.on("click", handleElementClick);
-
-            /**
-             * Selects the image when tapped on
-             */
-            image.on("tap", handleElementClick);
-
-            /**
              * Saves the changes to history when move end.
              */
-            image.on('dragend', (e) => {
+            image.on("dragend", (e) => {
                 const index = findIndexInState(image.id());
                 state[index] = {
-                    ...imageState,
+                    ...state[index],
                     x: e.target.x(),
                     y: e.target.y(),
                 };
@@ -224,10 +147,10 @@ export const StageRefContextProvider = ({children}) => {
             /**
              * Saves the changes to history when rotation end.
              */
-            image.on('transformend', (e) => {
+            image.on("transformend", (e) => {
                 const index = findIndexInState(image.id());
                 state[index] = {
-                    ...imageState,
+                    ...state[index],
                     rotation: e.target.rotation(),
                 };
                 setState(state);
@@ -236,22 +159,22 @@ export const StageRefContextProvider = ({children}) => {
             /**
              * Moves the image to the top (z-index)
              */
-            image.on('mousedown', (e) => {
+            image.on("mousedown", (e) => {
                 e.target.moveToTop();
             });
 
             /**
              * Change to pinter cursor when hovering over the image.
              */
-            image.on('mouseenter', (e) => {
-                document.body.style.cursor = 'pointer';
+            image.on("mouseenter", (e) => {
+                document.body.style.cursor = "pointer";
             });
 
             /**
              * Change to default cursor when exiting the image.
              */
-            image.on('mouseleave', (e) => {
-                document.body.style.cursor = 'default';
+            image.on("mouseleave", (e) => {
+                document.body.style.cursor = "default";
             });
 
             getStaticLayer().add(image);
@@ -265,32 +188,32 @@ export const StageRefContextProvider = ({children}) => {
      * Selects an element.
      * @param element {Shape | Stage} the element to be selected.
      */
-    const select = (element) => {
+    const select = useCallback((element) => {
         element.draggable(!isLocked);
 
         element.moveTo(getSelectLayer());
 
         const previousSelected = getSelectTransformer().nodes();
         getSelectTransformer().nodes([...previousSelected, element]);
-    }
+    }, [getSelectLayer, getSelectTransformer, isLocked]);
 
     /**
      * Deselects an element.
      * @param element {Shape | Stage} the element to be deselected.
      */
-    const deselect = (element) => {
+    const deselect = useCallback((element) => {
         element.draggable(false);
 
         element.moveTo(getStaticLayer());
 
         const updatedNodes = getSelectTransformer().nodes().filter(node => node.id() !== element.id());
         getSelectTransformer().nodes(updatedNodes);
-    }
+    }, [getSelectTransformer, getStaticLayer]);
 
     /**
      * Deselects all selected elements.
      */
-    const deselectAll = () => {
+    const deselectAll = useCallback(() => {
         getSelectedElements().forEach(function (element) {
             element.draggable(false);
 
@@ -298,24 +221,37 @@ export const StageRefContextProvider = ({children}) => {
         });
 
         getSelectTransformer().nodes([]);
-    }
+    }, [getSelectTransformer, getSelectedElements, getStaticLayer]);
 
     /**
      * Deselects all selected elements and selects an element.
      * @param element {Shape | Stage} the element to be selected.
      */
-    const selectOnly = (element) => {
+    const selectOnly = useCallback((element) => {
         deselectAll();
         select(element);
-    }
+    }, [deselectAll, select]);
 
     /**
      * Checks if an element is selected.
      * @param element {Shape | Stage} the element to be checked.
      * @return {boolean} true if element is selected, false if not.
      */
-    const isSelected = (element) => getSelectedElements()
-            .some(selectedElement => selectedElement.id() === element.id());
+    const isSelected = useCallback((element) => getSelectedElements()
+            .some(selectedElement => selectedElement.id() === element.id())
+        , [getSelectedElements]);
+
+    /**
+     * Deselects when the mouse left-clicks on an empty area on the canvas
+     * and ctrl key is not pressed.
+     * @param e{KonvaEventObject<MouseEvent>} the event.
+     */
+    const checkDeselect = useCallback((e) => {
+        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
+            deselectAll();
+        }
+    }, [ctrlPressed, deselectAll, shiftPressed]);
+
 
     /**
      * Set up and cleans up the select key check.
@@ -328,13 +264,11 @@ export const StageRefContextProvider = ({children}) => {
          * @param e{KeyboardEvent}
          */
         const handleSelectKeyDown = (e) => {
-            setCtrlPressed(true);
+            console.log(e.key);
             if (e.key === "Control") {
-                console.log("control down");
                 setCtrlPressed(true);
             }
             if (e.key === "Shift") {
-                console.log("shift down");
                 setShiftPressed(true);
             }
         };
@@ -345,11 +279,9 @@ export const StageRefContextProvider = ({children}) => {
          */
         const handleSelectKeyUp = (e) => {
             if (e.key === "Control") {
-                console.log("control up");
                 setCtrlPressed(false);
             }
             if (e.key === "Shift") {
-                console.log("shift up");
                 setShiftPressed(false);
             }
         };
@@ -363,19 +295,81 @@ export const StageRefContextProvider = ({children}) => {
         };
     }, []);
 
+    /**
+     * Set up and cleans up the on click functions of the images.
+     */
+    useEffect(() => {
+
+        /**
+         * Event handler for element clicking. This will check the selection of the element.
+         * @param e {KonvaEventObject<MouseEvent>} click event.
+         */
+        const handleElementClick = (e) => {
+            if (e.evt.button === 2) return;
+            const element = e.target;
+            element.moveToTop();
+
+            console.log("control: ", ctrlPressed, "shift: ", shiftPressed)
+            if (ctrlPressed || shiftPressed) {
+                if (isSelected(element)) {
+                    // already selected
+                    deselect(element);
+                } else {
+                    // not already selected
+                    select(element);
+                }
+            } else {
+                selectOnly(element);
+            }
+        }
+
+        for (const image of getAllImages()) {
+            console.log("in images")
+            /**
+             * Selects the image when clicked on
+             */
+            image.on("click", handleElementClick);
+
+            /**
+             * Selects the image when tapped on
+             */
+            image.on("tap", handleElementClick);
+        }
+
+        return () => {
+            for (const image of getAllImages()) {
+                image.off("click", handleElementClick);
+                image.off("tap", handleElementClick);
+            }
+        };
+    }, [ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
+
+    /**
+     * Initializes the stage, by creating it, and creating the two layers
+     */
+    initializeStage = useCallback(() => {
+        const staticLayer = new Konva.Layer({id: "static-layer"});
+        const selectLayer = new Konva.Layer({id: "select-layer"});
+
+        const selectTransformer = new Konva.Transformer({id: "select-transformer"});
+        selectTransformer.resizeEnabled(false);
+        selectTransformer.rotateEnabled(!isLocked);
+
+        selectLayer.add(selectTransformer);
+        getStage().add(staticLayer, selectLayer);
+        getStage().on("mousedown", checkDeselect);
+        getStage().on("touchstart", checkDeselect);
+    }, [checkDeselect, getStage, isLocked]);
+
     const providerValues = {
         stageRef,
         getStage,
-        getStaticLayer,
-        getElements,
-        setElements,
-        getImages,
-        getElementsInAllGroups,
-        getImagesInAllGroups,
         addImage,
+        getAllImages,
+        getStaticLayer,
         initializeStage,
         select,
-        deselectAll,
+        deselectAll
     }
 
     return (

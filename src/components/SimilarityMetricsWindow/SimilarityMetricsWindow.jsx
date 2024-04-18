@@ -51,7 +51,7 @@ const SimilarityMetricsWindow = () => {
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
-    const {getStage, getImages} = useContext(StageRefContext);
+    const {getStage, getAllImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
@@ -99,7 +99,7 @@ const SimilarityMetricsWindow = () => {
      */
     async function updateHistograms() {
         for (const index of selectedElementsIndex) {
-            for (const imageNode of getImages()) {
+            for (const imageNode of getAllImages()) {
                 if (elements[index].id === imageNode.attrs.id) {
                     const newHues = await getHueData(imageNode.toDataURL());
                     elements[index] = {

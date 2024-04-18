@@ -35,7 +35,7 @@ const StageArea = () => {
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
-    const {stageRef, getStage, getImages, getStaticLayer, initializeStage, select, deselectAll} = useContext(StageRefContext);
+    const {stageRef, getStage, getAllImages, getStaticLayer, initializeStage, select, deselectAll} = useContext(StageRefContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
@@ -335,12 +335,12 @@ const StageArea = () => {
          * an image that needs its width and height updated.
          */
         if (getStaticLayer() && elements.length > 0) {
-            const imageNodes = getImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
+            const imageNodes = getAllImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
                 setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
             }
         }
-    }, [elements.length, getStaticLayer, elements, getImages]);
+    }, [elements.length, getStaticLayer, elements, getAllImages]);
 
     useEffect(() => {
         if (getStage) {
