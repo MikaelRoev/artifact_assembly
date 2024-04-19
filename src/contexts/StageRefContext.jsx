@@ -1,9 +1,8 @@
-import React, {createContext, useContext, useEffect, useRef} from "react";
+import React, {createContext, useContext, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import LockedContext from "./LockedContext";
-import FilterInteractionContext from "./FilterInteractionContext";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -21,7 +20,6 @@ export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
     const {isLocked} = useContext(LockedContext);
-    const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
 
@@ -37,7 +35,7 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the select layer.
      * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
-     const getSelectLayer = () => {
+    const getSelectLayer = () => {
         const stage = getStage();
         if (!stage) return null;
         let selectLayer = stage.findOne("#select-layer");
@@ -46,7 +44,7 @@ export const StageRefContextProvider = ({children}) => {
             selectLayer = stage.findOne("#select-layer");
         }
         return selectLayer;
-     }
+    }
 
     /**
      * Getter for the static layer.
@@ -95,7 +93,6 @@ export const StageRefContextProvider = ({children}) => {
     /**
      * Getter for all the elements in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
-     * Todo unpack useCallback
      */
     const getAllElements = () => {
         const stage = getStage();
@@ -179,8 +176,23 @@ export const StageRefContextProvider = ({children}) => {
 
             getStaticLayer().add(image);
         });
+    }
 
-        newState = [...newState, imageState];
+    /**
+     * Makes and adds konva images.
+     * @param imageStates {{
+     * id: {string}
+     * x: {number}
+     * y: {number}
+     * filePath: {string}
+     * }[]} is the list of state values of the images that is needed to create konva images.
+     */
+    const addMultipleImages = (imageStates) => {
+        const newState = [...state];
+        imageStates.forEach(imageState => {
+            addImage(imageState);
+            newState.push(imageState);
+        })
         setState(newState);
     }
 
@@ -238,14 +250,14 @@ export const StageRefContextProvider = ({children}) => {
      * @return {boolean} true if element is selected, false if not.
      */
     const isSelected = (element) => getSelectedElements()
-            .some(selectedElement => selectedElement.id() === element.id())
+        .some(selectedElement => selectedElement.id() === element.id())
 
 
     /**
      * Delete all selected elements.
      */
     const deleteSelected = () => {
-        getSelectedElements().forEach(function(element) {
+        getSelectedElements().forEach(function (element) {
             element.destroy();
         })
 
@@ -277,8 +289,8 @@ export const StageRefContextProvider = ({children}) => {
         getSelectTransformer,
         getSelectedElements,
         getAllElements,
-        addImage,
         getAllImages,
+        addMultipleImages,
 
         select,
         deselect,

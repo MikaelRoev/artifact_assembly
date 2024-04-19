@@ -26,7 +26,7 @@ const NavBar = () => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage, addImage} = useContext(StageRefContext);
+    const {getStage, addMultipleImages} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {selectedElementsIndex, selectOnly} = useContext(SelectContext);
@@ -91,8 +91,8 @@ const NavBar = () => {
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
-            let idAdder = 0 //For when multiple images are loaded at the same time
-            result.forEach((file) => {
+            let idAdder = 0; //For when multiple images are loaded at the same time
+            const imageStates = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const imageState = {
                     type: "Image",
@@ -101,11 +101,12 @@ const NavBar = () => {
                     y: position.y,
                     filePath: file,
                 };
-                addImage(imageState);
                 idAdder++
                 position.x += xOffset;
                 position.y += yOffset;
+                return imageState;
             });
+            addMultipleImages(imageStates);
         }
         setIsLoading(false);
         handleFileButtonClick()
