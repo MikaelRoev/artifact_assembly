@@ -272,7 +272,11 @@ export const StageRefContextProvider = ({children}) => {
         });
 
         // destroy all selected elements
+        getSelectedElements().forEach( element => {
+            element.destroy();
+        })
 
+        console.log("transform nodes", getSelectTransformer().nodes())
         // remove all from transformer nodes
 
         // select group (add to the selected layer)
