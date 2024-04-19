@@ -23,8 +23,8 @@ const StageArea = () => {
         getStaticLayer,
         getSelectTransformer,
         getSelectedElements,
-        getAllElements,
         getAllImages,
+        addChanges,
 
         select,
         deselect,
@@ -286,15 +286,31 @@ const StageArea = () => {
         images.forEach(image => {
             image.on("click", handleElementClick);
             image.on("tap", handleElementClick);
+
+            /**
+             * Saves the changes to history when move end.
+             */
+            image.on("dragend", (e) => {
+                addChanges(e.target.id(), {x: e.target.x(), y: e.target.y()});
+            });
+
+            /**
+             * Saves the changes to history when rotation end.
+             */
+            image.on("transformend", (e) => {
+                addChanges(e.target.id(), {rotation: e.target.rotation()});
+            });
         })
 
         return () => {
             images.forEach(image => {
                 image.off("click");
                 image.off("tap");
+                image.off("dragend");
+                image.off("transformend");
             })
         }
-    }, [ctrlPressed, getAllImages, handleElementClick, shiftPressed]);
+    }, [addChanges, ctrlPressed, getAllImages, handleElementClick, shiftPressed]);
 
     return (
         <Stage

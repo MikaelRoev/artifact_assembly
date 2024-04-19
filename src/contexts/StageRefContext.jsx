@@ -104,7 +104,7 @@ export const StageRefContextProvider = ({children}) => {
      * @param id {string} unique identifier of the element.
      * @return {number} the index of the element in the state.
      */
-    const findIndexInState = (id) => state.findIndex((element) => element.id === id);
+    const findIndexInState = (id) => state.findIndex(elementState => elementState.id === id);
 
     /**
      * Makes and adds a konva image.
@@ -162,6 +162,20 @@ export const StageRefContextProvider = ({children}) => {
             newState.push(imageState);
         })
         setState(newState);
+    }
+
+    /**
+     * Adds the changes to be saves to the state history.
+     * @param id {string} unique identifier of the state element.
+     * @param changes {Object} the changes with properties.
+     */
+    const addChanges = (id, changes) => {
+        const index = findIndexInState(id);
+        state[index] = {
+            ...state[index],
+            ...changes
+        };
+        setState(state);
     }
 
     /**
@@ -259,6 +273,7 @@ export const StageRefContextProvider = ({children}) => {
         getAllElements,
         getAllImages,
         addMultipleImages,
+        addChanges,
 
         select,
         deselect,
