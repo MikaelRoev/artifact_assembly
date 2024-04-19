@@ -222,28 +222,6 @@ const StageArea = () => {
     };
 
     /**
-     * Event handler for element clicking. This will check the selection of the element.
-     * @param e {KonvaEventObject<MouseEvent>} click event.
-     */
-    const handleElementClick = (e) => {
-        if (e.evt.button === 2) return;
-        const element = e.target;
-        element.moveToTop();
-
-        if (ctrlPressed || shiftPressed) {
-            if (isSelected(element)) {
-                // already selected
-                deselect(element);
-            } else {
-                // not already selected
-                select(element);
-            }
-        } else {
-            selectOnly(element);
-        }
-    }
-
-    /**
      * useEffect for updating image dimensions
      */
     useEffect(() => {
@@ -282,6 +260,28 @@ const StageArea = () => {
     }, [elements.length, getStaticLayer, elements, getAllImages]);
 
     useEffect(() => {
+        /**
+         * Event handler for element clicking. This will check the selection of the element.
+         * @param e {KonvaEventObject<MouseEvent>} click event.
+         */
+        const handleElementClick = (e) => {
+            if (e.evt.button === 2) return;
+            const element = e.target;
+            element.moveToTop();
+
+            if (ctrlPressed || shiftPressed) {
+                if (isSelected(element)) {
+                    // already selected
+                    deselect(element);
+                } else {
+                    // not already selected
+                    select(element);
+                }
+            } else {
+                selectOnly(element);
+            }
+        }
+
         const images = getAllImages();
         images.forEach(image => {
             image.on("click", handleElementClick);
@@ -310,7 +310,7 @@ const StageArea = () => {
                 image.off("transformend");
             })
         }
-    }, [addChanges, ctrlPressed, getAllImages, handleElementClick, shiftPressed]);
+    }, [addChanges, ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
 
     return (
         <Stage
