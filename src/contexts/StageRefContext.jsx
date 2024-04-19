@@ -70,6 +70,12 @@ export const StageRefContextProvider = ({children}) => {
         return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
     }
 
+
+    const getAllSelectedImages = () => {
+        const selectLayer = getSelectLayer();
+        return selectLayer ? selectLayer.find(node => node instanceof(Konva.Image)) : [];
+    }
+
     /**
      * Getter for the select transformer box.
      * @return {Konva.Transformer | null} the select transformer.
