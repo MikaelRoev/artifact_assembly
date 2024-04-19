@@ -1,9 +1,8 @@
-import React, {createContext, useContext, useEffect, useRef} from "react";
+import React, {createContext, useContext, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import LockedContext from "./LockedContext";
-import FilterInteractionContext from "./FilterInteractionContext";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -21,7 +20,6 @@ export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
     const {isLocked} = useContext(LockedContext);
-    const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
 
@@ -95,7 +93,6 @@ export const StageRefContextProvider = ({children}) => {
     /**
      * Getter for all the elements in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
-     * Todo unpack useCallback
      */
     const getAllElements = () => {
         const stage = getStage();
