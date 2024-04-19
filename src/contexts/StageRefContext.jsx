@@ -269,6 +269,8 @@ export const StageRefContextProvider = ({children}) => {
         // move images from selected layer to group
         selectedImages.forEach(image => {
             image.moveTo(group);
+
+            image.draggable(false);
         });
 
         // destroy all selected elements
@@ -276,8 +278,8 @@ export const StageRefContextProvider = ({children}) => {
             element.destroy();
         })
 
-        console.log("transform nodes", getSelectTransformer().nodes())
         // remove all from transformer nodes
+        getSelectTransformer().nodes([]);
 
         // select group (add to the selected layer)
         select(group);
