@@ -66,7 +66,6 @@ export const StageRefContextProvider = ({children}) => {
      * @return {Konva.Node[]} the elements in the selected layer excluding transformers.
      */
     const getSelectedElements = () => {
-        //TODO: test this if it returns only group and not group and its children
         const selectLayer = getSelectLayer();
         return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
     }
