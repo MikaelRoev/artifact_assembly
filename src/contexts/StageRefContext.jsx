@@ -81,6 +81,15 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     /**
+     * Getter for all the selected images in the select layer.
+     * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
+     */
+    const getSelectedImages = () => {
+        const selectLayer = getSelectLayer();
+        return selectLayer ? selectLayer.find(node => node instanceof Konva.Image) : [];
+    }
+
+    /**
      * Getter for all the images in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
@@ -270,6 +279,7 @@ export const StageRefContextProvider = ({children}) => {
         getStaticLayer,
         getSelectTransformer,
         getSelectedElements,
+        getSelectedImages,
         getAllElements,
         getAllImages,
         addMultipleImages,
