@@ -128,43 +128,11 @@ export const StageRefContextProvider = ({children}) => {
             });
 
             /**
-             * Saves the changes to history when move end.
-             */
-            image.on("dragend", (e) => {
-                const index = findIndexInState(image.id());
-                state[index] = {
-                    //TODO test if it woks
-                    ...state[index],
-                    x: e.target.x(),
-                    y: e.target.y(),
-                };
-                setState(newState);
-            });
-
-            /**
-             * Saves the changes to history when rotation end.
-             */
-            image.on("transformend", (e) => {
-                const index = findIndexInState(image.id());
-                state[index] = {
-                    ...state[index],
-                    rotation: e.target.rotation(),
-                };
-                setState(state);
-            });
-
-            /**
-             * Moves the image to the top (z-index)
-             */
-            image.on("mousedown", (e) => {
-                e.target.moveToTop();
-            });
-
-            /**
-             * Change to pinter cursor when hovering over the image.
+             * Change to pinter cursor ad moves the image to the top (z-index) when hovering over the image.
              */
             image.on("mouseenter", (e) => {
                 document.body.style.cursor = "pointer";
+                e.target.moveToTop();
             });
 
             /**
