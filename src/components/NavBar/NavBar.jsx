@@ -11,7 +11,7 @@ import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
-import "./NavBar.css";
+import "./NavBar.css"
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.
@@ -26,10 +26,9 @@ const NavBar = () => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage, addImage} = useContext(StageRefContext);
+    const {getStage, addImage, groupSelected} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
-    const {selectedElementsIndex, selectOnly} = useContext(SelectContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {
         setIsConfirmModalOpen,
@@ -181,6 +180,7 @@ const NavBar = () => {
         handleToolsButtonClick();
     };
 
+    /*
     const handleLockPiecesTogether = () => {
         const newGroup = {
             type: "Group",
@@ -201,6 +201,8 @@ const NavBar = () => {
 
         handleFileButtonClick()
     }
+
+     */
 
     /**
      * Function to find the work area. Works by finding the nearest element and moving the stage to that element.
@@ -350,7 +352,7 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className="dropdownButton"
-                                        onClick={handleLockPiecesTogether}>
+                                        onClick={groupSelected}>
                                         Lock Selected Together
                                     </button>
                                 </li>

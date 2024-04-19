@@ -35,7 +35,7 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the select layer.
      * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
-     const getSelectLayer = () => {
+    const getSelectLayer = () => {
         const stage = getStage();
         if (!stage) return null;
         let selectLayer = stage.findOne("#select-layer");
@@ -44,7 +44,7 @@ export const StageRefContextProvider = ({children}) => {
             selectLayer = stage.findOne("#select-layer");
         }
         return selectLayer;
-     }
+    }
 
     /**
      * Getter for the static layer.
@@ -73,7 +73,7 @@ export const StageRefContextProvider = ({children}) => {
 
     const getAllSelectedImages = () => {
         const selectLayer = getSelectLayer();
-        return selectLayer ? selectLayer.find(node => node instanceof(Konva.Image)) : [];
+        return selectLayer ? selectLayer.find(node => node instanceof (Konva.Image)) : [];
     }
 
     /**
@@ -240,14 +240,14 @@ export const StageRefContextProvider = ({children}) => {
      * @return {boolean} true if element is selected, false if not.
      */
     const isSelected = (element) => getSelectedElements()
-            .some(selectedElement => selectedElement.id() === element.id())
+        .some(selectedElement => selectedElement.id() === element.id())
 
 
     /**
      * Delete all selected elements.
      */
     const deleteSelected = () => {
-        getSelectedElements().forEach(function(element) {
+        getSelectedElements().forEach(function (element) {
             element.destroy();
         })
 
@@ -255,6 +255,28 @@ export const StageRefContextProvider = ({children}) => {
         setState(newState);
 
         getSelectTransformer().nodes([]);
+    }
+
+    const groupSelected = () => {
+        console.log("group selected")
+
+        // get selected konva images
+        const selectedImages = getAllSelectedImages();
+
+        // use konva group
+        const group = new Konva.Group();
+
+        // move images from selected layer to group
+        selectedImages.forEach(image => {
+            image.moveTo(group);
+        });
+
+        // destroy all selected elements
+
+        // remove all from transformer nodes
+
+        // select group (add to the selected layer)
+        select(group);
     }
 
     /**
@@ -288,6 +310,7 @@ export const StageRefContextProvider = ({children}) => {
         selectOnly,
         isSelected,
         deleteSelected,
+        groupSelected,
 
         undo,
         redo,
