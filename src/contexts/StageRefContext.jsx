@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useRef} from "react";
+import React, {createContext, useContext, useEffect, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -27,19 +27,17 @@ export const StageRefContextProvider = ({children}) => {
 
     let newState = state;
 
-    let initializeStage: function;
-
     /**
      * Getter for the whole stage.
      * @return {Konva.Stage | null} the stage.
      */
-    const getStage = useCallback(() => stageRef.current, [stageRef]);
+    const getStage = () => stageRef.current;
 
     /**
      * Getter for the select layer.
      * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
-    const getSelectLayer = useCallback(() => {
+     const getSelectLayer = () => {
         const stage = getStage();
         if (!stage) return null;
         let selectLayer = stage.findOne("#select-layer");
@@ -48,13 +46,13 @@ export const StageRefContextProvider = ({children}) => {
             selectLayer = stage.findOne("#select-layer");
         }
         return selectLayer;
-    }, [getStage, initializeStage]);
+     }
 
     /**
      * Getter for the static layer.
      * @return {Konva.Layer | null} the static layer in the stage or null if it could not find it.
      */
-    const getStaticLayer = useCallback(() => {
+    const getStaticLayer = () => {
         const stage = getStage();
         if (!stage) return null;
         let staticLayer = stage.findOne("#static-layer");
@@ -63,45 +61,46 @@ export const StageRefContextProvider = ({children}) => {
             staticLayer = stage.findOne("#static-layer");
         }
         return staticLayer;
-    }, [getStage, initializeStage]);
+    }
 
     /**
      * Getter for the selected elements.
      * @return {Konva.Node[]} the elements in the selected layer excluding transformers.
      */
-    const getSelectedElements = useCallback(() => {
+    const getSelectedElements = () => {
         //TODO: test this if it returns only group and not group and its children
         const selectLayer = getSelectLayer();
         return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
-    }, [getSelectLayer]);
+    }
 
     /**
      * Getter for the select transformer box.
      * @return {Konva.Transformer | null} the select transformer.
      */
-    const getSelectTransformer = useCallback(() => {
+    const getSelectTransformer = () => {
         const selectLayer = getSelectLayer();
         return selectLayer ? selectLayer.findOne("#select-transformer") : null;
-    }, [getSelectLayer]);
+    }
 
     /**
      * Getter for all the images in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
-    const getAllImages = useCallback(() => {
+    const getAllImages = () => {
         //TODO: check if it returns all images including the ones inside of a group
         const stage = getStage();
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
-    }, [getStage]);
+    }
 
     /**
      * Getter for all the elements in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
+     * Todo unpack useCallback
      */
-    const getAllElements = useCallback(() => {
+    const getAllElements = () => {
         const stage = getStage();
         return stage ? [...getSelectedElements(), getStaticLayer().getChildren()] : [];
-    }, [getSelectedElements, getStage, getStaticLayer]);
+    }
 
     /**
      * Finds the index of the element in the state by id.
@@ -189,33 +188,32 @@ export const StageRefContextProvider = ({children}) => {
      * Selects an element.
      * @param element {Shape | Stage} the element to be selected.
      */
-        //TODO: check if all useCallbacks in Stage ref can be unpacked
-    const select = useCallback((element) => {
+    const select = (element) => {
         element.draggable(!isLocked);
 
         element.moveTo(getSelectLayer());
 
         const previousSelected = getSelectTransformer().nodes();
         getSelectTransformer().nodes([...previousSelected, element]);
-    }, [getSelectLayer, getSelectTransformer, isLocked]);
+    }
 
     /**
      * Deselects an element.
      * @param element {Shape | Stage} the element to be deselected.
      */
-    const deselect = useCallback((element) => {
+    const deselect = (element) => {
         element.draggable(false);
 
         element.moveTo(getStaticLayer());
 
         const updatedNodes = getSelectTransformer().nodes().filter(node => node.id() !== element.id());
         getSelectTransformer().nodes(updatedNodes);
-    }, [getSelectTransformer, getStaticLayer]);
+    }
 
     /**
      * Deselects all selected elements.
      */
-    const deselectAll = useCallback(() => {
+    const deselectAll = () => {
         getSelectedElements().forEach(function (element) {
             element.draggable(false);
 
@@ -223,30 +221,30 @@ export const StageRefContextProvider = ({children}) => {
         });
 
         getSelectTransformer().nodes([]);
-    }, [getSelectTransformer, getSelectedElements, getStaticLayer]);
+    }
 
     /**
      * Deselects all selected elements and selects an element.
      * @param element {Shape | Stage} the element to be selected.
      */
-    const selectOnly = useCallback((element) => {
+    const selectOnly = (element) => {
         deselectAll();
         select(element);
-    }, [deselectAll, select]);
+    }
 
     /**
      * Checks if an element is selected.
      * @param element {Shape | Stage} the element to be checked.
      * @return {boolean} true if element is selected, false if not.
      */
-    const isSelected = useCallback((element) => getSelectedElements()
+    const isSelected = (element) => getSelectedElements()
             .some(selectedElement => selectedElement.id() === element.id())
-        , [getSelectedElements]);
+
 
     /**
      * Delete all selected elements.
      */
-    const deleteSelected = useCallback((element) => {
+    const deleteSelected = () => {
         getSelectedElements().forEach(function(element) {
             element.destroy();
         })
@@ -255,12 +253,12 @@ export const StageRefContextProvider = ({children}) => {
         setState(newState);
 
         getSelectTransformer().nodes([]);
-    })
+    }
 
     /**
      * Initializes the stage, by creating it, and creating the two layers
      */
-    initializeStage = useCallback(() => {
+    const initializeStage = () => {
         const staticLayer = new Konva.Layer({id: "static-layer"});
         const selectLayer = new Konva.Layer({id: "select-layer"});
 
@@ -270,7 +268,7 @@ export const StageRefContextProvider = ({children}) => {
 
         selectLayer.add(selectTransformer);
         getStage().add(staticLayer, selectLayer);
-    }, [getStage, isLocked]);
+    }
 
     const providerValues = {
         stageRef,
@@ -297,7 +295,7 @@ export const StageRefContextProvider = ({children}) => {
         <StageRefContext.Provider value={providerValues}>
             {children}
         </StageRefContext.Provider>
-    )
+    );
 }
 
 export default StageRefContext;
