@@ -43,6 +43,7 @@ export const openProjectDialog = async (setProject, setElements) => {
             filters: [{name: "JSON Files", extensions: ["json"]}]
         });
 
+        //TODO: deal with error
         if (!filePath) return Promise.reject(Error("no file selected or operation cancelled"));
 
         const content = await readFile(filePath);
@@ -73,6 +74,7 @@ export const saveProjectDialog = async (project, setProject, elements) => {
             filters: [{name: "JSON Files", extensions: ["json"]}]
         });
 
+        //TODO: deal with error
         if (!filePath) return Promise.reject(Error("no file selected or operation cancelled"));
 
         let newProject = {

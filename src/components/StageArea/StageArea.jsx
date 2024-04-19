@@ -75,9 +75,8 @@ const StageArea = () => {
          * @param e{KeyboardEvent} the event.
          */
         const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === "Backspace") && getSelectedElements().length > 0
+            if (["Delete", "Backspace"].includes(e.key) && getSelectedElements().length > 0
                 && !isFilterInteracting) {
-                console.log("delete ", e.key)
                 deleteSelected();
             }
         };
@@ -97,8 +96,7 @@ const StageArea = () => {
          * @param e{KeyboardEvent} the event.
          */
         const handleSavePressed = (e) => {
-            if (e.ctrlKey && e.key === "s") {
-                console.log("save ", e.key)
+            if (e.ctrlKey && (e.key.toUpperCase() === "S")) {
                 e.preventDefault();
                 saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
             }
@@ -118,12 +116,10 @@ const StageArea = () => {
          * @param e {KeyboardEvent} the event.
          */
         const handleUndoRedoPressed = (e) => {
-            if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
-                console.log("redo ", e.key)
+            if ((e.ctrlKey && e.key.toUpperCase() === "Y") || (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "Z")) {
                 e.preventDefault();
                 redo();
-            } else if (e.ctrlKey && e.key === "z") {
-                console.log("undo ", e.key)
+            } else if (e.ctrlKey && e.key.toUpperCase() === "Z") {
                 e.preventDefault();
                 undo();
             }
@@ -144,11 +140,9 @@ const StageArea = () => {
          */
         const handleSelectKeyDown = (e) => {
             if (e.key === "Control") {
-                console.log("ctrl ", e.key)
                 setCtrlPressed(true);
             }
             if (e.key === "Shift") {
-                console.log("shift ", e.key)
                 setShiftPressed(true);
             }
         };
@@ -181,7 +175,6 @@ const StageArea = () => {
      * @param e{KonvaEventObject<MouseEvent>} the event.
      */
     const checkDeselect = useCallback((e) => {
-        console.log("deselect ", e.target)
         if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
             deselectAll();
         }
