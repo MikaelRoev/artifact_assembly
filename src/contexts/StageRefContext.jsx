@@ -70,8 +70,9 @@ export const StageRefContextProvider = ({children}) => {
      * @return {Konva.Node[]} the elements in the selected layer excluding transformers.
      */
     const getSelectedElements = useCallback(() => {
+        //TODO: test this if it returns only group and not group and its children
         const selectLayer = getSelectLayer();
-        return selectLayer ? selectLayer.find(node => !(node instanceof Konva.Transformer)) : [];
+        return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
     }, [getSelectLayer]);
 
     /**
@@ -88,8 +89,9 @@ export const StageRefContextProvider = ({children}) => {
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
     const getAllImages = useCallback(() => {
+        //TODO: check if it returns all images including the ones inside of a group
         const stage = getStage();
-        return stage ? getStage().find(node => node instanceof Konva.Image) : [];
+        return stage ? stage.find(node => node instanceof Konva.Image) : [];
     }, [getStage]);
 
     /**
@@ -135,6 +137,7 @@ export const StageRefContextProvider = ({children}) => {
             image.on("dragend", (e) => {
                 const index = findIndexInState(image.id());
                 state[index] = {
+                    //TODO test if it woks
                     ...state[index],
                     x: e.target.x(),
                     y: e.target.y(),
@@ -186,6 +189,7 @@ export const StageRefContextProvider = ({children}) => {
      * Selects an element.
      * @param element {Shape | Stage} the element to be selected.
      */
+        //TODO: check if all useCallbacks in Stage ref can be unpacked
     const select = useCallback((element) => {
         element.draggable(!isLocked);
 
@@ -252,36 +256,6 @@ export const StageRefContextProvider = ({children}) => {
 
         getSelectTransformer().nodes([]);
     })
-
-    /**
-     * Sets up and cleans up the delete event listener.
-     */
-    useEffect(() => {
-
-        /**
-         * Deletes the selected elements if the delete key is pressed.
-         * @param e{KeyboardEvent} the event.
-         */
-        const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === "Backspace") && getSelectedElements().length > 0
-                && !isFilterInteracting) {
-
-                getSelectedElements().forEach(function(element) {
-                    element.destroy();
-                })
-
-                getSelectTransformer().nodes([]);
-
-                const newState = state.filter((elementState) => !isSelected(elementState));
-                setState(newState);
-            }
-        };
-
-        document.addEventListener("keydown", handleDeletePressed);
-        return () => {
-            document.removeEventListener("keydown", handleDeletePressed);
-        };
-    }, [isFilterInteracting, deselectAll, isSelected, getSelectedElements, getSelectTransformer, state, setState]);
 
     /**
      * Initializes the stage, by creating it, and creating the two layers
