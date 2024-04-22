@@ -327,6 +327,8 @@ export const StageRefContextProvider = ({children}) => {
         deleteSelected,
         groupSelected,
 
+        state,
+        setState,
         undo,
         redo,
     }

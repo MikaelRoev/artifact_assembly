@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import {open} from "@tauri-apps/api/dialog";
 import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
 import LockedContext from "../../contexts/LockedContext";
-import ElementContext from "../../contexts/ElementContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
@@ -23,7 +22,6 @@ const NavBar = () => {
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {isLocked, setIsLocked} = useContext(LockedContext);
-    const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
     const {getStage, getAllImages, getSelectedElements, addImage, groupSelected, state, setState, undo, redo} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
@@ -44,7 +42,7 @@ const NavBar = () => {
      * Closes the project and returns to the landing page.
      */
     const goToLandingPage = () => {
-        setElements([]);
+        //setState([]);
         navigate("/");
     }
 
@@ -263,7 +261,7 @@ const NavBar = () => {
                                     <button
                                         className="dropdownButton"
                                         onClick={() => {
-                                            saveProjectDialog(project, setProject, elements)
+                                            saveProjectDialog(project, setProject, state)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
@@ -275,7 +273,7 @@ const NavBar = () => {
                                     <button
                                         className="dropdownButton"
                                         onClick={() => {
-                                            openProjectDialog(setProject, setElements)
+                                            openProjectDialog(setProject, setState)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
@@ -302,7 +300,7 @@ const NavBar = () => {
                                             onClick={() => {
                                                 setFileDropdownVisible(false);
                                                 setOnSave(() => () => {
-                                                    saveProjectDialog(project, setProject, elements)
+                                                    saveProjectDialog(project, setProject, state)
                                                         .then(goToLandingPage)
                                                         .catch(() => {
                                                         });
