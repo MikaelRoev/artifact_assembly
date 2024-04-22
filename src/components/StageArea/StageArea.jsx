@@ -23,7 +23,6 @@ const StageArea = () => {
         getStaticLayer,
         getSelectTransformer,
         getSelectedElements,
-        getAllElements,
         getAllImages,
 
         select,
@@ -33,6 +32,9 @@ const StageArea = () => {
         isSelected,
         deleteSelected,
 
+        state,
+        setState,
+        findIndexInState,
         undo,
         redo
     } = useContext(StageRefContext);
@@ -222,28 +224,6 @@ const StageArea = () => {
     };
 
     /**
-     * Event handler for element clicking. This will check the selection of the element.
-     * @param e {KonvaEventObject<MouseEvent>} click event.
-     */
-    const handleElementClick = (e) => {
-        if (e.evt.button === 2) return;
-        const element = e.target;
-        element.moveToTop();
-
-        if (ctrlPressed || shiftPressed) {
-            if (isSelected(element)) {
-                // already selected
-                deselect(element);
-            } else {
-                // not already selected
-                select(element);
-            }
-        } else {
-            selectOnly(element);
-        }
-    }
-
-    /**
      * useEffect for updating image dimensions
      */
     useEffect(() => {
@@ -274,7 +254,7 @@ const StageArea = () => {
          * an image that needs its width and height updated.
          */
         if (getStaticLayer() && elements.length > 0) {
-            const imageNodes = getAllImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
+            const imageNodes = getAllImages.filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
                 setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
             }
@@ -282,19 +262,67 @@ const StageArea = () => {
     }, [elements.length, getStaticLayer, elements, getAllImages]);
 
     useEffect(() => {
-        const images = getAllImages();
-        images.forEach(image => {
-            image.on("click", handleElementClick);
-            image.on("tap", handleElementClick);
+        /**
+         * Event handler for element clicking. This will check the selection of the element.
+         * @param e {KonvaEventObject<MouseEvent>} click event.
+         */
+        const handleElementClick = (e) => {
+            if (e.evt.button === 2) return;
+            const element = e.target;
+            element.moveToTop();
+
+            if (ctrlPressed || shiftPressed) {
+                if (isSelected(element)) {
+                    // already selected
+                    deselect(element);
+                } else {
+                    // not already selected
+                    select(element);
+                }
+            } else {
+                selectOnly(element);
+            }
+        }
+        
+        const elements = getAllImages;
+        elements.forEach(element => {
+            element.on("click", handleElementClick);
+            element.on("tap", handleElementClick);
         })
 
         return () => {
-            images.forEach(image => {
-                image.off("click");
-                image.off("tap");
+            elements.forEach(element => {
+                element.off("click");
+                element.off("tap");
             })
         }
-    }, [ctrlPressed, getAllImages, handleElementClick, shiftPressed]);
+    }, [ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
+
+    useEffect(() => {
+        /**
+         * Saves the changes to history when move end.
+         */
+        const handleDragEnd = (e) => {
+            const index = findIndexInState(e.target.id());
+            state[index] = {
+                ...state[index],
+                x: e.target.x(),
+                y: e.target.y(),
+            };
+            setState(state);
+        }
+
+        const elements = getAllImages;
+        elements.forEach(element => {
+            element.on("dragend", handleDragEnd);
+        })
+
+        return () => {
+            elements.forEach(element => {
+                element.off("dragend", handleDragEnd);
+            })
+        }
+    }, [getAllImages, setState, state]);
 
     return (
         <Stage

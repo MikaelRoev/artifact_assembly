@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useRef} from "react";
+import React, {createContext, useContext, useMemo, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -22,6 +22,9 @@ export const StageRefContextProvider = ({children}) => {
     const {isLocked} = useContext(LockedContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
+    state.forEach(stateElement => {
+        console.log(stateElement.id, ": x:", stateElement.x, "y: ", stateElement.y);
+    })
 
     let newState = state;
 
@@ -29,14 +32,14 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the whole stage.
      * @return {Konva.Stage | null} the stage.
      */
-    const getStage = () => stageRef.current;
+    const getStage = useMemo(() => stageRef.current, []);
 
     /**
      * Getter for the select layer.
      * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
     const getSelectLayer = () => {
-        const stage = getStage();
+        const stage = getStage;
         if (!stage) return null;
         let selectLayer = stage.findOne("#select-layer");
         if (!selectLayer) {
@@ -89,11 +92,11 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for all the images in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
-    const getAllImages = () => {
+    const getAllImages = useMemo(() => {
         //TODO: check if it returns all images including the ones inside of a group
         const stage = getStage();
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
-    }
+    }, [getStage]);
 
     /**
      * Getter for all the elements in the stage.
@@ -130,20 +133,6 @@ export const StageRefContextProvider = ({children}) => {
                 fileName: splitFilePath[splitFilePath.length - 1],
                 draggable: false,
                 perfectDrawEnabled: false,
-            });
-
-            /**
-             * Saves the changes to history when move end.
-             */
-            image.on("dragend", (e) => {
-                const index = findIndexInState(image.id());
-                state[index] = {
-                    //TODO test if it woks
-                    ...state[index],
-                    x: e.target.x(),
-                    y: e.target.y(),
-                };
-                setState(newState);
             });
 
             /**
@@ -329,6 +318,7 @@ export const StageRefContextProvider = ({children}) => {
 
         state,
         setState,
+        findIndexInState,
         undo,
         redo,
     }
