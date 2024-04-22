@@ -24,6 +24,7 @@ const StageArea = () => {
         getSelectTransformer,
         getSelectedElements,
         getAllImages,
+        getAllElements,
         addChanges,
 
         select,
@@ -101,14 +102,14 @@ const StageArea = () => {
         const handleSavePressed = (e) => {
             if (e.ctrlKey && (e.key.toUpperCase() === "S")) {
                 e.preventDefault();
-                saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
+                saveProjectDialog(project, setProject, state).then(() => console.log("project saved"));
             }
         };
         document.addEventListener("keydown", handleSavePressed);
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
         };
-    }, [elements, project, setProject]);
+    }, [state, project, setProject]);
 
     /**
      * Sets up and cleans up the undo event listener.
@@ -285,8 +286,8 @@ const StageArea = () => {
             }
         }
 
-        const images = getAllImages();
-        images.forEach(image => {
+        const elements = getAllElements();
+        elements.forEach(image => {
             image.on("click", handleElementClick);
             image.on("tap", handleElementClick);
         });
@@ -297,10 +298,10 @@ const StageArea = () => {
                 element.off("tap");
             })
         };
-    }, [ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
+    }, [ctrlPressed, deselect, getAllElements, isSelected, select, selectOnly, shiftPressed]);
 
     useEffect(() => {
-        const elements = getAllImages();
+        const elements = getAllElements();
         elements.forEach(element => {
             /**
              * Saves the changes to history when move end.
@@ -323,7 +324,7 @@ const StageArea = () => {
                 element.off("transformend");
             })
         }
-    }, [findIndexInState, getAllImages, setState, state]);
+    }, [findIndexInState, getAllElements, setState, state]);
 
     return (
         <Stage
