@@ -33,6 +33,9 @@ const StageArea = () => {
         isSelected,
         deleteSelected,
 
+        state,
+        setState,
+        findIndexInState,
         undo,
         redo
     } = useContext(StageRefContext);
@@ -286,31 +289,41 @@ const StageArea = () => {
         images.forEach(image => {
             image.on("click", handleElementClick);
             image.on("tap", handleElementClick);
+        });
 
+        return () => {
+            elements.forEach(element => {
+                element.off("click");
+                element.off("tap");
+            })
+        };
+    }, [ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
+
+    useEffect(() => {
+        const elements = getAllImages();
+        elements.forEach(element => {
             /**
              * Saves the changes to history when move end.
              */
-            image.on("dragend", (e) => {
+            element.on("dragend", (e) => {
                 addChanges(e.target.id(), {x: e.target.x(), y: e.target.y()});
             });
 
             /**
              * Saves the changes to history when rotation end.
              */
-            image.on("transformend", (e) => {
+            element.on("transformend", (e) => {
                 addChanges(e.target.id(), {rotation: e.target.rotation()});
             });
         })
 
         return () => {
-            images.forEach(image => {
-                image.off("click");
-                image.off("tap");
-                image.off("dragend");
-                image.off("transformend");
+            elements.forEach(element => {
+                element.off("dragend");
+                element.off("transformend");
             })
         }
-    }, [addChanges, ctrlPressed, deselect, getAllImages, isSelected, select, selectOnly, shiftPressed]);
+    }, [findIndexInState, getAllImages, setState, state]);
 
     return (
         <Stage

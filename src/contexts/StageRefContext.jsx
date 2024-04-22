@@ -22,6 +22,9 @@ export const StageRefContextProvider = ({children}) => {
     const {isLocked} = useContext(LockedContext);
 
     const [state, setState, undo, redo] = useHistory([], 20);
+    state.forEach(stateElement => {
+        console.log(stateElement.id, ": x:", stateElement.x, "y: ", stateElement.y);
+    })
 
     let newState = state;
 
@@ -118,7 +121,7 @@ export const StageRefContextProvider = ({children}) => {
      * @param id {string} unique identifier of the element.
      * @return {number} the index of the element in the state.
      */
-    const findIndexInState = (id) => state.findIndex(elementState => elementState.id === id);
+    const findIndexInState = (id) => state.findIndex((element) => element.id === id);
 
     /**
      * Makes and adds a konva image.
@@ -142,7 +145,7 @@ export const StageRefContextProvider = ({children}) => {
             });
 
             /**
-             * Change to pinter cursor ad moves the image to the top (z-index) when hovering over the image.
+             * Change to pinter cursor and moves the image to the top (z-index) when hovering over the image.
              */
             image.on("mouseenter", (e) => {
                 document.body.style.cursor = "pointer";
