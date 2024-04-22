@@ -26,7 +26,7 @@ const NavBar = () => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage, addImage, groupSelected} = useContext(StageRefContext);
+    const {getStage, getAllImages, addImage, groupSelected, state, setState, undo, redo} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -57,7 +57,7 @@ const NavBar = () => {
      *  false if there are no elements at the position.
      */
     const isAnyElementAtPosition = (position) => {
-        return elements.some((element) => {
+        return state.some((element) => {
             return element.x === position.x && element.y === position.y
         })
     }
