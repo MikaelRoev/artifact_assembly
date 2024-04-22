@@ -3,6 +3,8 @@ import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
+import ElementContext from "../../contexts/ElementContext";
+import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import "./SimilarityMetricsWindow.css"
@@ -21,11 +23,11 @@ export const SimilarityMetricsWindowContext = createContext(null);
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
     const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
-    const {getAllImages} = useContext(StageRefContext);
+    const {elements} = useContext(ElementContext);
 
     useEffect(() => {
-        if (getAllImages().length === 0) setIsSimilarityMetricsWindowOpen(false);
-    }, [getAllImages]);
+        if (elements.length === 0) setIsSimilarityMetricsWindowOpen(false);
+    }, [elements.length]);
 
     return (
         <SimilarityMetricsWindowContext.Provider value={{
@@ -47,7 +49,9 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {getStage, getSelectedImages, getAllImages} = useContext(StageRefContext);
+    const {elements} = useContext(ElementContext);
+    const {selectedElementsIndex} = useContext(SelectContext);
+    const {getStage, getAllImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
@@ -94,10 +98,17 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = getSelectedImages();
-        for (const imageNode of imageNodes) {
-            imageNode.attrs.hueValues = await getHueData(imageNode.toDataURL());
-            console.log(imageNode)
+        const imageNodes = getAllImages();
+        for (const index of selectedElementsIndex) {
+            for (const imageNode of imageNodes) {
+                if (elements[index].id === imageNode.attrs.id) {
+                    const newHues = await getHueData(imageNode.toDataURL());
+                    elements[index] = {
+                        ...elements[index],
+                        hueValues: newHues,
+                    }
+                }
+            }
         }
         setMinCutOff(minInputValue);
         setMaxCutOff(maxInputValue);
@@ -152,16 +163,16 @@ const SimilarityMetricsWindow = () => {
 
     /**
      * Sets a table with the similarity scores between the selectedElement and every other element
-     * @param selectedImage {Konva.Image}
+     * @param selectedElement
      * @returns {Element} div element with a table of scores and the most similar element to selectedElement
      */
-    function setTable(selectedImage) {
+    function setTable(selectedElement) {
         let rows = [];
-        const arrayA = countAndNormalizeValues(selectedImage.attrs.hueValues, maxHistogramValue);
+        const arrayA = countAndNormalizeValues(selectedElement.hueValues, maxHistogramValue);
         let lowest = Infinity;
         let lowestElement = null;
-        getAllImages().forEach((image) => {
-            if (selectedImage.id() !== image.id && (image.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
+        elements.forEach((element) => {
+            if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
                 const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
                 const values = getHistogramScores(arrayA, arrayB);
                 if (values.combined < lowest) {
@@ -278,21 +289,22 @@ const SimilarityMetricsWindow = () => {
                 <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
-                {getSelectedImages().length > 0 ?
+                {selectedElementsIndex.length > 0 ?
                     (update &&
-                        getSelectedImages().map((imageNode, index) => {
-                            if (imageNode.attrs.hueValues) {
-                                const path = imageNode.toDataURL();
+                        selectedElementsIndex.map((index) => {
+                            const image = elements[index];
+                            if (image.hueValues) {
+                                const path = convertFileSrc(image.filePath)
                                 return (
                                     <div className={"element-container"} key={index}>
                                         <div className="histogram-container">
                                             <div className="histogram-info">
                                                 <img src={path} alt={"For histogram"}/>
-                                                <p>{imageNode.attrs.fileName}</p>
+                                                <p>{image.fileName}</p>
                                             </div>
                                             <Histogram
                                                 key={index}
-                                                array={imageNode.attrs.hueValues}
+                                                array={image.hueValues}
                                                 widthProp={400}
                                                 heightProp={300}
                                                 binsProp={maxCutOff - minCutOff}
@@ -301,7 +313,7 @@ const SimilarityMetricsWindow = () => {
                                             />
                                         </div>
                                         <div>
-                                            {setTable(imageNode)}
+                                            {setTable(image)}
                                         </div>
                                     </div>
                                 )
