@@ -262,9 +262,11 @@ export const StageRefContextProvider = ({children}) => {
 
         // get selected konva images
         const selectedImages = getAllSelectedImages();
+        console.log("the selected images: ", selectedImages);
 
         // use konva group
         const group = new Konva.Group();
+        console.log("empty group? ", group);
 
         // move images from selected layer to group
         selectedImages.forEach(image => {
@@ -272,17 +274,24 @@ export const StageRefContextProvider = ({children}) => {
 
             image.draggable(false);
         });
+        console.log("after grouping them: ", group);
+        console.log("this layer should be empty: ", getSelectLayer())
 
         // destroy all selected elements
         getSelectedElements().forEach( element => {
             element.destroy();
         })
 
+        console.log("transform nodes before: ", getSelectTransformer().nodes())
+
         // remove all from transformer nodes
         getSelectTransformer().nodes([]);
+        console.log("transform halfway: ", getSelectTransformer().nodes())
 
         // select group (add to the selected layer)
         select(group);
+        console.log("this layer should have a group: ", getSelectLayer())
+        console.log("transform nodes after: ", getSelectTransformer().nodes())
     }
 
     /**

@@ -5,7 +5,6 @@ import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
 import LockedContext from "../../contexts/LockedContext";
 import ElementContext from "../../contexts/ElementContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
@@ -26,7 +25,7 @@ const NavBar = () => {
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage, getAllImages, addImage, groupSelected, state, setState, undo, redo} = useContext(StageRefContext);
+    const {getStage, getAllImages, getSelectedElements, addImage, groupSelected, state, setState, undo, redo} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -349,6 +348,7 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className="dropdownButton"
+                                        disabled={getSelectedElements().length <= 1}
                                         onClick={groupSelected}>
                                         Lock Selected Together
                                     </button>
