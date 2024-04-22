@@ -4,7 +4,7 @@ import {appWindow} from "@tauri-apps/api/window";
 import {openProjectDialog} from "../../util/FileHandling";
 import ProjectList from "../../components/ProjectList/ProjectList";
 import ProjectContext from "../../contexts/ProjectContext";
-import ElementContext from "../../contexts/ElementContext";
+import StageRefContext from "../../contexts/StageRefContext";
 import "./LandingPage.css";
 
 /**
@@ -16,7 +16,7 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     const {setProject} = useContext(ProjectContext);
-    const {setElements} = useContext(ElementContext);
+    const {setElements} = useContext(StageRefContext);
 
     /**
      * Closes the application.
