@@ -219,25 +219,21 @@ const NavBar = () => {
         const currentStageCenterY = -stage.y() / stage.scaleY() + stageHeight / 2 / stage.scaleY();
 
         //Finding the closest element
-        elements.forEach(element => {
-            const elementPosX = element.x;
-            const elementPosY = element.y;
-
-            const dx = elementPosX - currentStageCenterX;
-            const dy = elementPosY - currentStageCenterY;
+        getAllImages().forEach(image => {
+            const dx = image.x() - currentStageCenterX;
+            const dy = image.y() - currentStageCenterY;
             const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
-
             if (distance < shortestDistance) {
-                nearestElement = element;
+                nearestElement = image;
                 shortestDistance = distance;
             }
         });
 
         // Calculate the new X and Y values to move the stage to based on the nearest element
         if (nearestElement) {
-            const newX = -nearestElement.x + (stageWidth / 2) - (nearestElement.width / 2);
-            const newY = -nearestElement.y + (stageHeight / 2) - (nearestElement.height / 2);
+            const newX = -nearestElement.x() + (stageWidth / 2) - (nearestElement.width() / 2);
+            const newY = -nearestElement.y() + (stageHeight / 2) - (nearestElement.height() / 2);
             stage.to({
                 x: newX,
                 y: newY,
@@ -246,6 +242,7 @@ const NavBar = () => {
                 duration: 0.5,
                 onFinish: () => {
                     project.zoom = 1;
+                    setProject(project);
                 }
             })
         }
