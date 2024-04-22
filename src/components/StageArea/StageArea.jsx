@@ -254,7 +254,7 @@ const StageArea = () => {
          * an image that needs its width and height updated.
          */
         if (getStaticLayer() && elements.length > 0) {
-            const imageNodes = getAllImages.filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
+            const imageNodes = getAllImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
                 setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
             }
@@ -284,7 +284,7 @@ const StageArea = () => {
             }
         }
         
-        const elements = getAllImages;
+        const elements = getAllImages();
         elements.forEach(element => {
             element.on("click", handleElementClick);
             element.on("tap", handleElementClick);
@@ -312,7 +312,7 @@ const StageArea = () => {
             setState(state);
         }
 
-        const elements = getAllImages;
+        const elements = getAllImages();
         elements.forEach(element => {
             element.on("dragend", handleDragEnd);
         })
@@ -322,7 +322,7 @@ const StageArea = () => {
                 element.off("dragend", handleDragEnd);
             })
         }
-    }, [getAllImages, setState, state]);
+    }, [findIndexInState, getAllImages, setState, state]);
 
     return (
         <Stage

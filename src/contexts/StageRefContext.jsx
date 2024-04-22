@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useMemo, useRef} from "react";
+import React, {createContext, useContext, useRef} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -32,14 +32,14 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for the whole stage.
      * @return {Konva.Stage | null} the stage.
      */
-    const getStage = useMemo(() => stageRef.current, []);
+    const getStage = () => stageRef.current;
 
     /**
      * Getter for the select layer.
      * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
     const getSelectLayer = () => {
-        const stage = getStage;
+        const stage = getStage();
         if (!stage) return null;
         let selectLayer = stage.findOne("#select-layer");
         if (!selectLayer) {
@@ -92,11 +92,11 @@ export const StageRefContextProvider = ({children}) => {
      * Getter for all the images in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
-    const getAllImages = useMemo(() => {
+    const getAllImages = () => {
         //TODO: check if it returns all images including the ones inside of a group
         const stage = getStage();
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
-    }, [getStage]);
+    }
 
     /**
      * Getter for all the elements in the stage.
