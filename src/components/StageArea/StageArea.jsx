@@ -287,9 +287,9 @@ const StageArea = () => {
         }
 
         const elements = getAllElements();
-        elements.forEach(image => {
-            image.on("click", handleElementClick);
-            image.on("tap", handleElementClick);
+        elements.forEach(element => {
+            element.on("click", handleElementClick);
+            element.on("tap", handleElementClick);
         });
 
         return () => {
