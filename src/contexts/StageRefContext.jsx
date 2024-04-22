@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useRef} from "react";
+import React, {createContext, useContext, useRef, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -19,12 +19,12 @@ const StageRefContext = createContext(null);
 export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
-    const {isLocked} = useContext(LockedContext);
-
     const [state, setState, undo, redo] = useHistory([], 20);
     state.forEach(stateElement => {
         console.log(stateElement.id, ": x:", stateElement.x, "y: ", stateElement.y);
     })
+
+    const [isLocked, setIsLocked] = useState(false);
 
     let newState = state;
 
@@ -124,21 +124,22 @@ export const StageRefContextProvider = ({children}) => {
     const findIndexInState = (id) => state.findIndex((element) => element.id === id);
 
     /**
-     * Makes and adds a konva image.
-     * @param imageState {{
+     *
+     * @param imageProps {{
      * id: {string}
      * x: {number}
      * y: {number}
-     * filePath: {string}
-     * }} is the state values of the image that is needed to create a konva image.
+     * filePath: {string}}}
+     * @param callback {function(Konva.Image)}
      */
-    const addImage = (imageState) => {
-        const filePath = imageState.filePath;
+    const makeImage = (imageProps, callback) => {
+        const filePath = imageProps.filePath;
         const url = convertFileSrc(filePath);
+
         Konva.Image.fromURL(url, (image) => {
             const splitFilePath = filePath.split("\\");
             image.setAttrs({
-                ...imageState,
+                ...imageProps,
                 fileName: splitFilePath[splitFilePath.length - 1],
                 draggable: false,
                 perfectDrawEnabled: false,
@@ -159,9 +160,35 @@ export const StageRefContextProvider = ({children}) => {
                 document.body.style.cursor = "default";
             });
 
-            getStaticLayer().add(image);
-        });
+            callback(image);
+        })
     }
+
+    /**
+     * Makes and adds a konva image.
+     * @param imageProps {{
+     * id: {string}
+     * x: {number}
+     * y: {number}
+     * filePath: {string}
+     * }} is the state values of the image that is needed to create a konva image.
+     */
+    const addImage = (imageProps) => {
+        makeImage(imageProps, (image) => getStaticLayer().add(image));
+    }
+
+    /**
+     * Makes and adds a Konva group and its children
+     * @param groupProps {{groupElements: Object[]}}
+     */
+    const addGroup =(groupProps) => {
+        const group = new Konva.Group();
+        groupProps.groupElements.forEach(groupElement => {
+            makeImage(groupElement, (image) => group.add(image));
+        })
+        getStaticLayer()?.add(group);
+    }
+
 
     /**
      * Makes and adds konva images.
@@ -179,6 +206,18 @@ export const StageRefContextProvider = ({children}) => {
             newState.push(imageState);
         })
         setState(newState);
+    }
+
+    /**
+     * Sets the list of elements to be displayed on screen
+     * @param elements {Object[]}
+     */
+    const setElements = (elements) => {
+        setState(elements, false);
+        elements.forEach(element => {
+            if (element.type === "Image") addImage(element);
+            else if (element ==="Group") addGroup(element);
+        })
     }
 
     /**
@@ -327,6 +366,7 @@ export const StageRefContextProvider = ({children}) => {
         getSelectedImages,
         getAllElements,
         getAllImages,
+        setElements,
         addMultipleImages,
         addChanges,
 
@@ -342,6 +382,8 @@ export const StageRefContextProvider = ({children}) => {
         setState,
         undo,
         redo,
+        isLocked,
+        setIsLocked,
     }
 
     return (
