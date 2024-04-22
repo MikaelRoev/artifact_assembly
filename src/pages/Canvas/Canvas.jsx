@@ -30,18 +30,16 @@ const Canvas = () => {
                         <FilterWindowContextProvider>
                             <SimilarityMetricsWindowContextProvider>
                                 <FilterInteractionContextProvider>
-                                    <StageRefContextProvider>
-                                        <ConfirmCloseModalContextProvider>
-                                            <div className="stage-container">
-                                                <NavBar/>
-                                                <StageArea/>
-                                                <SimilarityMetricsWindow/>
-                                                <ExportImageModal/>
-                                                <FilterWindow/>
-                                                <ConfirmCloseModal/>
-                                            </div>
-                                        </ConfirmCloseModalContextProvider>
-                                    </StageRefContextProvider>
+                                    <ConfirmCloseModalContextProvider>
+                                        <div className="stage-container">
+                                            <NavBar/>
+                                            <StageArea/>
+                                            <SimilarityMetricsWindow/>
+                                            <ExportImageModal/>
+                                            <FilterWindow/>
+                                            <ConfirmCloseModal/>
+                                        </div>
+                                    </ConfirmCloseModalContextProvider>
                                 </FilterInteractionContextProvider>
                             </SimilarityMetricsWindowContextProvider>
                         </FilterWindowContextProvider>
