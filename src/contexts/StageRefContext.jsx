@@ -66,9 +66,14 @@ export const StageRefContextProvider = ({children}) => {
      * @return {Konva.Node[]} the elements in the selected layer excluding transformers.
      */
     const getSelectedElements = () => {
-        //TODO: test this if it returns only group and not group and its children
         const selectLayer = getSelectLayer();
         return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
+    }
+
+
+    const getAllSelectedImages = () => {
+        const selectLayer = getSelectLayer();
+        return selectLayer ? selectLayer.find(node => node instanceof (Konva.Image)) : [];
     }
 
     /**
@@ -258,6 +263,43 @@ export const StageRefContextProvider = ({children}) => {
         getSelectTransformer().nodes([]);
     }
 
+    const groupSelected = () => {
+        console.log("group selected")
+
+        // get selected konva images
+        const selectedImages = getAllSelectedImages();
+        console.log("the selected images: ", selectedImages);
+
+        // use konva group
+        const group = new Konva.Group();
+        console.log("empty group? ", group);
+
+        // move images from selected layer to group
+        selectedImages.forEach(image => {
+            image.moveTo(group);
+
+            image.draggable(false);
+        });
+        console.log("after grouping them: ", group);
+        console.log("this layer should be empty: ", getSelectLayer())
+
+        // destroy all selected elements
+        getSelectedElements().forEach( element => {
+            element.destroy();
+        })
+
+        console.log("transform nodes before: ", getSelectTransformer().nodes())
+
+        // remove all from transformer nodes
+        getSelectTransformer().nodes([]);
+        console.log("transform halfway: ", getSelectTransformer().nodes())
+
+        // select group (add to the selected layer)
+        select(group);
+        console.log("this layer should have a group: ", getSelectLayer())
+        console.log("transform nodes after: ", getSelectTransformer().nodes())
+    }
+
     /**
      * Initializes the stage, by creating it, and creating the two layers
      */
@@ -291,7 +333,10 @@ export const StageRefContextProvider = ({children}) => {
         selectOnly,
         isSelected,
         deleteSelected,
+        groupSelected,
 
+        state,
+        setState,
         undo,
         redo,
     }
