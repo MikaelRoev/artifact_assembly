@@ -113,7 +113,7 @@ export const StageRefContextProvider = ({children}) => {
      */
     const getAllElements = () => {
         const stage = getStage();
-        return stage ? [...getSelectedElements(), getStaticLayer().getChildren()] : [];
+        return stage ? [...getSelectedElements(), ...getStaticLayer().getChildren()] : [];
     }
 
     /**
