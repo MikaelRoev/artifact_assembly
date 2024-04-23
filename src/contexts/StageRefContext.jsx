@@ -98,6 +98,11 @@ export const StageRefContextProvider = ({children}) => {
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
     }
 
+
+    function isAnyImages() {
+        return getAllImages().length > 0;
+    }
+
     /**
      * Getter for all the elements in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
