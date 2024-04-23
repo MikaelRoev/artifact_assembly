@@ -23,11 +23,12 @@ export const SimilarityMetricsWindowContext = createContext(null);
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
     const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
-    const {elements} = useContext(ElementContext);
+    const {isAnyImages} = useContext(StageRefContext);
 
     useEffect(() => {
-        if (elements.length === 0) setIsSimilarityMetricsWindowOpen(false);
-    }, [elements.length]);
+        if (isAnyImages) setIsSimilarityMetricsWindowOpen(false);
+        console.log(isAnyImages)
+    }, [isAnyImages]);
 
     return (
         <SimilarityMetricsWindowContext.Provider value={{
