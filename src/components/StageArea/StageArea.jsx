@@ -37,10 +37,10 @@ const StageArea = () => {
         state,
         setState,
         findIndexInState,
+        isLocked,
         undo,
         redo
     } = useContext(StageRefContext);
-    const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
     const {elements} = useContext(ElementContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);

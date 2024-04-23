@@ -21,9 +21,9 @@ const NavBar = () => {
     const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
-    const {isLocked, setIsLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage, getAllImages, getSelectedElements, addMultipleImages, groupSelected, state, setState, undo, redo} = useContext(StageRefContext);
+    const {getStage, getAllImages, getSelectedElements, setElements, addMultipleImages,
+        groupSelected, state, undo, redo, isLocked, setIsLocked} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -274,7 +274,7 @@ const NavBar = () => {
                                     <button
                                         className="dropdownButton"
                                         onClick={() => {
-                                            openProjectDialog(setProject, setState)
+                                            openProjectDialog(setProject, setElements)
                                                 .then(handleFileButtonClick)
                                                 .catch(() => {
                                                 });
