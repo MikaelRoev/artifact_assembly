@@ -2,7 +2,6 @@ import React, {createContext, useContext, useEffect, useMemo, useState} from "re
 import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
-import ElementContext from "../../contexts/ElementContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import "./FilterWindow.css"
@@ -45,10 +44,9 @@ export const FilterWindowContextProvider = ({children}) => {
  * @constructor
  */
 const FilterWindow = () => {
-    const {elements, setElements} = useContext(ElementContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
-    const {getStage, getSelectedImages, isAnySelectedImages} = useContext(StageRefContext);
+    const {getStage, getSelectedImages, isAnySelectedImages, addChanges} = useContext(StageRefContext);
 
     const hueMax = 359;
     const hueMin = 0;
@@ -134,7 +132,6 @@ const FilterWindow = () => {
                     .querySelector('input[name="toggleCheckbox"]').checked = false;
             }
         }
-
     }, [getSelectedImages]);
 
     /**
@@ -178,23 +175,28 @@ const FilterWindow = () => {
      * Sets the value of the parameter on all the selected images.
      * @param parameter {string} the name of the parameter to set the value of.
      * @param value {number} the new value of the parameter.
-     * @param overwrite {evt: boolean} whether it should overwrite the last state in the history
+     * @param overwriteFirst {boolean | undefined} whether it should overwrite the last state in the history
      * or as default commit a new state.
      */
-    const setValue = (parameter, value, overwrite = false) => {
-        /*
-        selectedElementsIndex.forEach((index) => {
-            elements[index][parameter] = value;
+    const setValue = (parameter, value, overwriteFirst = false) => {
+        let isFirst = true;
+        getSelectedImages().forEach(image => {
+            image.attrs[parameter] = value;
+            const change = {};
+            change[parameter] = value;
+            if (isFirst) {
+                addChanges(image.id(), change, overwriteFirst);
+                isFirst = false;
+            } else {
+                addChanges(image.id(), change, true);
+            }
         });
-        setElements(elements, overwrite);
-
-         */
     }
 
     /**
      * Gets true if all the selected are true else returns false.
      * @param parameter {string} the name of the parameter to get the boolean value of.
-     * @return {number} true if all the selected are true else returns false.
+     * @return {boolean} true if all the selected are true else returns false.
      */
     const getBool = (parameter) => {
         const selectedImages = getSelectedImages();
@@ -208,13 +210,18 @@ const FilterWindow = () => {
      * @param bool {boolean} the new value of the parameter.
      */
     const setBool = (parameter, bool) => {
-        /*
-        selectedElementsIndex.forEach((index) => {
-            elements[index][parameter] = bool;
+        let isFirst = true;
+        getSelectedImages().forEach(image => {
+            image.attrs[parameter] = bool;
+            const change = {};
+            change[parameter] = bool;
+            if (isFirst) {
+                addChanges(image.id(), change, false);
+                isFirst = false;
+            } else {
+                addChanges(image.id(), change, true);
+            }
         });
-        setElements(elements);
-
-         */
     }
 
     return (
