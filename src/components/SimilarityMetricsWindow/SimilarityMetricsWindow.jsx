@@ -55,7 +55,7 @@ const SimilarityMetricsWindow = () => {
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
-    const {getStage, getAllImages} = useContext(StageRefContext);
+    const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
@@ -293,7 +293,7 @@ const SimilarityMetricsWindow = () => {
                 <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
-                {selectedElementsIndex.length > 0 ?
+                {isAnySelectedImages() ?
                     (update &&
                         selectedElementsIndex.map((index) => {
                             const image = elements[index];
