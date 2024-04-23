@@ -13,7 +13,7 @@ const FilterEnabledContext = createContext(null);
  * @constructor
  */
 export const FilterEnabledContextProvider = ({children}) => {
-    const [filterEnabled, setFilterEnabled] = useState(true);
+    const [filterEnabled, setFilterEnabled] = useState(false);
 
     return (
         <FilterEnabledContext.Provider value={{filterEnabled, setFilterEnabled}}>
