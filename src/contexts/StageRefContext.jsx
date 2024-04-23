@@ -71,12 +71,6 @@ export const StageRefContextProvider = ({children}) => {
         return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
     }
 
-
-    const getAllSelectedImages = () => {
-        const selectLayer = getSelectLayer();
-        return selectLayer ? selectLayer.find(node => node instanceof (Konva.Image)) : [];
-    }
-
     /**
      * Getter for the select transformer box.
      * @return {Konva.Transformer | null} the select transformer.
@@ -100,7 +94,6 @@ export const StageRefContextProvider = ({children}) => {
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
     const getAllImages = () => {
-        //TODO: check if it returns all images including the ones inside of a group
         const stage = getStage();
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
     }
@@ -307,7 +300,7 @@ export const StageRefContextProvider = ({children}) => {
         console.log("group selected")
 
         // get selected konva images
-        const selectedImages = getAllSelectedImages();
+        const selectedImages = getSelectedImages();
         console.log("the selected images: ", selectedImages);
 
         // use konva group
