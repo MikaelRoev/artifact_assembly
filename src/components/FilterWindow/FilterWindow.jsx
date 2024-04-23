@@ -50,7 +50,7 @@ const FilterWindow = () => {
     const {selectedElementsIndex} = useContext(SelectContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
-    const {getStage} = useContext(StageRefContext);
+    const {getStage, getSelectedImages} = useContext(StageRefContext);
 
     const hueMax = 359;
     const hueMin = 0;
@@ -64,9 +64,7 @@ const FilterWindow = () => {
     const thresholdMin = 0;
     const root = document.querySelector(":root");
 
-    const images = useMemo(
-        () => selectedElementsIndex.map((index) => elements[index]).filter((element) => element.type === "Image"),
-        [selectedElementsIndex, elements]);
+
 
     /**
      * Calculates the percentage representation of a value within a specified range.
@@ -124,7 +122,7 @@ const FilterWindow = () => {
         root.style.setProperty("--saturation",
             mapToPercentage(getValue("saturation"), saturationMin, saturationMax));
         updateBrightnessStyle(getValue("value"), getBool("invert"));
-        if (images.length > 0) {
+        if (getSelectedImages().length > 0) {
             if (!isFilterWindowOpen) return;
             document.getElementById("grayscaleToggle")
                 .querySelector('input[name="toggleCheckbox"]').checked = !!getBool("grayscale");
@@ -173,9 +171,9 @@ const FilterWindow = () => {
      * @return {number} the value if the value is the same for all the selected images or 0 if not.
      */
     const getValue = (parameter) => {
-        if (images.length === 0) return 0;
-        const firstValue = images[0][parameter];
-        if (!isNaN(firstValue) && images.every(image => image[parameter] === firstValue)) return firstValue;
+        if (getSelectedImages().length === 0) return 0;
+        const firstValue = getSelectedImages()[0][parameter];
+        if (!isNaN(firstValue) && getSelectedImages().every(image => image[parameter] === firstValue)) return firstValue;
         return 0;
     }
 
@@ -199,8 +197,8 @@ const FilterWindow = () => {
      * @return {number} true if all the selected are true else returns false.
      */
     const getBool = (parameter) => {
-        if (images.length === 0) return false;
-        return images.every(image => image[parameter]);
+        if (getSelectedImages().length === 0) return false;
+        return getSelectedImages().every(image => image[parameter]);
     }
 
     /**
@@ -232,7 +230,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("hue")}
                         setValue={(hu, overwrite) => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             const hue = parseInt(hu);
                             setValue("hue", hue, overwrite);
                             root.style.setProperty("--hue", -hue);
@@ -246,7 +244,7 @@ const FilterWindow = () => {
                         step={0.1}
                         value={getValue("saturation")}
                         setValue={(sat, overwrite) => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             const saturation = parseFloat(sat);
                             setValue("saturation", saturation, overwrite);
                             root.style.setProperty("--saturation",
@@ -261,7 +259,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("contrast")}
                         setValue={(contrast, overwrite) => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             setValue("contrast", parseFloat(contrast), overwrite);
                             root.style.setProperty("--contrast",
                                 mapToPercentage(contrast, contrastMin, contrastMax));
@@ -275,7 +273,7 @@ const FilterWindow = () => {
                         step={0.05}
                         value={getValue("value")}
                         setValue={(bri, overwrite) => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             const brightness = parseFloat(bri);
                             setValue("value", brightness, overwrite);
                             updateBrightnessStyle(brightness, getBool("invert"));
@@ -289,7 +287,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("threshold")}
                         setValue={(threshold, overwrite) => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             setValue("threshold", parseInt(threshold), overwrite);
                         }}
                     />
@@ -297,7 +295,7 @@ const FilterWindow = () => {
                         label="Grayscale"
                         id={"grayscaleToggle"}
                         setValue={() => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             setBool("grayscale", !getBool("grayscale"));
                         }}
                     />
@@ -305,7 +303,7 @@ const FilterWindow = () => {
                         label="Invert"
                         id={"invertToggle"}
                         setValue={() => {
-                            if (images.length === 0) return;
+                            if (getSelectedImages().length === 0) return;
                             const invert = !getBool("invert");
                             setBool("invert", invert);
                             updateBrightnessStyle(getValue("value"), invert);
