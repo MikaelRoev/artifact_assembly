@@ -3,7 +3,6 @@ import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
 import ElementContext from "../../contexts/ElementContext";
-import SelectContext from "../../contexts/SelectContext";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import "./FilterWindow.css"
@@ -47,7 +46,6 @@ export const FilterWindowContextProvider = ({children}) => {
  */
 const FilterWindow = () => {
     const {elements, setElements} = useContext(ElementContext);
-    const {selectedElementsIndex} = useContext(SelectContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {getStage, getSelectedImages} = useContext(StageRefContext);
@@ -63,8 +61,6 @@ const FilterWindow = () => {
     const thresholdMax = 350;
     const thresholdMin = 0;
     const root = document.querySelector(":root");
-
-
 
     /**
      * Calculates the percentage representation of a value within a specified range.
@@ -139,7 +135,7 @@ const FilterWindow = () => {
             }
         }
 
-    }, [selectedElementsIndex]);
+    }, [getSelectedImages]);
 
     /**
      * Resets the filters on the filter image.
@@ -171,9 +167,10 @@ const FilterWindow = () => {
      * @return {number} the value if the value is the same for all the selected images or 0 if not.
      */
     const getValue = (parameter) => {
-        if (getSelectedImages().length === 0) return 0;
-        const firstValue = getSelectedImages()[0][parameter];
-        if (!isNaN(firstValue) && getSelectedImages().every(image => image[parameter] === firstValue)) return firstValue;
+        const selectedImages = getSelectedImages();
+        if (selectedImages.length === 0) return 0;
+        const firstValue = selectedImages[0].attrs[parameter];
+        if (!isNaN(firstValue) && selectedImages.every(image => image.attrs[parameter] === firstValue)) return firstValue;
         return 0;
     }
 
@@ -185,10 +182,13 @@ const FilterWindow = () => {
      * or as default commit a new state.
      */
     const setValue = (parameter, value, overwrite = false) => {
+        /*
         selectedElementsIndex.forEach((index) => {
             elements[index][parameter] = value;
         });
         setElements(elements, overwrite);
+
+         */
     }
 
     /**
@@ -197,8 +197,9 @@ const FilterWindow = () => {
      * @return {number} true if all the selected are true else returns false.
      */
     const getBool = (parameter) => {
-        if (getSelectedImages().length === 0) return false;
-        return getSelectedImages().every(image => image[parameter]);
+        const selectedImages = getSelectedImages();
+        if (selectedImages.length === 0) return false;
+        return selectedImages.every(image => image.attrs[parameter]);
     }
 
     /**
@@ -207,10 +208,13 @@ const FilterWindow = () => {
      * @param bool {boolean} the new value of the parameter.
      */
     const setBool = (parameter, bool) => {
+        /*
         selectedElementsIndex.forEach((index) => {
             elements[index][parameter] = bool;
         });
         setElements(elements);
+
+         */
     }
 
     return (
@@ -220,7 +224,7 @@ const FilterWindow = () => {
                 <div className={"filterWindowTitle"}>Filter</div>
                 <button className={"square exit"} onClick={() => setIsFilterWindowOpen(false)}></button>
             </div>
-            {selectedElementsIndex.length > 0 ?
+            {getSelectedImages().length > 0 ?
                 (<div className={"filterWindowBody"}>
                     <FilterForm
                         id={"filter-hue"}
