@@ -29,7 +29,9 @@ export const FilterWindowContextProvider = ({children}) => {
     }, [isAnyImages]);
 
     const provideValues = useMemo(() =>
-    {return {isFilterWindowOpen, setIsFilterWindowOpen}}, [isFilterWindowOpen, setIsFilterWindowOpen]);
+    {
+        return {isFilterWindowOpen, setIsFilterWindowOpen}
+    }, [isFilterWindowOpen, setIsFilterWindowOpen]);
 
     return (
         <FilterWindowContext.Provider value={provideValues}>

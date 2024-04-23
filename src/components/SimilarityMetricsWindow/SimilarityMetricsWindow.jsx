@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useRef, useState} from "react";
+import React, {createContext, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
@@ -27,14 +27,17 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
 
     useEffect(() => {
         if (isAnyImages) setIsSimilarityMetricsWindowOpen(false);
-        console.log(isAnyImages)
     }, [isAnyImages]);
 
-    return (
-        <SimilarityMetricsWindowContext.Provider value={{
+    const providerValues = useMemo(() => {
+        return {
             isSimilarityMetricsWindowOpen,
             setIsSimilarityMetricsWindowOpen
-        }}>
+        };
+    }, [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen]);
+
+    return (
+        <SimilarityMetricsWindowContext.Provider value={providerValues}>
             {children}
         </SimilarityMetricsWindowContext.Provider>
     )
