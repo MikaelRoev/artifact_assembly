@@ -54,6 +54,7 @@ const SimilarityMetricsWindow = () => {
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
+    const {selectedElementsIndex} = useContext(SelectContext);
     const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
