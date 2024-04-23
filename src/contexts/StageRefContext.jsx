@@ -1,8 +1,7 @@
-import React, {createContext, useContext, useRef, useState} from "react";
+import React, {createContext, useRef, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
-import LockedContext from "./LockedContext";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -98,7 +97,10 @@ export const StageRefContextProvider = ({children}) => {
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
     }
 
-
+    /**
+     * Checks if there are any images on the canvas.
+     * @return {boolean} true if there are any images on the stage or false if there ar none.
+     */
     function isAnyImages() {
         return getAllImages().length > 0;
     }
@@ -121,7 +123,7 @@ export const StageRefContextProvider = ({children}) => {
 
     /**
      * Makes a konva image.
-     * @param imageState {{
+     * @param imageProps {{
      * id: {string}
      * x: {number}
      * y: {number}
