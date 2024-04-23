@@ -230,9 +230,9 @@ export const StageRefContextProvider = ({children}) => {
      * Adds the changes to be saves to the state history.
      * @param id {string} unique identifier of the state element.
      * @param changes {Object} the changes with properties.
-     * @param overwrite {evt: boolean}
-     *  true - overwrites the previous history commit.
-     *  false (default) - makes a new history commit.
+     * @param overwrite {boolean | undefined}
+     * true - overwrites the previous history commit.
+     * false (default)- makes a new history commit
      */
     const addChanges = (id, changes, overwrite) => {
         const index = findIndexInState(id);
