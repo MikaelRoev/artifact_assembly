@@ -4,7 +4,6 @@ import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
 import ElementContext from "../../contexts/ElementContext";
-import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import "./SimilarityMetricsWindow.css"
@@ -54,8 +53,7 @@ const SimilarityMetricsWindow = () => {
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
-    const {selectedElementsIndex} = useContext(SelectContext);
-    const {getStage, getAllImages} = useContext(StageRefContext);
+    const {getStage, getAllImages, getSelectedImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
@@ -102,18 +100,10 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = getAllImages();
-        for (const index of selectedElementsIndex) {
-            for (const imageNode of imageNodes) {
-                if (elements[index].id === imageNode.attrs.id) {
-                    const newHues = await getHueData(imageNode.toDataURL());
-                    elements[index] = {
-                        ...elements[index],
-                        hueValues: newHues,
-                    }
-                }
-            }
+        for (const image of getSelectedImages()) {
+            image.attrs.hueValues = await getHueData(image.toDataURL());
         }
+
         setMinCutOff(minInputValue);
         setMaxCutOff(maxInputValue);
 
