@@ -99,12 +99,16 @@ export const StageRefContextProvider = ({children}) => {
 
     /**
      * Checks if there are any images on the canvas.
-     * @return {boolean} true if there are any images on the stage or false if there ar none.
+     * @return {boolean} true if there are any images on the stage or false if there are none.
      */
     function isAnyImages() {
         return getAllImages().length > 0;
     }
 
+    /**
+     * Checks if there are any selected images on the canvas.
+     * @return {boolean} true if there are any images in the selected layer or false if there are none.
+     */
     function isAnySelectedImages() {
         return getSelectedImages().length > 0;
     }
