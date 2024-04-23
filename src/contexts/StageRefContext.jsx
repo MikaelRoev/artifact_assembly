@@ -105,6 +105,10 @@ export const StageRefContextProvider = ({children}) => {
         return getAllImages().length > 0;
     }
 
+    function isAnySelectedImages() {
+        return getSelectedImages().length > 0;
+    }
+
     /**
      * Getter for all the elements in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
@@ -365,6 +369,7 @@ export const StageRefContextProvider = ({children}) => {
         getAllElements,
         getAllImages,
         isAnyImages,
+        isAnySelectedImages,
         setElements,
         addMultipleImages,
         addChanges,
