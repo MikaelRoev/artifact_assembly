@@ -162,11 +162,11 @@ const SimilarityMetricsWindow = () => {
      */
     function setTable(selectedElement) {
         let rows = [];
-        const arrayA = countAndNormalizeValues(selectedElement.hueValues, maxHistogramValue);
+        const arrayA = countAndNormalizeValues(selectedElement.attrs.hueValues, maxHistogramValue);
         let lowest = Infinity;
         let lowestElement = null;
         elements.forEach((element) => {
-            if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
+            if (selectedElement.id() !== element.id && (element.hueValues !== undefined && selectedElement.attrs.hueValues !== undefined)) {
                 const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
                 const values = getHistogramScores(arrayA, arrayB);
                 if (values.combined < lowest) {
@@ -175,7 +175,7 @@ const SimilarityMetricsWindow = () => {
                 }
                 const path = convertFileSrc(element.filePath);
                 rows.push(
-                    <tr key={`${selectedElement.id}-${element.id}`}>
+                    <tr key={`${selectedElement.id()}-${element.id}`}>
                         <td className={"tableColumn1"}><img src={path} alt={"For table row"}/></td>
                         <td>{values.combined.toFixed(3)}</td>
                         <td>{values.euclideanDistance.toFixed(3)}</td>
@@ -185,10 +185,10 @@ const SimilarityMetricsWindow = () => {
                 );
             }
         })
-        const path = convertFileSrc(selectedElement.filePath);
+        const path = convertFileSrc(selectedElement.attrs.filePath);
         const lowestPath = convertFileSrc(lowestElement.filePath);
         return (
-            <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
+            <div key={`table-${selectedElement.id()}`} className={"tableDiv"}>
                 <table className={"score-table"}>
                     <thead>
                     <tr>
@@ -285,20 +285,18 @@ const SimilarityMetricsWindow = () => {
             <div ref={contentRef} className="window-content">
                 {isAnySelectedImages() ?
                     (update &&
-                        getSelectedImages.map((index) => {
-                            const image = elements[index];
-                            if (image.hueValues) {
-                                const path = convertFileSrc(image.filePath)
+                        getSelectedImages().map(image => {
+                            if (image.attrs.hueValues) {
                                 return (
-                                    <div className={"element-container"} key={index}>
+                                    <div className={"element-container"} key={image.id()}>
                                         <div className="histogram-container">
                                             <div className="histogram-info">
-                                                <img src={path} alt={"For histogram"}/>
-                                                <p>{image.fileName}</p>
+                                                <img src={image.toDataURL()} alt={"For histogram"}/>
+                                                <p>{image.attrs.fileName}</p>
                                             </div>
                                             <Histogram
-                                                key={index}
-                                                array={image.hueValues}
+                                                key={image.id()}
+                                                array={image.attrs.hueValues}
                                                 widthProp={400}
                                                 heightProp={300}
                                                 binsProp={maxCutOff - minCutOff}
