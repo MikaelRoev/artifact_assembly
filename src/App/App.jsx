@@ -9,6 +9,7 @@ import {StageRefContextProvider} from "../contexts/StageRefContext";
 
 //TODO: change functions from const to function
 //TODO: go through all deps in hooks.
+//TODO: provider values for context providers should be useMemo
 
 /**
  * The application component.

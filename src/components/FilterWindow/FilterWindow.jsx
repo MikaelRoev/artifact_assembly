@@ -22,14 +22,17 @@ export const FilterWindowContext = createContext(null);
  */
 export const FilterWindowContextProvider = ({children}) => {
     const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
-    const {elements} = useContext(ElementContext);
+    const {isAnyImages} = useContext(StageRefContext);
 
     useEffect(() => {
-        if (elements.length === 0) setIsFilterWindowOpen(false);
-    }, [elements.length]);
+        if (isAnyImages) setIsFilterWindowOpen(false);
+    }, [isAnyImages]);
+
+    const provideValues = useMemo(() =>
+    {return {isFilterWindowOpen, setIsFilterWindowOpen}}, [isFilterWindowOpen, setIsFilterWindowOpen]);
 
     return (
-        <FilterWindowContext.Provider value={{isFilterWindowOpen, setIsFilterWindowOpen}}>
+        <FilterWindowContext.Provider value={provideValues}>
             {children}
         </FilterWindowContext.Provider>
     )

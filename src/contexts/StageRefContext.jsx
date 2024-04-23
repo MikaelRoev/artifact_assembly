@@ -364,6 +364,7 @@ export const StageRefContextProvider = ({children}) => {
         getSelectedImages,
         getAllElements,
         getAllImages,
+        isAnyImages,
         setElements,
         addMultipleImages,
         addChanges,
