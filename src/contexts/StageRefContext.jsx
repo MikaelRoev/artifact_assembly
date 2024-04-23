@@ -26,8 +26,6 @@ export const StageRefContextProvider = ({children}) => {
         console.log(stateElement.id, ": x:", stateElement.x, "y: ", stateElement.y);
     })
 
-    let newState = state;
-
     /**
      * Getter for the whole stage.
      * @return {Konva.Stage | null} the stage.

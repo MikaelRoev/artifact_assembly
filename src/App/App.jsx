@@ -6,6 +6,9 @@ import {ProjectContextProvider} from "../contexts/ProjectContext";
 import {ElementContextProvider} from "../contexts/ElementContext";
 import "./App.css";
 
+//TODO: change functions from const to function
+//TODO: go through all deps in hooks.
+
 /**
  * The application component.
  * @return {JSX.Element} the application component.

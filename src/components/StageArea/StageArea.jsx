@@ -336,26 +336,6 @@ const StageArea = () => {
             onWheel={zoomStage}
             onMouseDown={checkDeselect}
             onTouchStart={checkDeselect}>
-
-            {/*<Layer
-                className="layer">
-                {renderElements()}
-                {
-                    selectedElements.length > 0 &&
-                    <Transformer
-                        ref={trRef}
-                        boundBoxFunc={(oldBox, newBox) => {
-                            // limit resize
-                            if (newBox.width < 5 || newBox.height < 5) {
-                                return oldBox;
-                            }
-                            return newBox;
-                        }}
-                        resizeEnabled={false}
-                        rotateEnabled={!isLocked}
-                    />
-                }
-            </Layer>*/}
         </Stage>
     );
 };
