@@ -54,7 +54,7 @@ const StageArea = () => {
         stage.position({x: project.x, y: project.y});
         stage.scale({x: project.zoom, y: project.zoom});
         stage.batchDraw();
-    }, [project, getStage]);
+    }, [getStage, project.x, project.y, project.zoom]);
 
     /**
      * Changes the ability to rotate and drag the selected elements when isLocked changes.
@@ -63,7 +63,7 @@ const StageArea = () => {
         if (!getStage()) return;
         getSelectTransformer().rotateEnabled(!isLocked);
         getSelectedElements().forEach(element => element.draggable(!isLocked));
-    }, [getStage, getSelectTransformer, isLocked, getSelectedElements]);
+    }, [getSelectTransformer, getSelectedElements, getStage, isLocked]);
 
     /**
      * Sets up and cleans up the delete event listener.
@@ -105,7 +105,7 @@ const StageArea = () => {
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
         };
-    }, [state, project, setProject]);
+    }, [project, setProject, state]);
 
     /**
      * Sets up and cleans up the undo event listener.
@@ -128,7 +128,7 @@ const StageArea = () => {
         return () => {
             document.removeEventListener("keydown", handleUndoRedoPressed);
         };
-    }, [undo, redo]);
+    }, [redo, undo]);
 
     /**
      * Set up and cleans up the select key check.
@@ -310,7 +310,7 @@ const StageArea = () => {
                 element.off("transformend");
             })
         }
-    }, [findIndexInState, getAllElements, setState, state]);
+    }, [addChanges, getAllElements]);
 
     return (
         <Stage
