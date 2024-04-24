@@ -231,23 +231,15 @@ const StageArea = () => {
     useEffect(() => {
         /**
          * Sets the width and height of images that does not have them yet.
-         * @param imageNodes Image nodes on the canvas.
+         * @param konvaImages Image nodes on the canvas.
          * @returns {Promise<void>}
          */
-        const setImageDimensions = async (imageNodes) => {
+        const setImageHueValues = async (konvaImages) => {
+            console.log("Running setImageHueValues()")
             await new Promise(resolve => setTimeout(resolve, 1000));
-            for (const imageNode of imageNodes) {
-                for (const image of elements) {
-                    const index = elements.indexOf(image);
-                    if (imageNode.attrs.id === image.id) {
-                        const hueValues = await getHueData(imageNode.toDataURL());
-                        elements[index] = {
-                            ...image, hueValues: hueValues,
-                            width: imageNode.width(),
-                            height: imageNode.height(),
-                        }
-                    }
-                }
+
+            for (const image of konvaImages) {
+                image.attrs.hueValues = await getHueData(image.toDataURL());
             }
         }
 
@@ -255,13 +247,11 @@ const StageArea = () => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (getStaticLayer() && elements.length > 0) {
-            const imageNodes = getAllImages().filter((child) => !child.width() || !child.height() || !child.attrs.hueValues);
-            if (imageNodes.length > 0) {
-                setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
-            }
-        }
-    }, [elements.length, getStaticLayer, elements, getAllImages]);
+        if (getAllImages().length === 0) return;
+        const konvaImages = getAllImages().filter((child) => !child.attrs.hueValues);
+        if (konvaImages.length === 0) return;
+        setImageHueValues(konvaImages).then(() => console.log("Information retrieved"));
+    }, [getAllImages]);
 
     useEffect(() => {
         /**
