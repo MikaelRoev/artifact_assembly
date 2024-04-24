@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
@@ -29,7 +29,7 @@ export const FilterWindowContextProvider = ({children}) => {
     const provideValues = useMemo(() =>
     {
         return {isFilterWindowOpen, setIsFilterWindowOpen}
-    }, [isFilterWindowOpen, setIsFilterWindowOpen]);
+    }, [isFilterWindowOpen]);
 
     return (
         <FilterWindowContext.Provider value={provideValues}>
@@ -76,14 +76,14 @@ const FilterWindow = () => {
      * @param brightness {number} the brightness value of the selected images.
      * @param invert {boolean} whether the selected images is inverted or not.
      */
-    function updateBrightnessStyle(brightness, invert) {
+    const updateBrightnessStyle = useCallback((brightness, invert) => {
         let valuePercent = mapToPercentage(brightness, brightnessMin, brightnessMax);
         if (invert) {
             valuePercent = 100 - valuePercent;
         }
         //Value is Brightness
         root.style.setProperty("--brightness", valuePercent);
-    }
+    }, [brightnessMin, root.style]);
 
     /**
      * Makes the filter window draggable on creation
@@ -109,6 +109,30 @@ const FilterWindow = () => {
     }, []);
 
     /**
+     * Gets the value of the parameter if the value is the same for all the selected images or 0 if not.
+     * @param parameter {string} the name of the parameter to get the value of.
+     * @return {number} the value if the value is the same for all the selected images or 0 if not.
+     */
+    const getValue = useCallback((parameter) => {
+        const selectedImages = getSelectedImages();
+        if (!isAnySelectedImages()) return 0;
+        const firstValue = selectedImages[0].attrs[parameter];
+        if (!isNaN(firstValue) && selectedImages.every(image => image.attrs[parameter] === firstValue)) return firstValue;
+        return 0;
+    }, [getSelectedImages, isAnySelectedImages]);
+
+    /**
+     * Gets true if all the selected are true else returns false.
+     * @param parameter {string} the name of the parameter to get the boolean value of.
+     * @return {boolean} true if all the selected are true else returns false.
+     */
+    const getBool = useCallback((parameter) => {
+        const selectedImages = getSelectedImages();
+        if (!isAnySelectedImages()) return false;
+        return selectedImages.every(image => image.attrs[parameter]);
+    }, [getSelectedImages, isAnySelectedImages]);
+
+    /**
      * Sets the sliders and toggles on the filter window when changing which fragment to filter.
      */
     useEffect(() => {
@@ -132,7 +156,7 @@ const FilterWindow = () => {
                     .querySelector('input[name="toggleCheckbox"]').checked = false;
             }
         }
-    }, [getSelectedImages]);
+    }, [getBool, getValue, isAnySelectedImages, isFilterWindowOpen, root.style, saturationMin, updateBrightnessStyle]);
 
     /**
      * Resets the filters on the filter image.
@@ -156,19 +180,6 @@ const FilterWindow = () => {
         root.style.setProperty("--mask", 0)
         root.style.setProperty("--invert-first", 0);
         root.style.setProperty("--invert-last", 100);
-    };
-
-    /**
-     * Gets the value of the parameter if the value is the same for all the selected images or 0 if not.
-     * @param parameter {string} the name of the parameter to get the value of.
-     * @return {number} the value if the value is the same for all the selected images or 0 if not.
-     */
-    function getValue(parameter){
-        const selectedImages = getSelectedImages();
-        if (!isAnySelectedImages()) return 0;
-        const firstValue = selectedImages[0].attrs[parameter];
-        if (!isNaN(firstValue) && selectedImages.every(image => image.attrs[parameter] === firstValue)) return firstValue;
-        return 0;
     }
 
     /**
@@ -191,17 +202,6 @@ const FilterWindow = () => {
                 addChanges(image.id(), change, true);
             }
         });
-    }
-
-    /**
-     * Gets true if all the selected are true else returns false.
-     * @param parameter {string} the name of the parameter to get the boolean value of.
-     * @return {boolean} true if all the selected are true else returns false.
-     */
-    function getBool(parameter) {
-        const selectedImages = getSelectedImages();
-        if (!isAnySelectedImages()) return false;
-        return selectedImages.every(image => image.attrs[parameter]);
     }
 
     /**

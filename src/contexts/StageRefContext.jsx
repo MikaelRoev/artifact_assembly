@@ -161,7 +161,7 @@ export const StageRefContextProvider = ({children}) => {
             /**
              * Change to default cursor when exiting the image.
              */
-            image.on("mouseleave", (e) => {
+            image.on("mouseleave", () => {
                 document.body.style.cursor = "default";
             });
 

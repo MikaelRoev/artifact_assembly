@@ -76,7 +76,7 @@ const Histogram = ({array, widthProp, heightProp, binsProp, minCutoff, maxCutoff
             g.append("g")
                 .call(d3.axisLeft(y));
         }
-    }, [array, widthProp, heightProp, binsProp, minCutoff, maxCutoff]);
+    }, [array, binsProp, heightProp, maxCutoff, minCutoff, widthProp]);
 
     return (
         <svg

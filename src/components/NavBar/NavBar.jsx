@@ -105,7 +105,7 @@ const NavBar = () => {
         }
         setIsLoading(false);
         handleFileButtonClick()
-    };
+    }
 
     /**
      * Clocks the canvas.
@@ -113,7 +113,7 @@ const NavBar = () => {
     function handleLockCanvasClick() {
         setIsLocked((prevLock) => !prevLock);
         handleToolsButtonClick();
-    };
+    }
 
     /**
      * Constant function to set the visibility of the file dropdown menu.
