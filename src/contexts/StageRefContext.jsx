@@ -20,7 +20,7 @@ export const StageRefContextProvider = ({children}) => {
 
     const [state, setState, undo, redo] = useHistory([], 20);
     state.forEach(stateElement => {
-        console.log(stateElement.id, ": x:", stateElement.x, "y: ", stateElement.y);
+        //console.log(stateElement.id, ": x:", stateElement.x, "y: ", stateElement.y);
     })
 
     const [isLocked, setIsLocked] = useState(false);
