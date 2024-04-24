@@ -51,7 +51,7 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
      * Handles the filters on the image.
      * @returns {Array<Filter>} an array of the filters or null.
      */
-    const handleFilters = () => {
+    function handleFilters() {
         if (filterEnabled === true) {
             const filters = [];
             if (
@@ -67,7 +67,7 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
             if (imageProps.invert) filters.push(Konva.Filters.Invert);
             return filters;
         } else return null;
-    };
+    }
 
     /**
      * Gets the image.

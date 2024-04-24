@@ -40,7 +40,7 @@ const NavBar = () => {
     /**
      * Closes the project and returns to the landing page.
      */
-    const goToLandingPage = () => {
+    function goToLandingPage() {
         //setState([]);
         navigate("/");
     }
@@ -52,7 +52,7 @@ const NavBar = () => {
      *  true if there are at least one element at the position,
      *  false if there are no elements at the position.
      */
-    const isAnyElementAtPosition = (position) => {
+    function isAnyElementAtPosition(position) {
         return state.some((element) => {
             return element.x === position.x && element.y === position.y
         })
@@ -63,7 +63,7 @@ const NavBar = () => {
      * @param position {{x: number, y: number}} the starting position to search from.
      * @return {{x: number, y: number}} the first available position.
      */
-    const findFirstFreePosition = (position) => {
+    function findFirstFreePosition(position) {
         while (isAnyElementAtPosition(position)) {
             position.x += xOffset;
             position.y += yOffset;
@@ -75,7 +75,7 @@ const NavBar = () => {
      * Asynchronous function for uploading of images.
      * @returns {Promise<void>}
      */
-    const handleImageUpload = async () => {
+    async function handleImageUpload() {
         setIsLoading(true);
         // open file explorer dialog window
         const result = await open({
@@ -110,7 +110,7 @@ const NavBar = () => {
     /**
      * Clocks the canvas.
      */
-    const handleLockCanvasClick = () => {
+    function handleLockCanvasClick() {
         setIsLocked((prevLock) => !prevLock);
         handleToolsButtonClick();
     };
@@ -118,7 +118,7 @@ const NavBar = () => {
     /**
      * Constant function to set the visibility of the file dropdown menu.
      */
-    const handleFileButtonClick = () => {
+    function handleFileButtonClick() {
         setFileDropdownVisible(!fileDropdownVisible);
         setToolsDropdownVisible(false);
     }
@@ -126,7 +126,7 @@ const NavBar = () => {
     /**
      * Constant function to set the visibility of the tools dropdown menu.
      */
-    const handleToolsButtonClick = () => {
+    function handleToolsButtonClick() {
         setToolsDropdownVisible(!toolsDropdownVisible);
         setFileDropdownVisible(false);
     }
@@ -156,7 +156,7 @@ const NavBar = () => {
     /**
      * Function to handle exporting an image of the canvas
      */
-    const handleImageOfCanvasExport = () => {
+    function handleImageOfCanvasExport() {
         setIsExportImageModalOpen(true);
         handleFileButtonClick()
     }
@@ -164,21 +164,21 @@ const NavBar = () => {
     /**
      * Function to open up the similarity metrics window for all the selected images.
      */
-    const handleOpenScoreWindow = async () => {
+    async function handleOpenScoreWindow(){
         setIsSimilarityMetricsWindowOpen(true);
         handleToolsButtonClick();
-    };
+    }
 
     /**
      * Function to open up the filter window for all the selected images.
      */
-    const handleOpenFilterWindow = async () => {
+    async function handleOpenFilterWindow(){
         setIsFilterWindowOpen(true);
         handleToolsButtonClick();
-    };
+    }
 
     /*
-    const handleLockPiecesTogether = () => {
+    function handleLockPiecesTogether() {
         const newGroup = {
             type: "Group",
             groupElements: []
@@ -204,7 +204,7 @@ const NavBar = () => {
     /**
      * Function to find the work area. Works by finding the nearest element and moving the stage to that element.
      */
-    const findWorkArea = () => {
+    function findWorkArea() {
         let nearestElement = null;
         let shortestDistance = Infinity;
         const stage = getStage();

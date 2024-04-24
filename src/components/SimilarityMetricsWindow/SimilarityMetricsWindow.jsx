@@ -122,7 +122,7 @@ const SimilarityMetricsWindow = () => {
      * histogramIntersection: number}
      * }
      */
-    const getHistogramScores = (arrayA, arrayB) => {
+    function getHistogramScores(arrayA, arrayB) {
         // Euclidean Distance
         let euclidean = 0;
         // Bhattacharyya Distance
@@ -159,7 +159,7 @@ const SimilarityMetricsWindow = () => {
      * @param selectedElement
      * @returns {Element} div element with a table of scores and the most similar element to selectedElement
      */
-    function setTable(selectedElement) {
+    const setTable = (selectedElement) => {
         console.log("Runs setTable()")
         let rows = [];
         const arrayA = countAndNormalizeValues(selectedElement.attrs.hueValues, maxHistogramValue);
@@ -221,7 +221,7 @@ const SimilarityMetricsWindow = () => {
      * @param maxValue the max value possible in the array
      * @returns {any[]}
      */
-    const countAndNormalizeValues = (array, maxValue) => {
+    function countAndNormalizeValues(array, maxValue) {
         const probArray = new Array(maxValue + 1).fill(0);
         array.forEach(value => {
             if (value >= 0 && value <= maxValue) {

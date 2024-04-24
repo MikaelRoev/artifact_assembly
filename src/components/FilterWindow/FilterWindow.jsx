@@ -67,7 +67,7 @@ const FilterWindow = () => {
      * @param max {number} The maximum value of the range.
      * @return {number} A percentage value representing where value falls within the range defined by min and max.
      */
-    const mapToPercentage = (value, min, max) => {
+    function mapToPercentage(value, min, max) {
         return ((value - min) * 100) / (max - min);
     }
 
@@ -76,7 +76,7 @@ const FilterWindow = () => {
      * @param brightness {number} the brightness value of the selected images.
      * @param invert {boolean} whether the selected images is inverted or not.
      */
-    const updateBrightnessStyle = (brightness, invert) => {
+    function updateBrightnessStyle(brightness, invert) {
         let valuePercent = mapToPercentage(brightness, brightnessMin, brightnessMax);
         if (invert) {
             valuePercent = 100 - valuePercent;
@@ -137,7 +137,7 @@ const FilterWindow = () => {
     /**
      * Resets the filters on the filter image.
      */
-    const resetFilter = () => {
+    function resetFilter() {
         setValue("hue", 0);
         setValue("saturation", 0);
         setValue("value", 0); //Value is Brightness
@@ -163,7 +163,7 @@ const FilterWindow = () => {
      * @param parameter {string} the name of the parameter to get the value of.
      * @return {number} the value if the value is the same for all the selected images or 0 if not.
      */
-    const getValue = (parameter) => {
+    function getValue(parameter){
         const selectedImages = getSelectedImages();
         if (!isAnySelectedImages()) return 0;
         const firstValue = selectedImages[0].attrs[parameter];
@@ -178,7 +178,7 @@ const FilterWindow = () => {
      * @param overwriteFirst {boolean | undefined} whether it should overwrite the last state in the history
      * or as default commit a new state.
      */
-    const setValue = (parameter, value, overwriteFirst = false) => {
+    function setValue(parameter, value, overwriteFirst = false) {
         let isFirst = true;
         getSelectedImages().forEach(image => {
             image.attrs[parameter] = value;
@@ -198,7 +198,7 @@ const FilterWindow = () => {
      * @param parameter {string} the name of the parameter to get the boolean value of.
      * @return {boolean} true if all the selected are true else returns false.
      */
-    const getBool = (parameter) => {
+    function getBool(parameter) {
         const selectedImages = getSelectedImages();
         if (!isAnySelectedImages()) return false;
         return selectedImages.every(image => image.attrs[parameter]);
@@ -209,7 +209,7 @@ const FilterWindow = () => {
      * @param parameter {string} the name of the parameter to set the value of.
      * @param bool {boolean} the new value of the parameter.
      */
-    const setBool = (parameter, bool) => {
+    function setBool(parameter, bool) {
         let isFirst = true;
         getSelectedImages().forEach(image => {
             image.attrs[parameter] = bool;

@@ -74,12 +74,12 @@ const StageArea = () => {
          * Deletes the selected elements if the delete key is pressed.
          * @param e{KeyboardEvent} the event.
          */
-        const handleDeletePressed = (e) => {
+        function handleDeletePressed(e) {
             if (["Delete", "Backspace"].includes(e.key) && getSelectedElements().length > 0
                 && !isFilterInteracting) {
                 deleteSelected();
             }
-        };
+        }
 
         document.addEventListener("keydown", handleDeletePressed);
         return () => {
@@ -95,12 +95,12 @@ const StageArea = () => {
          * Saves the project if ctrl + S is pressed.
          * @param e{KeyboardEvent} the event.
          */
-        const handleSavePressed = (e) => {
+        function handleSavePressed(e) {
             if (e.ctrlKey && (e.key.toUpperCase() === "S")) {
                 e.preventDefault();
                 saveProjectDialog(project, setProject, state).then(() => console.log("project saved"));
             }
-        };
+        }
         document.addEventListener("keydown", handleSavePressed);
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
@@ -115,7 +115,7 @@ const StageArea = () => {
          * Key event handler for undo and redo.
          * @param e {KeyboardEvent} the event.
          */
-        const handleUndoRedoPressed = (e) => {
+        function handleUndoRedoPressed(e) {
             if ((e.ctrlKey && e.key.toUpperCase() === "Y") || (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "Z")) {
                 e.preventDefault();
                 redo();
@@ -123,7 +123,7 @@ const StageArea = () => {
                 e.preventDefault();
                 undo();
             }
-        };
+        }
         document.addEventListener("keydown", handleUndoRedoPressed);
         return () => {
             document.removeEventListener("keydown", handleUndoRedoPressed);
@@ -138,27 +138,27 @@ const StageArea = () => {
          * The selection keys down event handler.
          * @param e{KeyboardEvent}
          */
-        const handleSelectKeyDown = (e) => {
+        function handleSelectKeyDown(e) {
             if (e.key === "Control") {
                 setCtrlPressed(true);
             }
             if (e.key === "Shift") {
                 setShiftPressed(true);
             }
-        };
+        }
 
         /**
          * The select key up event handler.
          * @param e{KeyboardEvent}
          */
-        const handleSelectKeyUp = (e) => {
+        function handleSelectKeyUp(e) {
             if (e.key === "Control") {
                 setCtrlPressed(false);
             }
             if (e.key === "Shift") {
                 setShiftPressed(false);
             }
-        };
+        }
 
         document.addEventListener("keydown", handleSelectKeyDown);
         document.addEventListener("keyup", handleSelectKeyUp);
@@ -185,7 +185,7 @@ const StageArea = () => {
      *
      * @param e{KonvaEventObject} - The event object containing information about the scroll event.
      */
-    const zoomStage = (e) => {
+    function zoomStage(e) {
         e.evt.preventDefault();
 
         const stage = getStage();
@@ -208,7 +208,7 @@ const StageArea = () => {
             x: pointer.x - mousePointTo.x * newScale,
             y: pointer.y - mousePointTo.y * newScale,
         });
-    };
+    }
 
     /**
      * Clamps a numeric value between a minimum and maximum range.
@@ -217,9 +217,9 @@ const StageArea = () => {
      * @param {number} max - The maximum value of the range.
      * @returns {number} The clamped value.
      */
-    const clamp = (value, min, max) => {
+    function clamp(value, min, max){
         return Math.min(Math.max(value, min), max);
-    };
+    }
 
     /**
      * useEffect for updating image dimensions
