@@ -52,7 +52,6 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {elements} = useContext(ElementContext);
     const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageRefContext);
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
@@ -161,21 +160,22 @@ const SimilarityMetricsWindow = () => {
      * @returns {Element} div element with a table of scores and the most similar element to selectedElement
      */
     function setTable(selectedElement) {
+        console.log("Runs setTable()")
         let rows = [];
         const arrayA = countAndNormalizeValues(selectedElement.attrs.hueValues, maxHistogramValue);
         let lowest = Infinity;
         let lowestElement = null;
-        elements.forEach((element) => {
-            if (selectedElement.id() !== element.id && (element.hueValues !== undefined && selectedElement.attrs.hueValues !== undefined)) {
-                const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
+        getAllImages().forEach((konvaImage) => {
+            if (selectedElement.id() !== konvaImage.id && (konvaImage.attrs.hueValues !== undefined && selectedElement.attrs.hueValues !== undefined)) {
+                const arrayB = countAndNormalizeValues(konvaImage.attrs.hueValues, maxHistogramValue);
                 const values = getHistogramScores(arrayA, arrayB);
                 if (values.combined < lowest) {
                     lowest = values.combined;
-                    lowestElement = element;
+                    lowestElement = konvaImage;
                 }
-                const path = convertFileSrc(element.filePath);
+                const path = convertFileSrc(konvaImage.attrs.filePath);
                 rows.push(
-                    <tr key={`${selectedElement.id()}-${element.id}`}>
+                    <tr key={`${selectedElement.id()}-${konvaImage.id}`}>
                         <td className={"tableColumn1"}><img src={path} alt={"For table row"}/></td>
                         <td>{values.combined.toFixed(3)}</td>
                         <td>{values.euclideanDistance.toFixed(3)}</td>
@@ -186,7 +186,7 @@ const SimilarityMetricsWindow = () => {
             }
         })
         const path = convertFileSrc(selectedElement.attrs.filePath);
-        const lowestPath = convertFileSrc(lowestElement.filePath);
+        const lowestPath = convertFileSrc(lowestElement.attrs.filePath);
         return (
             <div key={`table-${selectedElement.id()}`} className={"tableDiv"}>
                 <table className={"score-table"}>
@@ -287,6 +287,7 @@ const SimilarityMetricsWindow = () => {
                     (update &&
                         getSelectedImages().map(image => {
                             if (image.attrs.hueValues) {
+                                console.log("has hue values")
                                 return (
                                     <div className={"element-container"} key={image.id()}>
                                         <div className="histogram-container">
