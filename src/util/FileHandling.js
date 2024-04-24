@@ -35,7 +35,7 @@ function readFile(filePath) {
  * @param setElements {function(Object)} the setter for the elements.
  * @return {Promise<void>} when the dialog window closes.
  */
-export const openProjectDialog = async (setProject, setElements) => {
+export async function openProjectDialog (setProject, setElements) {
     try {
         const filePath = await dialog.open({
             title: "Open Project",
@@ -64,7 +64,7 @@ export const openProjectDialog = async (setProject, setElements) => {
  * @param elements {Object[]} the elements on the canvas.
  * @return {Promise<never>}
  */
-export const saveProjectDialog = async (project, setProject, elements) => {
+export async function saveProjectDialog(project, setProject, elements) {
     elements.forEach((element) => {
         delete element.hueValues;
     })
@@ -89,13 +89,14 @@ export const saveProjectDialog = async (project, setProject, elements) => {
     } catch (error) {
         console.error("Error during file save dialog: ", error);
     }
-};
+}
+
 /**
  * Opens a save dialog window to select where the exported image of the canvas should be saved.
  * @param image{Object} the image of the canvas. Needs to be in base64 dataURL form.
  * @returns {Promise<void>}
  */
-export const exportCanvasAsImageDialog = async (image) => {
+export async function exportCanvasAsImageDialog(image) {
     const base64 = image.split(",")[1];
     const binary = atob(base64);
     const len = binary.length;

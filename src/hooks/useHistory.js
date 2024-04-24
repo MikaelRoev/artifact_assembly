@@ -15,11 +15,14 @@ import {useState} from "react";
  *  - An undo function to revert to the previous state in history.
  *  - A redo function to move forward to the next state in history.
  */
-const useHistory = (initialState, maxSteps) => {
+function useHistory(initialState, maxSteps) {
     const [index, setIndex] = useState(0);
     const [history, setHistory] = useState([initialState]);
 
-    const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
+    //TODO: comment and put in util
+    function deepCopy(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
 
     /**
      * Updates the state.
@@ -28,7 +31,7 @@ const useHistory = (initialState, maxSteps) => {
      *  true - overwrites the previous history commit.
      *  false (default) - makes a new history commit.
      */
-    const setState = (action, overwrite = false) => {
+    function setState(action, overwrite = false) {
         // get the new state ether from a function or a variable, implemented similar to useState
         const newState = typeof action === "function" ? action(deepCopy(history[index])) : action;
 
@@ -59,12 +62,20 @@ const useHistory = (initialState, maxSteps) => {
     /**
      * Undoes the last action in the history.
      */
-    const undo = () => index > 0 && setIndex(prevState => prevState - 1)
+    function undo() {
+        if (index > 0) {
+            setIndex(prevState => prevState - 1)
+        }
+    }
 
     /**
      * Redoes the last action in the history.
      */
-    const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
+    function redo() {
+        if (index < history.length - 1) {
+            setIndex(prevState => prevState + 1);
+        }
+    }
 
     return [deepCopy(history[index]), setState, undo, redo];
 }

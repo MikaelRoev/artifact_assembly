@@ -19,7 +19,7 @@ function rgbToHsv(r, g, b) {
     return [h, s, v];
 }
 
-export const getHueData = (imageDataURL) => {
+export function getHueData(imageDataURL) {
     return new Promise((resolve, reject) => {
         const image = new Image();
         image.onload = () => {
