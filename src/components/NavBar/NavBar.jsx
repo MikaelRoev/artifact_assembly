@@ -9,6 +9,7 @@ import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 import "./NavBar.css";
+import StateContext from "../../contexts/StateContext";
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.
@@ -22,7 +23,8 @@ const NavBar = () => {
 
     const {project, setProject} = useContext(ProjectContext);
     const {getStage, getAllImages, getSelectedElements, setElements, addMultipleImages,
-        groupSelected, state, undo, redo, isLocked, setIsLocked} = useContext(StageRefContext);
+        groupSelected, isLocked, setIsLocked} = useContext(StageRefContext);
+    const {state, undo, redo} = useContext(StateContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);

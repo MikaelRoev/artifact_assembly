@@ -5,9 +5,8 @@ import LandingPage from "../pages/LandingPage/LandingPage";
 import {ProjectContextProvider} from "../contexts/ProjectContext";
 import "./App.css";
 import {StageRefContextProvider} from "../contexts/StageRefContext";
+import {StateContextProvider} from "../contexts/StateContext";
 
-//TODO: change functions from const to function
-//TODO: go through all deps in hooks.
 //TODO: provider values for context providers should be useMemo
 
 /**
@@ -18,14 +17,16 @@ import {StageRefContextProvider} from "../contexts/StageRefContext";
 const App = () => {
     return (
         <ProjectContextProvider>
-            <StageRefContextProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<LandingPage/>}/>
-                        <Route path="/canvas" element={<Canvas/>}/>
-                    </Routes>
-                </BrowserRouter>
-            </StageRefContextProvider>
+            <StateContextProvider>
+                <StageRefContextProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<LandingPage/>}/>
+                            <Route path="/canvas" element={<Canvas/>}/>
+                        </Routes>
+                    </BrowserRouter>
+                </StageRefContextProvider>
+            </StateContextProvider>
         </ProjectContextProvider>
     );
 };
