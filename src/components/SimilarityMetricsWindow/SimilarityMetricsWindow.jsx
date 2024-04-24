@@ -3,7 +3,6 @@ import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
-import ElementContext from "../../contexts/ElementContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import "./SimilarityMetricsWindow.css"
@@ -53,6 +52,7 @@ const SimilarityMetricsWindow = () => {
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageRefContext);
+    //TODO: change name of context: filter interaction?
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);

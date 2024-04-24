@@ -2,9 +2,7 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 import {Stage} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
 import {getHueData} from "../../util/ImageManupulation";
-import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import ElementContext from "../../contexts/ElementContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
 
@@ -20,7 +18,6 @@ const StageArea = () => {
     const {
         stageRef,
         getStage,
-        getStaticLayer,
         getSelectTransformer,
         getSelectedElements,
         getAllImages,
@@ -42,7 +39,6 @@ const StageArea = () => {
         redo
     } = useContext(StageRefContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {elements} = useContext(ElementContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 
     const zoomScale = 1.17; //How much zoom each time
@@ -321,7 +317,7 @@ const StageArea = () => {
             ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
-            draggable={false} //TODO: make true
+            draggable={true}
             className="stage"
             onWheel={zoomStage}
             onMouseDown={checkDeselect}

@@ -16,6 +16,7 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     const {setProject} = useContext(ProjectContext);
+
     const {setElements} = useContext(StageRefContext);
 
     /**

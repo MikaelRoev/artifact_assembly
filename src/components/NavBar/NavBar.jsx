@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {open} from "@tauri-apps/api/dialog";
 import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
-import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
