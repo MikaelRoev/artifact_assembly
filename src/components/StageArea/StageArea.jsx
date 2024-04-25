@@ -5,7 +5,6 @@ import {getHueData} from "../../util/ImageManupulation";
 import ProjectContext from "../../contexts/ProjectContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
-import StateContext from "../../contexts/StateContext";
 
 /**
  * Component that represents the konva stage area in the canvas page.
@@ -32,9 +31,11 @@ const StageArea = () => {
         isSelected,
         deleteSelected,
 
+        state,
         isLocked,
+        undo,
+        redo
     } = useContext(StageRefContext);
-    const {state, undo, redo} = useContext(StateContext);
     const {project, setProject} = useContext(ProjectContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 

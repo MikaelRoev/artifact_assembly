@@ -1,7 +1,7 @@
-import React, {createContext, useContext, useRef, useState} from "react";
+import React, {createContext, useRef, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
-import StateContext from "./StateContext";
+import useHistory from "../hooks/useHistory";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -18,9 +18,9 @@ const StageRefContext = createContext(null);
 export const StageRefContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
-    const [isLocked, setIsLocked] = useState(false);
+    const [state, setState, undo, redo] = useHistory([], 20);
 
-    const {state, setState} = useContext(StateContext);
+    const [isLocked, setIsLocked] = useState(false);
 
     /**
      * Getter for the whole stage.
@@ -389,6 +389,9 @@ export const StageRefContextProvider = ({children}) => {
         deleteSelected,
         groupSelected,
 
+        state,
+        undo,
+        redo,
         isLocked,
         setIsLocked,
     }

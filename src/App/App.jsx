@@ -5,7 +5,6 @@ import LandingPage from "../pages/LandingPage/LandingPage";
 import {ProjectContextProvider} from "../contexts/ProjectContext";
 import "./App.css";
 import {StageRefContextProvider} from "../contexts/StageRefContext";
-import {StateContextProvider} from "../contexts/StateContext";
 
 //TODO: provider values for context providers should be useMemo
 
@@ -17,16 +16,14 @@ import {StateContextProvider} from "../contexts/StateContext";
 const App = () => {
     return (
         <ProjectContextProvider>
-            <StateContextProvider>
-                <StageRefContextProvider>
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<LandingPage/>}/>
-                            <Route path="/canvas" element={<Canvas/>}/>
-                        </Routes>
-                    </BrowserRouter>
-                </StageRefContextProvider>
-            </StateContextProvider>
+            <StageRefContextProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<LandingPage/>}/>
+                        <Route path="/canvas" element={<Canvas/>}/>
+                    </Routes>
+                </BrowserRouter>
+            </StageRefContextProvider>
         </ProjectContextProvider>
     );
 };
