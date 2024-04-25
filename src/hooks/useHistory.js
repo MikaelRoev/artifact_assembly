@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 
 /**
  * Hook for handling the state history, undo, and redo.
@@ -23,6 +23,8 @@ function useHistory(initialState, maxSteps) {
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
     }
+    
+    const currentState = useMemo(() => deepCopy(history[index]), [history, index]);
 
     /**
      * Updates the state.
@@ -33,7 +35,7 @@ function useHistory(initialState, maxSteps) {
      */
     function setState(action, overwrite = false) {
         // get the new state ether from a function or a variable, implemented similar to useState
-        const newState = typeof action === "function" ? action(deepCopy(history[index])) : action;
+        const newState = typeof action === "function" ? action(currentState) : action;
 
         if (overwrite) {
             // overwrite the current state
@@ -77,7 +79,7 @@ function useHistory(initialState, maxSteps) {
         }
     }
 
-    return [deepCopy(history[index]), setState, undo, redo];
+    return [currentState, setState, undo, redo];
 }
 
 export default useHistory;
