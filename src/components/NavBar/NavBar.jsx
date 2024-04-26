@@ -45,7 +45,7 @@ const NavBar = () => {
     /**
      * Closes the project and returns to the landing page.
      */
-    const goToLandingPage = () => {
+    function goToLandingPage() {
         setElements([]);
         navigate("/");
     }
@@ -57,7 +57,7 @@ const NavBar = () => {
      *  true if there are at least one element at the position,
      *  false if there are no elements at the position.
      */
-    const isAnyElementAtPosition = (position) => {
+    function isAnyElementAtPosition(position) {
         return elements.some((element) => {
             return element.x === position.x && element.y === position.y
         })
@@ -68,7 +68,7 @@ const NavBar = () => {
      * @param position {{x: number, y: number}} the starting position to search from.
      * @return {{x: number, y: number}} the first available position.
      */
-    const findFirstFreePosition = (position) => {
+    function findFirstFreePosition(position) {
         while (isAnyElementAtPosition(position)) {
             position.x += xOffset;
             position.y += yOffset;
@@ -77,10 +77,10 @@ const NavBar = () => {
     }
 
     /**
-     * Asynchronous function for uploading of an image.
+     * Asynchronous function for uploading of images.
      * @returns {Promise<void>}
      */
-    const handleImageUpload = async () => {
+    async function handleImageUpload() {
         setIsLoading(true);
         // open file explorer dialog window
         const result = await open({
@@ -91,17 +91,16 @@ const NavBar = () => {
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
-            let idAdder = 0 //For when multiple images are loaded at the same time
+            let idAdder = 0; //For when multiple images are loaded at the same time
             const newImages = result.map((file) => {
                 position = findFirstFreePosition(position);
                 const newImage = {
                     type: "Image",
+                    id: (Date.now() + idAdder).toString(),
                     x: position.x,
                     y: position.y,
-                    id: Date.now()+idAdder.toString(),
                     fileName: file.split("\\")[file.split("\\").length - 1],
                     filePath: file,
-                    // Other properties for the `shapeProps` object
                 };
                 idAdder++
                 position.x += xOffset;
@@ -112,20 +111,20 @@ const NavBar = () => {
         }
         setIsLoading(false);
         handleFileButtonClick()
-    };
+    }
 
     /**
      * Clocks the canvas.
      */
-    const handleLockCanvasClick = () => {
+    function handleLockCanvasClick() {
         setIsLocked((prevLock) => !prevLock);
         handleToolsButtonClick();
-    };
+    }
 
     /**
      * Constant function to set the visibility of the file dropdown menu.
      */
-    const handleFileButtonClick = () => {
+    function handleFileButtonClick() {
         setFileDropdownVisible(!fileDropdownVisible);
         setToolsDropdownVisible(false);
     }
@@ -133,7 +132,7 @@ const NavBar = () => {
     /**
      * Constant function to set the visibility of the tools dropdown menu.
      */
-    const handleToolsButtonClick = () => {
+    function handleToolsButtonClick() {
         setToolsDropdownVisible(!toolsDropdownVisible);
         setFileDropdownVisible(false);
     }
@@ -160,13 +159,10 @@ const NavBar = () => {
         }
     }, [toolsDropdownVisible]);
 
-
-
-
     /**
      * Function to handle exporting an image of the canvas
      */
-    const handleImageOfCanvasExport = () => {
+    function handleImageOfCanvasExport() {
         setIsExportImageModalOpen(true);
         handleFileButtonClick()
     }
@@ -174,28 +170,29 @@ const NavBar = () => {
     /**
      * Function to open up the similarity metrics window for all the selected images.
      */
-    const handleOpenScoreWindow = async () => {
+    async function handleOpenScoreWindow(){
         setIsSimilarityMetricsWindowOpen(true);
         handleToolsButtonClick();
-    };
+    }
 
     /**
      * Function to open up the filter window for all the selected images.
      */
-    const handleOpenFilterWindow = async () => {
+    async function handleOpenFilterWindow(){
         setIsFilterWindowOpen(true);
         handleToolsButtonClick();
-    };
+    }
 
-    const handleLockPiecesTogether = () => {
+    /*
+    function handleLockPiecesTogether() {
         const newGroup = {
             type: "Group",
             groupElements: []
         }
 
-        for (let i= 0; i < selectedElementsIndex.length; i++) {
-            const groupElement = elements[selectedElementsIndex[i]];
-            newGroup.groupElements.push(groupElement)
+        for (const index of selectedElementsIndex) {
+            const groupElement = elements[index];
+            newGroup.groupElements.push(groupElement);
         }
 
         const newElements = elements.filter((element, index) =>
@@ -203,19 +200,20 @@ const NavBar = () => {
         )
         setElements([...newElements, newGroup])
 
-        // TODO deselect selected elements
-
+        selectOnly();
 
         handleFileButtonClick()
     }
 
+     */
+
     /**
      * Function to find the work area. Works by finding the nearest element and moving the stage to that element.
      */
-    const findWorkArea = () => {
+    function findWorkArea() {
         let nearestElement = null;
-        let shortestDistance = Infinity
-        let stage = stageRef.current
+        let shortestDistance = Infinity;
+        let stage = stageRef.current;
         const stageWidth = stage.width();
         const stageHeight = stage.height();
 
@@ -231,7 +229,6 @@ const NavBar = () => {
             const dx = elementPosX - currentStageCenterX;
             const dy = elementPosY - currentStageCenterY;
             const distance = Math.sqrt(dx ** 2 + dy ** 2);
-
 
             if (distance < shortestDistance) {
                 nearestElement = element;
@@ -250,7 +247,7 @@ const NavBar = () => {
                 scaleY: 1,
                 duration: 0.5,
                 onFinish: () => {
-                    project.zoom = 1
+                    project.zoom = 1;
                 }
             })
         }
@@ -314,7 +311,7 @@ const NavBar = () => {
                                                     saveProjectDialog(project, setProject, elements)
                                                         .then(goToLandingPage)
                                                         .catch(() => {
-                                                        })
+                                                        });
                                                 });
                                                 setOnDoNotSave(() => () => goToLandingPage());
                                                 setIsConfirmModalOpen(true);

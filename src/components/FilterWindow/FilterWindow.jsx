@@ -203,7 +203,7 @@ const FilterWindow = () => {
      * @param parameter {string} the name of the parameter to set the value of.
      * @param bool {boolean} the new value of the parameter.
      */
-    const setBool = (parameter, bool) => {
+    function setBool(parameter, bool) {
         selectedElementsIndex.forEach((index) => {
             elements[index][parameter] = bool;
         });

@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useRef, useState} from "react";
+import React, {createContext, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
@@ -29,11 +29,15 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
         if (elements.length === 0) setIsSimilarityMetricsWindowOpen(false);
     }, [elements.length]);
 
-    return (
-        <SimilarityMetricsWindowContext.Provider value={{
+    const providerValues = useMemo(() => {
+        return {
             isSimilarityMetricsWindowOpen,
             setIsSimilarityMetricsWindowOpen
-        }}>
+        };
+    }, [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen]);
+
+    return (
+        <SimilarityMetricsWindowContext.Provider value={providerValues}>
             {children}
         </SimilarityMetricsWindowContext.Provider>
     )
@@ -45,7 +49,6 @@ export const SimilarityMetricsWindowContextProvider = ({children}) => {
  * @constructor
  */
 const SimilarityMetricsWindow = () => {
-
     const {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
@@ -53,15 +56,15 @@ const SimilarityMetricsWindow = () => {
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
+    //TODO: change name of context: filter interaction to disable image delete?
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
-    const maxHistogramValue = 360
-    const [minInputValue, setMinInputValue] = useState(0)
-    const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue)
-    const [minCutOff, setMinCutOff] = useState(0)
-    const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue)
-
+    const maxHistogramValue = 360;
+    const [minInputValue, setMinInputValue] = useState(0);
+    const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue);
+    const [minCutOff, setMinCutOff] = useState(0);
+    const [maxCutOff, setMaxCutOff] = useState(maxHistogramValue);
 
     /**
      * UseEffect to make the score window draggable on creation.
@@ -113,12 +116,13 @@ const SimilarityMetricsWindow = () => {
                 }
             }
         }
-        setMinCutOff(minInputValue)
-        setMaxCutOff(maxInputValue)
 
-        setUpdate(false)
+        setMinCutOff(minInputValue);
+        setMaxCutOff(maxInputValue);
+
+        setUpdate(false);
         await new Promise(resolve => setTimeout(resolve, 1));
-        setUpdate(true)
+        setUpdate(true);
     }
 
     /**
@@ -132,9 +136,9 @@ const SimilarityMetricsWindow = () => {
      * histogramIntersection: number}
      * }
      */
-    const getHistogramScores = (arrayA, arrayB) => {
+    function getHistogramScores(arrayA, arrayB) {
         // Euclidean Distance
-        let euclidean = 0
+        let euclidean = 0;
         // Bhattacharyya Distance
         let coefficient = 0;
         // Histogram Intersection
@@ -142,7 +146,7 @@ const SimilarityMetricsWindow = () => {
 
         for (let i = 0; i < arrayA.length; i++) {
             // Euclidean
-            euclidean += Math.pow(arrayA[i] - arrayB[i], 2)
+            euclidean += Math.pow(arrayA[i] - arrayB[i], 2);
 
             // Bhattacharyya
             coefficient += Math.sqrt(arrayA[i] * arrayB[i]);
@@ -153,8 +157,8 @@ const SimilarityMetricsWindow = () => {
 
         // Final calculation
         const euclideanDistance = Math.sqrt(euclidean);
-        const bhattacharyyaDistance = -Math.log(coefficient)
-        const histogramIntersection = (1 - intersection)
+        const bhattacharyyaDistance = -Math.log(coefficient);
+        const histogramIntersection = (1 - intersection);
 
         return {
             euclideanDistance: euclideanDistance,
@@ -171,13 +175,13 @@ const SimilarityMetricsWindow = () => {
      */
     function setTable(selectedElement) {
         let rows = [];
-        const arrayA = countAndNormalizeValues(selectedElement.hueValues, 360)
-        let lowest = Infinity
-        let lowestElement = null
+        const arrayA = countAndNormalizeValues(selectedElement.hueValues, maxHistogramValue);
+        let lowest = Infinity;
+        let lowestElement = null;
         elements.forEach((element) => {
             if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
-                const arrayB = countAndNormalizeValues(element.hueValues, 360)
-                const values = getHistogramScores(arrayA, arrayB)
+                const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
+                const values = getHistogramScores(arrayA, arrayB);
                 if (values.combined < lowest) {
                     lowest = values.combined;
                     lowestElement = element;
@@ -195,8 +199,8 @@ const SimilarityMetricsWindow = () => {
             }
         })
 
-        const path = convertFileSrc(selectedElement.filePath)
-        const lowestPath = convertFileSrc(lowestElement.filePath)
+        const path = convertFileSrc(selectedElement.filePath);
+        const lowestPath = convertFileSrc(lowestElement.filePath);
         return (
             <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
                 <table className={"score-table"}>
@@ -231,17 +235,17 @@ const SimilarityMetricsWindow = () => {
      * @param maxValue the max value possible in the array
      * @returns {any[]}
      */
-    const countAndNormalizeValues = (array, maxValue) => {
-        const probArray = new Array(maxValue + 1).fill(0)
+    function countAndNormalizeValues(array, maxValue) {
+        const probArray = new Array(maxValue + 1).fill(0);
         array.forEach(value => {
             if (value >= 0 && value <= maxValue) {
-                probArray[Math.floor(value)]++
+                probArray[Math.floor(value)]++;
             }
-        })
+        });
         const totalCount = array.length;
         probArray.forEach((value, index, arr) => {
-            arr[index] = value / totalCount
-        })
+            arr[index] = value / totalCount;
+        });
 
         return probArray;
     }
@@ -250,8 +254,8 @@ const SimilarityMetricsWindow = () => {
      * Resets the values in the inputs to default.
      */
     function handleReset() {
-        setMinInputValue(0)
-        setMaxInputValue(maxHistogramValue)
+        setMinInputValue(0);
+        setMaxInputValue(maxHistogramValue);
     }
 
     return (
@@ -295,7 +299,7 @@ const SimilarityMetricsWindow = () => {
             <div ref={contentRef} className="window-content">
                 {selectedElementsIndex.length > 0 ?
                     (update &&
-                        selectedElementsIndex.map((index) => {
+                        selectedElementsIndex.map(index => {
                             const image = elements[index];
                             if (image.hueValues) {
                                 const path = convertFileSrc(image.filePath)
