@@ -2,6 +2,7 @@ import React, {createContext, useEffect, useRef, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
+import {emitter} from "../util/EventEmitter";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -166,6 +167,8 @@ export const StageRefContextProvider = ({children}) => {
             });
 
             callback(image);
+
+            emitter.emit('imageDrawn', image);
         })
     }
 
