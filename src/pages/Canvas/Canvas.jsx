@@ -23,14 +23,14 @@ import "./Canvas.css";
  */
 const Canvas = () => {
     return (
-        <FilterEnabledContextProvider>
+        <StageRefContextProvider>
             <SelectContextProvider>
                 <LockedContextProvider>
-                    <ExportImageModalContextProvider>
-                        <FilterWindowContextProvider>
-                            <SimilarityMetricsWindowContextProvider>
-                                <FilterInteractionContextProvider>
-                                    <StageRefContextProvider>
+                    <FilterEnabledContextProvider>
+                        <FilterInteractionContextProvider>
+                            <FilterWindowContextProvider>
+                                <SimilarityMetricsWindowContextProvider>
+                                    <ExportImageModalContextProvider>
                                         <ConfirmCloseModalContextProvider>
                                             <div className="stage-container">
                                                 <NavBar/>
@@ -41,14 +41,14 @@ const Canvas = () => {
                                                 <ConfirmCloseModal/>
                                             </div>
                                         </ConfirmCloseModalContextProvider>
-                                    </StageRefContextProvider>
-                                </FilterInteractionContextProvider>
-                            </SimilarityMetricsWindowContextProvider>
-                        </FilterWindowContextProvider>
-                    </ExportImageModalContextProvider>
+                                    </ExportImageModalContextProvider>
+                                </SimilarityMetricsWindowContextProvider>
+                            </FilterWindowContextProvider>
+                        </FilterInteractionContextProvider>
+                    </FilterEnabledContextProvider>
                 </LockedContextProvider>
             </SelectContextProvider>
-        </FilterEnabledContextProvider>
+        </StageRefContextProvider>
     );
 };
 
