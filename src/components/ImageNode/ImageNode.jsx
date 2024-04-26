@@ -4,6 +4,7 @@ import {convertFileSrc} from '@tauri-apps/api/tauri';
 import {Image as KonvaImage} from "react-konva";
 import useImage from "use-image";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
+import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 
 /**
  * Component that represents a konva image object on the canvas.
@@ -45,29 +46,9 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
 
     const [image] = useImage(url, "anonymous");
 
-    const {filterEnabled} = useContext(FilterEnabledContext);
+    const {handleFilters} = useContext(FilterInteractionContext);
 
-    /**
-     * Handles the filters on the image.
-     * @returns {Array<Filter>} an array of the filters or null.
-     */
-    function handleFilters() {
-        if (filterEnabled === true) {
-            const filters = [];
-            if (
-                (imageProps.hue !== undefined && imageProps.hue !== 0)
-                || (imageProps.saturation !== undefined && imageProps.saturation !== 0)
-                || (imageProps.value !== undefined && imageProps.value !== 0)
-            ) filters.push(Konva.Filters.HSV);
-            if (imageProps.contrast !== undefined && imageProps.contrast !== 0) filters.push(Konva.Filters.Contrast);
-            if (imageProps.threshold !== undefined && imageProps.threshold !== 0) {
-                filters.push(Konva.Filters.Mask);
-            }
-            if (imageProps.grayscale) filters.push(Konva.Filters.Grayscale);
-            if (imageProps.invert) filters.push(Konva.Filters.Invert);
-            return filters;
-        } else return null;
-    }
+
 
     /**
      * Gets the image.
