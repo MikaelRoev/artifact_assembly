@@ -28,7 +28,7 @@ const LandingPage = () => {
     /**
      * Opens dialog window and goes to canvas of selected project.
      */
-    const handleOpenProjectClick = () => {
+    function handleOpenProjectClick() {
         openProjectDialog(setProject, setElements)
             .then(() => navigate("/canvas"))
             .catch(error => {
@@ -39,7 +39,7 @@ const LandingPage = () => {
     /**
      * Opens the canvas page.
      */
-    const handleNewProjectClick = () => {
+    function handleNewProjectClick() {
         navigate("/canvas")
     }
 

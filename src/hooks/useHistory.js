@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 
 /**
  * Hook for handling the state history, undo, and redo.
@@ -15,22 +15,27 @@ import {useState} from "react";
  *  - An undo function to revert to the previous state in history.
  *  - A redo function to move forward to the next state in history.
  */
-const useHistory = (initialState, maxSteps) => {
+function useHistory(initialState, maxSteps) {
     const [index, setIndex] = useState(0);
     const [history, setHistory] = useState([initialState]);
 
-    const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
+    //TODO: comment and put in util
+    function deepCopy(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
+
+    const currentState = useMemo(() => deepCopy(history[index]), [history, index]);
 
     /**
      * Updates the state.
      * @param action {Function|Object} a callback that returns a new state or a new state object
-     * @param overwrite {boolean}
+     * @param overwrite {boolean | null}
      *  true - overwrites the previous history commit.
      *  false (default) - makes a new history commit.
      */
-    const setState = (action, overwrite = false) => {
+    function setState(action, overwrite = false) {
         // get the new state ether from a function or a variable, implemented similar to useState
-        const newState = typeof action === "function" ? action(deepCopy(history[index])) : action;
+        const newState = typeof action === "function" ? action(currentState) : action;
 
         if (overwrite) {
             // overwrite the current state
@@ -59,14 +64,18 @@ const useHistory = (initialState, maxSteps) => {
     /**
      * Undoes the last action in the history.
      */
-    const undo = () => index > 0 && setIndex(prevState => prevState - 1)
+    function undo() {
+        index > 0 && setIndex(prevState => prevState - 1);
+    }
 
     /**
      * Redoes the last action in the history.
      */
-    const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
+    function redo() {
+        index < history.length - 1 && setIndex(prevState => prevState + 1);
+    }
 
-    return [deepCopy(history[index]), setState, undo, redo];
+    return [currentState, setState, undo, redo];
 }
 
 export default useHistory;

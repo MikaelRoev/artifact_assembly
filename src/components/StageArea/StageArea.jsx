@@ -73,20 +73,20 @@ const StageArea = () => {
          * Deletes the selected elements if the delete key is pressed.
          * @param e{KeyboardEvent} the event.
          */
-        const handleDeletePressed = (e) => {
-            if ((e.key === "Delete" || e.key === "Backspace")
+        function handleDeletePressed(e) {
+            if (["Delete", "Backspace"].includes(e.key)
                 && selectedElementsIndex.length > 0
                 && !isFilterInteracting) {
                 const newElements = elements.filter((element, index) => !isSelected(index));
                 setElements(newElements);
                 deselectAll();
             }
-        };
+        }
         document.addEventListener("keydown", handleDeletePressed);
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [elements, selectedElementsIndex, setElements, isFilterInteracting, deselectAll]);
+    }, [deselectAll, elements, isFilterInteracting, isSelected, selectedElementsIndex.length, setElements]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -116,20 +116,20 @@ const StageArea = () => {
          * Key event handler for undo and redo.
          * @param e {KeyboardEvent} the event.
          */
-        const handleUndoRedoPressed = (e) => {
-            if ((e.ctrlKey && e.key === "y") || (e.ctrlKey && e.shiftKey && e.key === "Z")) {
+        function handleUndoRedoPressed(e) {
+            if ((e.ctrlKey && e.key.toUpperCase() === "Y") || (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "Z")) {
                 e.preventDefault();
                 redo();
-            } else if (e.ctrlKey && e.key === "z") {
+            } else if (e.ctrlKey && e.key.toUpperCase() === "Z") {
                 e.preventDefault();
                 undo();
             }
-        };
+        }
         document.addEventListener("keydown", handleUndoRedoPressed);
         return () => {
             document.removeEventListener("keydown", handleUndoRedoPressed);
         };
-    }, [undo, redo]);
+    }, [redo, undo]);
 
     /**
      * Set up and cleans up the select key check.
@@ -139,27 +139,27 @@ const StageArea = () => {
          * The selection keys down event handler.
          * @param e{KeyboardEvent}
          */
-        const handleSelectKeyDown = (e) => {
+        function handleSelectKeyDown(e) {
             if (e.key === "Control") {
                 setCtrlPressed(true);
             }
             if (e.key === "Shift") {
                 setShiftPressed(true);
             }
-        };
+        }
 
         /**
          * The select key up event handler.
          * @param e{KeyboardEvent}
          */
-        const handleSelectKeyUp = (e) => {
+        function handleSelectKeyUp(e) {
             if (e.key === "Control") {
                 setCtrlPressed(false);
             }
             if (e.key === "Shift") {
                 setShiftPressed(false);
             }
-        };
+        }
 
         document.addEventListener("keydown", handleSelectKeyDown);
         document.addEventListener("keyup", handleSelectKeyUp);
@@ -186,7 +186,7 @@ const StageArea = () => {
      *
      * @param e{KonvaEventObject} - The event object containing information about the scroll event.
      */
-    const zoomStage = (e) => {
+    function zoomStage(e) {
         e.evt.preventDefault();
 
         const stage = stageRef.current;
@@ -209,7 +209,7 @@ const StageArea = () => {
             x: pointer.x - mousePointTo.x * newScale,
             y: pointer.y - mousePointTo.y * newScale,
         });
-    };
+    }
 
     /**
      * Clamps a numeric value between a minimum and maximum range.
@@ -218,9 +218,9 @@ const StageArea = () => {
      * @param {number} max - The maximum value of the range.
      * @returns {number} The clamped value.
      */
-    const clamp = (value, min, max) => {
+    function clamp(value, min, max){
         return Math.min(Math.max(value, min), max);
-    };
+    }
 
     /**
      * Updates the transformer to selected elements.

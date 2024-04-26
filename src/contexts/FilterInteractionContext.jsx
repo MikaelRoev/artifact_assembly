@@ -9,6 +9,7 @@ const FilterInteractionContext = createContext(null);
 /**
  * Provider for the filer interaction context that allows for  setting and getting if the filers is interacting.
  * @param children {JSX.Element} the components that can use the context.
+ * @param imageProps
  * @return {JSX.Element} the context provider.
  * @constructor
  */
