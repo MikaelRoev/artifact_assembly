@@ -7,8 +7,6 @@ import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {emitter} from "../../util/EventEmitter";
 
-
-
 /**
  * Component that represents the konva stage area in the canvas page.
  * @returns {JSX.Element} the konva stage.
@@ -273,24 +271,15 @@ const StageArea = () => {
             }
         }
 
-        const elements = getAllElements();
-
         emitter.on('imageDrawn', (image) => {
             console.log("emitter on");
-            elements.forEach(element => {
-                console.log("handles element click")
-                element.on("click", handleElementClick);
-                element.on("tap", handleElementClick);
-            });
         })
 
-        /*
         const elements = getAllElements();
         elements.forEach(element => {
             element.on("click", handleElementClick);
             element.on("tap", handleElementClick);
         });
-         */
 
         return () => {
             elements.forEach(element => {
