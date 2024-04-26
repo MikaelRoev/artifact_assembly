@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
@@ -70,7 +70,7 @@ const FilterWindow = () => {
      * @param max {number} The maximum value of the range.
      * @return {number} A percentage value representing where value falls within the range defined by min and max.
      */
-    const mapToPercentage = (value, min, max) => {
+    function mapToPercentage(value, min, max) {
         return ((value - min) * 100) / (max - min);
     }
 
@@ -79,14 +79,14 @@ const FilterWindow = () => {
      * @param brightness {number} the brightness value of the selected images.
      * @param invert {boolean} whether the selected images is inverted or not.
      */
-    const updateBrightnessStyle = (brightness, invert) => {
+    const updateBrightnessStyle = useCallback((brightness, invert) => {
         let valuePercent = mapToPercentage(brightness, brightnessMin, brightnessMax);
         if (invert) {
             valuePercent = 100 - valuePercent;
         }
         //Value is Brightness
         root.style.setProperty("--brightness", valuePercent);
-    }
+    }, [brightnessMin, root.style]);
 
     /**
      * Makes the filter window draggable on creation
@@ -113,6 +113,28 @@ const FilterWindow = () => {
     }, []);
 
     /**
+     * Gets the value of the parameter if the value is the same for all the selected images or 0 if not.
+     * @param parameter {string} the name of the parameter to get the value of.
+     * @return {number} the value if the value is the same for all the selected images or 0 if not.
+     */
+    const getValue = useCallback((parameter) => {
+        if (images.length === 0) return 0;
+        const firstValue = images[0][parameter];
+        if (!isNaN(firstValue) && images.every(image => image[parameter] === firstValue)) return firstValue;
+        return 0;
+    }, [images]);
+
+    /**
+     * Gets true if all the selected are true else returns false.
+     * @param parameter {string} the name of the parameter to get the boolean value of.
+     * @return {boolean} true if all the selected are true else returns false.
+     */
+    const getBool = useCallback((parameter) => {
+        if (images.length === 0) return false;
+        return images.every(image => image[parameter]);
+    }, [images]);
+
+    /**
      * Sets the sliders and toggles on the filter window when changing which fragment to filter.
      */
     useEffect(() => {
@@ -136,8 +158,7 @@ const FilterWindow = () => {
                     .querySelector('input[name="toggleCheckbox"]').checked = false;
             }
         }
-
-    }, [selectedElementsIndex]);
+    }, [getBool, getValue, images.length, isFilterWindowOpen, root.style, saturationMin, updateBrightnessStyle]);
 
     /**
      * Resets the filters on the filter image.
@@ -164,39 +185,17 @@ const FilterWindow = () => {
     };
 
     /**
-     * Gets the value of the parameter if the value is the same for all the selected images or 0 if not.
-     * @param parameter {string} the name of the parameter to get the value of.
-     * @return {number} the value if the value is the same for all the selected images or 0 if not.
-     */
-    const getValue = (parameter) => {
-        if (images.length === 0) return 0;
-        const firstValue = images[0][parameter];
-        if (!isNaN(firstValue) && images.every(image => image[parameter] === firstValue)) return firstValue;
-        return 0;
-    }
-
-    /**
      * Sets the value of the parameter on all the selected images.
      * @param parameter {string} the name of the parameter to set the value of.
      * @param value {number} the new value of the parameter.
-     * @param overwrite {evt: boolean} whether it should overwrite the last state in the history
+     * @param overwrite {boolean | undefined} whether it should overwrite the last state in the history
      * or as default commit a new state.
      */
-    const setValue = (parameter, value, overwrite = false) => {
+    function setValue (parameter, value, overwrite = false) {
         selectedElementsIndex.forEach((index) => {
             elements[index][parameter] = value;
         });
         setElements(elements, overwrite);
-    }
-
-    /**
-     * Gets true if all the selected are true else returns false.
-     * @param parameter {string} the name of the parameter to get the boolean value of.
-     * @return {number} true if all the selected are true else returns false.
-     */
-    const getBool = (parameter) => {
-        if (images.length === 0) return false;
-        return images.every(image => image[parameter]);
     }
 
     /**

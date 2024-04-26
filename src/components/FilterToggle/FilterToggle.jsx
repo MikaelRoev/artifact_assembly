@@ -9,7 +9,7 @@ import "./FilterToggle.css"
  * @return {JSX.Element} the filter toggle.
  * @constructor
  */
-function FilterToggle({label, setValue, id}) {
+const FilterToggle = ({label, setValue, id}) => {
     return (
         <div
             className="toggle-group"
