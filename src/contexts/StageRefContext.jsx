@@ -1,4 +1,4 @@
-import React, {createContext, useRef, useState} from "react";
+import React, {createContext, useEffect, useRef, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -362,22 +362,36 @@ export const StageRefContextProvider = ({children}) => {
         getStage().add(staticLayer, selectLayer);
     }
 
-    function undo() {
-        undoState();
-        getAllElements().forEach(node => node.destroy());
-        state.forEach(element => {
+    /**
+     * Updates the stage based on the state.
+     */
+    useEffect(() => {
+        const konvaIdSet = new Set(getAllElements().map(element => element.id()));
+
+        getAllElements().forEach(element => {
+            const stateElement = state.find(e => e.id === element.id());
+            if (stateElement) {
+                element.attrs = {
+                    ...element.attrs,
+                    ...stateElement,
+                }
+            } else {
+                element.destroy();
+            }
+        })
+
+        state.filter(element => !konvaIdSet.has(element.id)).forEach(element => {
             if (element.type === "Image") addImage(element);
             else if (element ==="Group") addGroup(element);
         })
+    }, [addGroup, addImage, getAllElements, state]);
+
+    function undo() {
+        undoState();
     }
 
     function redo() {
         redoState();
-        getAllElements().forEach(node => node.destroy());
-        state.forEach(element => {
-            if (element.type === "Image") addImage(element);
-            else if (element ==="Group") addGroup(element);
-        })
     }
 
     const providerValues = {
