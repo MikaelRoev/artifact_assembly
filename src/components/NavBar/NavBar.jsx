@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {open} from "@tauri-apps/api/dialog";
 import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
 import ProjectContext from "../../contexts/ProjectContext";
-import StageRefContext from "../../contexts/StageRefContext";
+import StageContext from "../../contexts/StageContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
@@ -22,7 +22,7 @@ const NavBar = () => {
 
     const {project, setProject} = useContext(ProjectContext);
     const {getStage, getAllImages, getSelectedElements, setElements, addMultipleImages,
-        groupSelected, state, undo, redo, isLocked, setIsLocked} = useContext(StageRefContext);
+        groupSelected, state, undo, redo, isLocked, setIsLocked} = useContext(StageContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);

@@ -3,7 +3,7 @@ import {convertFileSrc} from "@tauri-apps/api/tauri";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
-import StageRefContext from "../../contexts/StageRefContext";
+import StageContext from "../../contexts/StageContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import "./SimilarityMetricsWindow.css"
 
@@ -21,7 +21,7 @@ export const SimilarityMetricsWindowContext = createContext(null);
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
     const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
-    const {isAnyImages} = useContext(StageRefContext);
+    const {isAnyImages} = useContext(StageContext);
 
     useEffect(() => {
         if (isAnyImages) setIsSimilarityMetricsWindowOpen(false);
@@ -51,7 +51,7 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageRefContext);
+    const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageContext);
     //TODO: change name of context: filter interaction?
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);

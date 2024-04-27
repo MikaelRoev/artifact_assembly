@@ -3,7 +3,7 @@ import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
-import StageRefContext from "../../contexts/StageRefContext";
+import StageContext from "../../contexts/StageContext";
 import "./FilterWindow.css"
 
 /**
@@ -20,7 +20,7 @@ export const FilterWindowContext = createContext(null);
  */
 export const FilterWindowContextProvider = ({children}) => {
     const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
-    const {isAnyImages} = useContext(StageRefContext);
+    const {isAnyImages} = useContext(StageContext);
 
     useEffect(() => {
         if (isAnyImages) setIsFilterWindowOpen(false);
@@ -46,7 +46,7 @@ export const FilterWindowContextProvider = ({children}) => {
 const FilterWindow = () => {
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
-    const {getStage, getSelectedImages, isAnySelectedImages, addChanges} = useContext(StageRefContext);
+    const {getStage, getSelectedImages, isAnySelectedImages, addChanges} = useContext(StageContext);
 
     const hueMax = 359;
     const hueMin = 0;

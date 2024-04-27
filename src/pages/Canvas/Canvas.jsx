@@ -11,6 +11,7 @@ import ConfirmCloseModal, {
 } from "../../components/ConfirmCloseModal/ConfirmCloseModal";
 import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
 import {FilterInteractionContextProvider} from "../../contexts/FilterInteractionContext";
+import {StageContextProvider} from "../../contexts/StageContext";
 import "./Canvas.css";
 
 /**
@@ -20,26 +21,28 @@ import "./Canvas.css";
  */
 const Canvas = () => {
     return (
-        <FilterEnabledContextProvider>
-            <FilterInteractionContextProvider>
-                <ExportImageModalContextProvider>
-                    <FilterWindowContextProvider>
-                        <SimilarityMetricsWindowContextProvider>
-                            <ConfirmCloseModalContextProvider>
-                                <div className="stage-container">
-                                    <NavBar/>
-                                    <StageArea/>
-                                    <SimilarityMetricsWindow/>
-                                    <ExportImageModal/>
-                                    <FilterWindow/>
-                                    <ConfirmCloseModal/>
-                                </div>
-                            </ConfirmCloseModalContextProvider>
-                        </SimilarityMetricsWindowContextProvider>
-                    </FilterWindowContextProvider>
-                </ExportImageModalContextProvider>
-            </FilterInteractionContextProvider>
-        </FilterEnabledContextProvider>
+        <StageContextProvider>
+            <FilterEnabledContextProvider>
+                <FilterInteractionContextProvider>
+                    <ExportImageModalContextProvider>
+                        <FilterWindowContextProvider>
+                            <SimilarityMetricsWindowContextProvider>
+                                <ConfirmCloseModalContextProvider>
+                                    <div className="stage-container">
+                                        <NavBar/>
+                                        <StageArea/>
+                                        <SimilarityMetricsWindow/>
+                                        <ExportImageModal/>
+                                        <FilterWindow/>
+                                        <ConfirmCloseModal/>
+                                    </div>
+                                </ConfirmCloseModalContextProvider>
+                            </SimilarityMetricsWindowContextProvider>
+                        </FilterWindowContextProvider>
+                    </ExportImageModalContextProvider>
+                </FilterInteractionContextProvider>
+            </FilterEnabledContextProvider>
+        </StageContextProvider>
     );
 };
 

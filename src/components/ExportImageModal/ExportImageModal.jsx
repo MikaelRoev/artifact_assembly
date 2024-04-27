@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useState} from "react";
 import {exportCanvasAsImageDialog} from "../../util/FileHandling";
-import StageRefContext from "../../contexts/StageRefContext";
+import StageContext from "../../contexts/StageContext";
 import "./ExportImageModal.css"
 
 /**
@@ -34,7 +34,7 @@ const ExportImageModal = () => {
     const [number, setNumber] = useState(1);
     const [isInfoVisible, setIsInfoVisible] = useState(false);
     const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
-    const {getStage} = useContext(StageRefContext);
+    const {getStage} = useContext(StageContext);
 
     /**
      * Gets the canvas as DataURL and send it to the export canvas as image dialog.

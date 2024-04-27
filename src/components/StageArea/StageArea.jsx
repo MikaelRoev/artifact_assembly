@@ -4,7 +4,7 @@ import {saveProjectDialog} from "../../util/FileHandling"
 import {getHueData} from "../../util/ImageManupulation";
 import ProjectContext from "../../contexts/ProjectContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
-import StageRefContext from "../../contexts/StageRefContext";
+import StageContext from "../../contexts/StageContext";
 import {emitter} from "../../util/EventEmitter";
 
 /**
@@ -36,7 +36,7 @@ const StageArea = () => {
         isLocked,
         undo,
         redo
-    } = useContext(StageRefContext);
+    } = useContext(StageContext);
     const {project, setProject} = useContext(ProjectContext);
     const {isFilterInteracting} = useContext(FilterInteractionContext);
 

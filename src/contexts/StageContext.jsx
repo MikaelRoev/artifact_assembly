@@ -8,7 +8,7 @@ import {emitter} from "../util/EventEmitter";
  * The stage reference context that allows for using the reference to konva stage in the stage area.
  * @type {React.Context<null>}
  */
-const StageRefContext = createContext(null);
+const StageContext = createContext(null);
 
 /**
  * Provider for the stage reference context that allows for using the reference to konva stage in the stage area.
@@ -16,7 +16,7 @@ const StageRefContext = createContext(null);
  * @return {JSX.Element} the context provider.
  * @constructor
  */
-export const StageRefContextProvider = ({children}) => {
+export const StageContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
     const [state, setState, undoState, redoState] = useHistory([], 20);
@@ -428,10 +428,10 @@ export const StageRefContextProvider = ({children}) => {
     }
 
     return (
-        <StageRefContext.Provider value={providerValues}>
+        <StageContext.Provider value={providerValues}>
             {children}
-        </StageRefContext.Provider>
+        </StageContext.Provider>
     );
 }
 
-export default StageRefContext;
+export default StageContext;
