@@ -4,7 +4,6 @@ import {appWindow} from "@tauri-apps/api/window";
 import {openProjectDialog} from "../../util/FileHandling";
 import ProjectList from "../../components/ProjectList/ProjectList";
 import ProjectContext from "../../contexts/ProjectContext";
-import StageContext from "../../contexts/StageContext";
 import "./LandingPage.css";
 
 /**
@@ -16,7 +15,8 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     const {setProject} = useContext(ProjectContext);
-    const [projectElements, setProjectElements] = useState([]);
+    //const [projectElements, setProjectElements] = useState([]);
+    let projectElements = [];
 
     /**
      * Closes the application.
@@ -29,8 +29,12 @@ const LandingPage = () => {
      * Opens dialog window and goes to canvas of selected project.
      */
     function handleOpenProjectClick() {
-        openProjectDialog(setProject, setProjectElements)
-            .then(() => navigate("/canvas", { state: { projectElements: projectElements }}))
+        openProjectDialog(setProject, (elements) => {
+            projectElements = elements;
+        })
+            .then(() => {
+                navigate("/canvas", {state: {projectElements: projectElements} });
+            })
             .catch(error => {
                 if (error) console.error("Failed to open project:", error);
             });
@@ -40,7 +44,7 @@ const LandingPage = () => {
      * Opens the canvas page.
      */
     function handleNewProjectClick() {
-        navigate("/canvas")
+        navigate("/canvas", {state: {projectElements: projectElements} });
     }
 
     return (

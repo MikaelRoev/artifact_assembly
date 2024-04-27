@@ -3,6 +3,7 @@ import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
 import {emitter} from "../util/EventEmitter";
+import {useLocation} from "react-router-dom";
 
 /**
  * The stage reference context that allows for using the reference to konva stage in the stage area.
@@ -19,9 +20,13 @@ const StageContext = createContext(null);
 export const StageContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
-    const [state, setState, undoState, redoState] = useHistory([], 20);
+    const [historyState, setState, undoState, redoState] = useHistory([], 20);
 
     const [isLocked, setIsLocked] = useState(false);
+
+    const {state} = useLocation();
+    const {projectElements} = state;
+    console.log(projectElements);
 
     /**
      * Getter for the whole stage.
@@ -126,7 +131,7 @@ export const StageContextProvider = ({children}) => {
      * @return {number} the index of the element in the state.
      */
     function findIndexInState(id) {
-        return state.findIndex((element) => element.id === id);
+        return historyState.findIndex((element) => element.id === id);
     }
 
     /**
@@ -208,7 +213,7 @@ export const StageContextProvider = ({children}) => {
      * }[]} is the list of state values of the images that is needed to create konva images.
      */
     function addMultipleImages(imageStates) {
-        const newState = [...state];
+        const newState = [...historyState];
         imageStates.forEach(imageState => {
             addImage(imageState);
             newState.push(imageState);
@@ -234,11 +239,11 @@ export const StageContextProvider = ({children}) => {
      */
     function addChanges(id, changes, overwrite) {
         const index = findIndexInState(id);
-        state[index] = {
-            ...state[index],
+        historyState[index] = {
+            ...historyState[index],
             ...changes
         };
-        setState(state, overwrite);
+        setState(historyState, overwrite);
     }
 
     /**
@@ -307,7 +312,7 @@ export const StageContextProvider = ({children}) => {
             element.destroy();
         })
 
-        const newState = state.filter((elementState) => !isSelected(elementState));
+        const newState = historyState.filter((elementState) => !isSelected(elementState));
         setState(newState);
 
         getSelectTransformer().nodes([]);
@@ -372,7 +377,7 @@ export const StageContextProvider = ({children}) => {
         const konvaIdSet = new Set(getAllElements().map(element => element.id()));
 
         getAllElements().forEach(element => {
-            const stateElement = state.find(e => e.id === element.id());
+            const stateElement = historyState.find(e => e.id === element.id());
             if (stateElement) {
                 element.attrs = {
                     ...element.attrs,
@@ -383,11 +388,11 @@ export const StageContextProvider = ({children}) => {
             }
         })
 
-        state.filter(element => !konvaIdSet.has(element.id)).forEach(element => {
+        historyState.filter(element => !konvaIdSet.has(element.id)).forEach(element => {
             if (element.type === "Image") addImage(element);
             else if (element ==="Group") addGroup(element);
         })
-    }, [addGroup, addImage, getAllElements, state]);
+    }, [addGroup, addImage, getAllElements, historyState]);
 
     function undo() {
         undoState();
@@ -420,7 +425,7 @@ export const StageContextProvider = ({children}) => {
         deleteSelected,
         groupSelected,
 
-        state,
+        state: historyState,
         undo,
         redo,
         isLocked,
