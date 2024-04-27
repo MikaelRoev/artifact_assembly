@@ -20,7 +20,7 @@ const StageContext = createContext(null);
 export const StageContextProvider = ({children}) => {
     const stageRef = useRef(null);
 
-    const [historyState, setState, undoState, redoState] = useHistory([], 20);
+    const [historyState, setHistoryState, undoState, redoState] = useHistory([], 20);
 
     const [isLocked, setIsLocked] = useState(false);
 
@@ -121,8 +121,8 @@ export const StageContextProvider = ({children}) => {
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
     function getAllElements() {
-        const stage = getStage();
-        return stage ? [...getSelectedElements(), ...getStaticLayer().getChildren()] : [];
+        const staticLayer = getStaticLayer();
+        return staticLayer ? [...getSelectedElements(), ...staticLayer.getChildren()] : [];
     }
 
     /**
@@ -135,13 +135,13 @@ export const StageContextProvider = ({children}) => {
     }
 
     /**
-     * Makes a konva image.
+     * Makes and add a konva image into a container.
      * @param imageProps {{
      * id: {string}
      * x: {number}
      * y: {number}
-     * filePath: {string}}}
-     * @param callback {function(Konva.Image)} for when the image is done loading.
+     * filePath: {string}}} needed to make the konva image.
+     * @param container {Konva.Container} to add the image into.
      */
     function makeImage(imageProps, callback) {
         const filePath = imageProps.filePath;
@@ -204,13 +204,14 @@ export const StageContextProvider = ({children}) => {
 
 
     /**
-     * Makes and adds konva images.
-     * @param imageStates {{
+     * Makes and adds multiple konva images into a container.
+     * @param imageProps {{
      * id: {string}
      * x: {number}
      * y: {number}
      * filePath: {string}
-     * }[]} is the list of state values of the images that is needed to create konva images.
+     * }[]} is the list of values of the images that is needed to make the konva images.
+     * @param container {Konva.Container} to add the images into.
      */
     function addMultipleImages(imageStates) {
         const newState = [...historyState];
@@ -219,6 +220,8 @@ export const StageContextProvider = ({children}) => {
             newState.push(imageState);
         })
         setState(newState);
+        setHistoryState();
+    }
     }
 
     /**
@@ -226,7 +229,7 @@ export const StageContextProvider = ({children}) => {
      * @param elements {Object[]}
      */
     function setElements(elements) {
-        setState(elements, false);
+        setHistoryState(elements, false);
     }
 
     /**
@@ -243,7 +246,7 @@ export const StageContextProvider = ({children}) => {
             ...historyState[index],
             ...changes
         };
-        setState(historyState, overwrite);
+        setHistoryState(historyState, overwrite);
     }
 
     /**
@@ -313,7 +316,7 @@ export const StageContextProvider = ({children}) => {
         })
 
         const newState = historyState.filter((elementState) => !isSelected(elementState));
-        setState(newState);
+        setHistoryState(newState);
 
         getSelectTransformer().nodes([]);
     }

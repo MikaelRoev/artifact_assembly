@@ -59,9 +59,10 @@ const StageArea = () => {
      * Changes the ability to rotate and drag the selected elements when isLocked changes.
      */
     useEffect(() => {
-        if (!getStage()) return;
-        getSelectTransformer().rotateEnabled(!isLocked);
-        getSelectedElements().forEach(element => element.draggable(!isLocked));
+        const selectTransformer = getSelectTransformer();
+        if (!selectTransformer) return;
+        selectTransformer.rotateEnabled(!isLocked);
+        selectTransformer.forEach(element => element.draggable(!isLocked));
     }, [getSelectTransformer, getSelectedElements, getStage, isLocked]);
 
     /**
