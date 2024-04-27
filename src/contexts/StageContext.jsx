@@ -204,7 +204,7 @@ export const StageContextProvider = ({children}) => {
      */
     function addMultipleImages(imageProps, container) {
         imageProps.forEach(imageState => {
-            addImage(imageState);
+            addImage(imageState, container);
         })
         setHistoryState(historyState => [...historyState, ...imageProps]);
     }
@@ -217,18 +217,18 @@ export const StageContextProvider = ({children}) => {
     function addGroup(groupProps, container) {
         const group = new Konva.Group();
         groupProps.groupElements.forEach(groupElement => {
-            addImage(groupElement, (image) => group.add(image));
+            addImage(groupElement, group);
         })
         container.add(group);
     }
     
-    function addElement(elementProps, callback) {
+    function addElement(elementProps, container) {
         switch (elementProps.type) {
             case "Image":
-                addImage(elementProps, callback);
+                addImage(elementProps, container);
                 break;
             case "Group":
-                addGroup(elementProps, callback);
+                addGroup(elementProps, container);
                 break;
             default:
                 break;
@@ -387,8 +387,8 @@ export const StageContextProvider = ({children}) => {
         })
 
         historyState.filter(element => !konvaIdSet.has(element.id)).forEach(element => {
-            if (element.type === "Image") addImage(element);
-            else if (element ==="Group") addGroup(element);
+            if (element.type === "Image") addImage(element, getStaticLayer());
+            else if (element ==="Group") addGroup(element, getStaticLayer());
         })
     }, [addGroup, addImage, getAllElements, historyState]);
 
