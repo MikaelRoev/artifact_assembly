@@ -206,7 +206,7 @@ export const StageContextProvider = ({children}) => {
         imageProps.forEach(imageState => {
             addImage(imageState);
         })
-        setHistoryState();
+        setHistoryState(historyState => [...historyState, ...imageProps]);
     }
 
     /**

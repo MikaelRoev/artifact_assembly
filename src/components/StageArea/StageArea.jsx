@@ -60,9 +60,10 @@ const StageArea = () => {
      */
     useEffect(() => {
         const selectTransformer = getSelectTransformer();
-        if (!selectTransformer) return;
+        const selectElements = getSelectedElements();
+        if (!selectTransformer || !selectElements) return;
         selectTransformer.rotateEnabled(!isLocked);
-        selectTransformer.forEach(element => element.draggable(!isLocked));
+        selectElements.forEach(element => element.draggable(!isLocked));
     }, [getSelectTransformer, getSelectedElements, getStage, isLocked]);
 
     /**
