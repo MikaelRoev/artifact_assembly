@@ -28,6 +28,31 @@ export const StageContextProvider = ({children}) => {
     const {projectElements} = state;
     console.log(projectElements);
 
+
+    /**
+     * Initializes the stage, by creating it, and creating the two layers
+     */
+    useEffect(function initializeStage() {
+        const staticLayer = new Konva.Layer({id: "static-layer"});
+        const selectLayer = new Konva.Layer({id: "select-layer"});
+
+        const selectTransformer = new Konva.Transformer({id: "select-transformer"});
+        selectTransformer.resizeEnabled(false);
+        
+        projectElements.forEach(element => {
+            addElement(element, staticLayer);
+        })
+        
+        selectLayer.add(selectTransformer);
+        getStage().add(staticLayer, selectLayer);
+        
+        return () => {
+            emitter.off("imageLoaded",image => staticLayer.add(image));
+            selectLayer.destroy();
+            staticLayer.destroy();
+        }
+    }, [addElement, projectElements]);
+    
     /**
      * Getter for the whole stage.
      * @return {Konva.Stage | null} the stage.
@@ -41,12 +66,7 @@ export const StageContextProvider = ({children}) => {
     function getSelectLayer() {
         const stage = getStage();
         if (!stage) return null;
-        let selectLayer = stage.findOne("#select-layer");
-        if (!selectLayer) {
-            initializeStage();
-            selectLayer = stage.findOne("#select-layer");
-        }
-        return selectLayer;
+        return stage.findOne("#select-layer");
     }
 
     /**
@@ -56,12 +76,7 @@ export const StageContextProvider = ({children}) => {
     function getStaticLayer() {
         const stage = getStage();
         if (!stage) return null;
-        let staticLayer = stage.findOne("#static-layer");
-        if (!staticLayer) {
-            initializeStage();
-            staticLayer = stage.findOne("#static-layer");
-        }
-        return staticLayer;
+        return stage.findOne("#static-layer");
     }
 
     /**
@@ -143,7 +158,7 @@ export const StageContextProvider = ({children}) => {
      * filePath: {string}}} needed to make the konva image.
      * @param container {Konva.Container} to add the image into.
      */
-    function makeImage(imageProps, callback) {
+    function addImage(imageProps, container) {
         const filePath = imageProps.filePath;
         const url = convertFileSrc(filePath);
 
@@ -171,37 +186,11 @@ export const StageContextProvider = ({children}) => {
                 document.body.style.cursor = "default";
             });
 
-            callback(image);
+            container.add(image);
 
-            emitter.emit('imageDrawn', image);
+            emitter.emit('imageMade', image);
         })
     }
-
-    /**
-     * Makes and adds a konva image to the static layer.
-     * @param imageProps {{
-     * id: {string}
-     * x: {number}
-     * y: {number}
-     * filePath: {string}
-     * }} is the state values of the image that is needed to create a konva image.
-     */
-    function addImage(imageProps) {
-        makeImage(imageProps, (image) => getStaticLayer().add(image));
-    }
-
-    /**
-     * Makes and adds a Konva group and its children
-     * @param groupProps {{groupElements: Object[]}}
-     */
-    function addGroup(groupProps) {
-        const group = new Konva.Group();
-        groupProps.groupElements.forEach(groupElement => {
-            makeImage(groupElement, (image) => group.add(image));
-        })
-        getStaticLayer()?.add(group);
-    }
-
 
     /**
      * Makes and adds multiple konva images into a container.
@@ -213,15 +202,37 @@ export const StageContextProvider = ({children}) => {
      * }[]} is the list of values of the images that is needed to make the konva images.
      * @param container {Konva.Container} to add the images into.
      */
-    function addMultipleImages(imageStates) {
-        const newState = [...historyState];
-        imageStates.forEach(imageState => {
+    function addMultipleImages(imageProps, container) {
+        imageProps.forEach(imageState => {
             addImage(imageState);
-            newState.push(imageState);
         })
-        setState(newState);
         setHistoryState();
     }
+
+    /**
+     * Makes and add a konva group into a container.
+     * @param groupProps {{groupElements: Object[]}} needed to make the konva group containing its children.
+     * @param container {Konva.Container} to add the group into.
+     */
+    function addGroup(groupProps, container) {
+        const group = new Konva.Group();
+        groupProps.groupElements.forEach(groupElement => {
+            addImage(groupElement, (image) => group.add(image));
+        })
+        container.add(group);
+    }
+    
+    function addElement(elementProps, callback) {
+        switch (elementProps.type) {
+            case "Image":
+                addImage(elementProps, callback);
+                break;
+            case "Group":
+                addGroup(elementProps, callback);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -306,7 +317,6 @@ export const StageContextProvider = ({children}) => {
         return getSelectedElements().some(selectedElement => selectedElement.id() === element.id());
     }
 
-
     /**
      * Delete all selected elements.
      */
@@ -356,21 +366,6 @@ export const StageContextProvider = ({children}) => {
         select(group);
         console.log("this layer should have a group: ", getSelectLayer())
         console.log("transform nodes after: ", getSelectTransformer().nodes())
-    }
-
-    /**
-     * Initializes the stage, by creating it, and creating the two layers
-     */
-    function initializeStage() {
-        const staticLayer = new Konva.Layer({id: "static-layer"});
-        const selectLayer = new Konva.Layer({id: "select-layer"});
-
-        const selectTransformer = new Konva.Transformer({id: "select-transformer"});
-        selectTransformer.resizeEnabled(false);
-        selectTransformer.rotateEnabled(!isLocked);
-
-        selectLayer.add(selectTransformer);
-        getStage().add(staticLayer, selectLayer);
     }
 
     /**
