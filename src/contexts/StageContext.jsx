@@ -18,7 +18,7 @@ const StageContext = createContext(null);
  * @constructor
  */
 export const StageContextProvider = ({children}) => {
-    const stageRef = useRef(null);
+    const [stage, setStage] = useState(null);
 
     const [historyState, setHistoryState, undoState, redoState] = useHistory([], 20);
 
@@ -26,30 +26,33 @@ export const StageContextProvider = ({children}) => {
 
     const {state} = useLocation();
     const {projectElements} = state;
-    console.log(projectElements);
-
 
     /**
      * Initializes the stage, by creating it, and creating the two layers
      */
     useEffect(function initializeStage() {
+        const newStage = new Konva.Stage({
+            container: "stage-area",
+            width: window.innerWidth,
+            height: window.innerHeight,
+            draggable: true,
+        });
+
         const staticLayer = new Konva.Layer({id: "static-layer"});
         const selectLayer = new Konva.Layer({id: "select-layer"});
 
         const selectTransformer = new Konva.Transformer({id: "select-transformer"});
         selectTransformer.resizeEnabled(false);
-        
+
+        selectLayer.add(selectTransformer);
         projectElements.forEach(element => {
             addElement(element, staticLayer);
-        })
-        
-        selectLayer.add(selectTransformer);
-        getStage().add(staticLayer, selectLayer);
+        });
+        newStage.add(staticLayer, selectLayer);
+        setStage(newStage);
         
         return () => {
-            emitter.off("imageLoaded",image => staticLayer.add(image));
-            selectLayer.destroy();
-            staticLayer.destroy();
+            newStage.destroy();
         }
     }, [addElement, projectElements]);
     
@@ -57,7 +60,7 @@ export const StageContextProvider = ({children}) => {
      * Getter for the whole stage.
      * @return {Konva.Stage | null} the stage.
      */
-    const getStage = () => stageRef.current;
+    const getStage = () => stage;
 
     /**
      * Getter for the select layer.
@@ -401,7 +404,6 @@ export const StageContextProvider = ({children}) => {
     }
 
     const providerValues = {
-        stageRef,
         getStage,
         getStaticLayer,
         getAllElements,

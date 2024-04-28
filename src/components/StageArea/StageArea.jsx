@@ -1,5 +1,4 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {Stage} from "react-konva";
 import {saveProjectDialog} from "../../util/FileHandling"
 import {getHueData} from "../../util/ImageManupulation";
 import ProjectContext from "../../contexts/ProjectContext";
@@ -17,7 +16,6 @@ const StageArea = () => {
     const [shiftPressed, setShiftPressed] = useState(false);
 
     const {
-        stageRef,
         getStage,
         getSelectTransformer,
         getSelectedElements,
@@ -318,8 +316,9 @@ const StageArea = () => {
     }, [addChanges, getAllElements]);
 
     return (
+        <div id="stage-area"/>
+        /*
         <Stage
-            ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
             draggable={true}
@@ -328,6 +327,8 @@ const StageArea = () => {
             onMouseDown={checkDeselect}
             onTouchStart={checkDeselect}>
         </Stage>
+
+         */
     );
 };
 
