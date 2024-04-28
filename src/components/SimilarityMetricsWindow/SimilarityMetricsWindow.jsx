@@ -51,7 +51,7 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {getStage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageContext);
+    const {stage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageContext);
     //TODO: change name of context: filter interaction?
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
@@ -70,16 +70,16 @@ const SimilarityMetricsWindow = () => {
         if (!isSimilarityMetricsWindowOpen) return;
         const element = document.getElementById("scoreWindow");
         const dragFrom = element.querySelector(".window-top");
-        makeDraggable(element, dragFrom, getStage());
-    }, [getStage, isSimilarityMetricsWindowOpen]);
+        makeDraggable(element, dragFrom, stage);
+    }, [stage, isSimilarityMetricsWindowOpen]);
 
     /**
      * Resizes the window.
      */
     useEffect(() => {
         if (!isSimilarityMetricsWindowOpen) return;
-        makeResizable(document.getElementById("scoreWindow"), 10, getStage());
-    }, [getStage, isSimilarityMetricsWindowOpen]);
+        makeResizable(document.getElementById("scoreWindow"), 10, stage);
+    }, [stage, isSimilarityMetricsWindowOpen]);
 
 
     /**

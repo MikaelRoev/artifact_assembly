@@ -46,7 +46,7 @@ export const FilterWindowContextProvider = ({children}) => {
 const FilterWindow = () => {
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
-    const {getStage, getSelectedImages, isAnySelectedImages, addChanges} = useContext(StageContext);
+    const {stage, getSelectedImages, isAnySelectedImages, addChanges} = useContext(StageContext);
 
     const hueMax = 359;
     const hueMin = 0;
@@ -93,8 +93,8 @@ const FilterWindow = () => {
         if (!isFilterWindowOpen) return;
         const element = document.querySelector(".filterWindow");
         const dragFrom = element.querySelector(".filterWindowHeader");
-        makeDraggable(element, dragFrom, getStage());
-    }, [getStage, isFilterWindowOpen]);
+        makeDraggable(element, dragFrom, stage);
+    }, [stage, isFilterWindowOpen]);
 
     /**
      * On creation, adds prevent right-click on the filter window.

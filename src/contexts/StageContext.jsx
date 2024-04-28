@@ -1,4 +1,4 @@
-import React, {createContext, useEffect, useState} from "react";
+import React, {createContext, useCallback, useEffect, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -26,6 +26,32 @@ export const StageContextProvider = ({children}) => {
 
     const {state} = useLocation();
     const {projectElements} = state;
+    
+    /**
+     * Makes and add a konva group into a container.
+     * @param groupProps {{groupElements: Object[]}} needed to make the konva group containing its children.
+     * @param container {Konva.Container} to add the group into.
+     */
+    const addGroup = useCallback((groupProps, container) => {
+        const group = new Konva.Group();
+        groupProps.groupElements.forEach(groupElement => {
+            addImage(groupElement, group);
+        })
+        container.add(group);
+    }, []);
+
+    const addElement = useCallback( (elementProps, container) => {
+        switch (elementProps.type) {
+            case "Image":
+                addImage(elementProps, container);
+                break;
+            case "Group":
+                addGroup(elementProps, container);
+                break;
+            default:
+                break;
+        }
+    }, [addGroup]);
 
     /**
      * Initializes the stage, by creating it, and creating the two layers
@@ -55,19 +81,12 @@ export const StageContextProvider = ({children}) => {
             newStage.destroy();
         }
     }, [addElement, projectElements]);
-    
-    /**
-     * Getter for the whole stage.
-     * @return {Konva.Stage | null} the stage.
-     */
-    const getStage = () => stage;
 
     /**
      * Getter for the select layer.
      * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
      */
     function getSelectLayer() {
-        const stage = getStage();
         if (!stage) return null;
         return stage.findOne("#select-layer");
     }
@@ -77,7 +96,6 @@ export const StageContextProvider = ({children}) => {
      * @return {Konva.Layer | null} the static layer in the stage or null if it could not find it.
      */
     function getStaticLayer() {
-        const stage = getStage();
         if (!stage) return null;
         return stage.findOne("#static-layer");
     }
@@ -114,7 +132,6 @@ export const StageContextProvider = ({children}) => {
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
     function getAllImages() {
-        const stage = getStage();
         return stage ? stage.find(node => node instanceof Konva.Image) : [];
     }
 
@@ -138,10 +155,10 @@ export const StageContextProvider = ({children}) => {
      * Getter for all the elements in the stage.
      * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
      */
-    function getAllElements() {
+    const getAllElements = useCallback(() => {
         const staticLayer = getStaticLayer();
         return staticLayer ? [...getSelectedElements(), ...staticLayer.getChildren()] : [];
-    }
+    }, [getSelectedElements, getStaticLayer]);
 
     /**
      * Finds the index of the element in the state by id.
@@ -210,32 +227,6 @@ export const StageContextProvider = ({children}) => {
             addImage(imageState, staticLayer);
         })
         setHistoryState(historyState => [...historyState, ...imageProps]);
-    }
-
-    /**
-     * Makes and add a konva group into a container.
-     * @param groupProps {{groupElements: Object[]}} needed to make the konva group containing its children.
-     * @param container {Konva.Container} to add the group into.
-     */
-    function addGroup(groupProps, container) {
-        const group = new Konva.Group();
-        groupProps.groupElements.forEach(groupElement => {
-            addImage(groupElement, group);
-        })
-        container.add(group);
-    }
-    
-    function addElement(elementProps, container) {
-        switch (elementProps.type) {
-            case "Image":
-                addImage(elementProps, container);
-                break;
-            case "Group":
-                addGroup(elementProps, container);
-                break;
-            default:
-                break;
-        }
     }
 
     /**
@@ -393,7 +384,7 @@ export const StageContextProvider = ({children}) => {
             if (element.type === "Image") addImage(element, getStaticLayer());
             else if (element ==="Group") addGroup(element, getStaticLayer());
         })
-    }, [addGroup, addImage, getAllElements, historyState]);
+    }, [addGroup, getAllElements, getStaticLayer, historyState]);
 
     function undo() {
         undoState();
@@ -404,7 +395,7 @@ export const StageContextProvider = ({children}) => {
     }
 
     const providerValues = {
-        getStage,
+        stage,
         getStaticLayer,
         getAllElements,
         getAllImages,

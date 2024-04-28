@@ -16,7 +16,7 @@ const StageArea = () => {
     const [shiftPressed, setShiftPressed] = useState(false);
 
     const {
-        getStage,
+        stage,
         getSelectTransformer,
         getSelectedElements,
         getAllImages,
@@ -46,12 +46,11 @@ const StageArea = () => {
      * Update the stage according to the project.
      */
     useEffect(() => {
-        const stage = getStage();
         if (!stage) return;
         stage.position({x: project.x, y: project.y});
         stage.scale({x: project.zoom, y: project.zoom});
         stage.batchDraw();
-    }, [getStage, project.x, project.y, project.zoom]);
+    }, [stage, project.x, project.y, project.zoom]);
 
     /**
      * Changes the ability to rotate and drag the selected elements when isLocked changes.
@@ -62,7 +61,7 @@ const StageArea = () => {
         if (!selectTransformer || !selectElements) return;
         selectTransformer.rotateEnabled(!isLocked);
         selectElements.forEach(element => element.draggable(!isLocked));
-    }, [getSelectTransformer, getSelectedElements, getStage, isLocked]);
+    }, [getSelectTransformer, getSelectedElements, isLocked]);
 
     /**
      * Sets up and cleans up the delete event listener.
@@ -187,7 +186,6 @@ const StageArea = () => {
     function zoomStage(e) {
         e.evt.preventDefault();
 
-        const stage = getStage();
         if (!stage) {
             return;
         }
