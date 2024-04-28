@@ -21,7 +21,7 @@ const NavBar = () => {
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {project, setProject} = useContext(ProjectContext);
-    const {getStage, getAllImages, getSelectedElements, setElements, addMultipleImages,
+    const {getStage, getAllImages, getSelectedElements, setElements, loadInImages,
         groupSelected, state, undo, redo, isLocked, setIsLocked} = useContext(StageContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
@@ -101,7 +101,7 @@ const NavBar = () => {
                 position.y += yOffset;
                 return imageState;
             });
-            addMultipleImages(imageStates);
+            loadInImages(imageStates);
         }
         setIsLoading(false);
         handleFileButtonClick()

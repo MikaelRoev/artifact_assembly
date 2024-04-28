@@ -1,4 +1,4 @@
-import React, {createContext, useEffect, useRef, useState} from "react";
+import React, {createContext, useEffect, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -196,18 +196,18 @@ export const StageContextProvider = ({children}) => {
     }
 
     /**
-     * Makes and adds multiple konva images into a container.
+     * Makes and adds multiple konva images into a container and commits to the history.
      * @param imageProps {{
      * id: {string}
      * x: {number}
      * y: {number}
      * filePath: {string}
      * }[]} is the list of values of the images that is needed to make the konva images.
-     * @param container {Konva.Container} to add the images into.
      */
-    function addMultipleImages(imageProps, container) {
+    function loadInImages (imageProps) {
+        const staticLayer = getStaticLayer();
         imageProps.forEach(imageState => {
-            addImage(imageState, container);
+            addImage(imageState, staticLayer);
         })
         setHistoryState(historyState => [...historyState, ...imageProps]);
     }
@@ -410,7 +410,7 @@ export const StageContextProvider = ({children}) => {
         getAllImages,
         isAnyImages,
         setElements,
-        addMultipleImages,
+        loadInImages,
         addChanges,
 
         getSelectTransformer,
