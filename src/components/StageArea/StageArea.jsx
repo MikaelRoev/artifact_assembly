@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {saveProjectDialog} from "../../util/FileHandling"
 import {getHueData} from "../../util/ImageManupulation";
 import ProjectContext from "../../contexts/ProjectContext";
@@ -68,7 +68,6 @@ const StageArea = () => {
      * Sets up and cleans up the delete event listener.
      */
     useEffect(() => {
-
         /**
          * Deletes the selected elements if the delete key is pressed.
          * @param e{KeyboardEvent} the event.
@@ -133,6 +132,8 @@ const StageArea = () => {
      * Set up and cleans up the select key check.
      */
     useEffect(() => {
+        if (!stage) return;
+        
         /**
          * The selection keys down event handler.
          * @param e{KeyboardEvent}
@@ -166,47 +167,65 @@ const StageArea = () => {
             document.removeEventListener("keydown", handleSelectKeyDown);
             document.removeEventListener("keyup", handleSelectKeyUp);
         };
-    }, []);
+    }, [stage]);
 
-    /**
-     * Deselects when the mouse left-clicks on an empty area on the canvas
-     * and ctrl key is not pressed.
-     * @param e{KonvaEventObject<MouseEvent>} the event.
-     */
-    const checkDeselect = useCallback((e) => {
-        if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
-            deselectAll();
-        }
-    }, [ctrlPressed, deselectAll, shiftPressed]);
+    useEffect(() => {
+        if (!stage) return;
 
-    /**
-     * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
-     *
-     * @param e{KonvaEventObject} - The event object containing information about the scroll event.
-     */
-    function zoomStage(e) {
-        e.evt.preventDefault();
-
-        if (!stage) {
-            return;
+        /**
+         * Deselects when the mouse left-clicks on an empty area on the canvas
+         * and ctrl key is not pressed.
+         * @param e{KonvaEventObject<MouseEvent>} the event.
+         */
+        const checkDeselect = (e) => {
+            if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
+                deselectAll();
+            }
         }
 
-        const oldScale = stage.scaleX();
-        const pointer = stage.getPointerPosition();
-        const mousePointTo = {
-            x: (pointer.x - stage.x()) / oldScale,
-            y: (pointer.y - stage.y()) / oldScale,
+        stage.on("mousedown", checkDeselect);
+        stage.on("touchstart", checkDeselect);
+
+        return () => {
+            stage.off("mousedown", checkDeselect);
+            stage.off("touchstart", checkDeselect);
         };
+    }, [ctrlPressed, deselectAll, shiftPressed, stage]);
+    
+    useEffect(() => {
+        if (!stage) return;
 
-        const zoomFactor = e.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
-        const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
-        setProject({
-            ...project,
-            zoom: newScale,
-            x: pointer.x - mousePointTo.x * newScale,
-            y: pointer.y - mousePointTo.y * newScale,
-        });
-    }
+        /**
+         * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
+         *
+         * @param e{KonvaEventObject} - The event object containing information about the scroll event.
+         */
+        function zoomStage(e) {
+            e.evt.preventDefault();
+
+            const oldScale = stage.scaleX();
+            const pointer = stage.getPointerPosition();
+            const mousePointTo = {
+                x: (pointer.x - stage.x()) / oldScale,
+                y: (pointer.y - stage.y()) / oldScale,
+            };
+
+            const zoomFactor = e.evt.deltaY < 0 ? zoomScale : 1 / zoomScale;
+            const newScale = clamp(oldScale * zoomFactor, zoomMin, zoomMax);
+            setProject({
+                ...project,
+                zoom: newScale,
+                x: pointer.x - mousePointTo.x * newScale,
+                y: pointer.y - mousePointTo.y * newScale,
+            });
+        }
+
+        stage.on("wheel", zoomStage);
+
+        return () => {
+            stage.off("wheel", zoomStage);
+        }
+    }, [project, setProject, stage]);
 
     /**
      * useEffect for updating image dimensions
@@ -305,18 +324,6 @@ const StageArea = () => {
 
     return (
         <div id="stage-area"/>
-        /*
-        <Stage
-            width={window.innerWidth}
-            height={window.innerHeight}
-            draggable={true}
-            className="stage"
-            onWheel={zoomStage}
-            onMouseDown={checkDeselect}
-            onTouchStart={checkDeselect}>
-        </Stage>
-
-         */
     );
 };
 
