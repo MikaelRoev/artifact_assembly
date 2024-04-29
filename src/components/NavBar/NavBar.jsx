@@ -56,7 +56,7 @@ const NavBar = () => {
      *  false if there are no elements at the position.
      */
     function isAnyElementAtPosition(position) {
-        return elements.some((element) => {
+        return elements.some(element => {
             return element.x === position.x && element.y === position.y
         })
     }
@@ -103,7 +103,7 @@ const NavBar = () => {
                 idAdder++
                 position.x += xOffset;
                 position.y += yOffset;
-                return newImage
+                return newImage;
             });
             setElements([...elements, ...newImages]);
         }

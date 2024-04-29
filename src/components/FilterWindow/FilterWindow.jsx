@@ -163,7 +163,7 @@ const FilterWindow = () => {
     /**
      * Resets the filters on the filter image.
      */
-    const resetFilter = () => {
+    function resetFilter() {
         setValue("hue", 0);
         setValue("saturation", 0);
         setValue("value", 0); //Value is Brightness
@@ -182,7 +182,7 @@ const FilterWindow = () => {
         root.style.setProperty("--mask", 0)
         root.style.setProperty("--invert-first", 0);
         root.style.setProperty("--invert-last", 100);
-    };
+    }
 
     /**
      * Sets the value of the parameter on all the selected images.
@@ -301,8 +301,8 @@ const FilterWindow = () => {
                         id={"invertToggle"}
                         setValue={() => {
                             if (images.length === 0) return;
-                            const invert = getBool("invert");
-                            setBool("invert", !invert);
+                            const invert = !getBool("invert");
+                            setBool("invert", invert);
                             updateBrightnessStyle(getValue("value"), invert);
                             if (invert) {
                                 root.style.setProperty("--invert-first", 100);

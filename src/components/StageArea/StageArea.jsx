@@ -9,6 +9,7 @@ import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import StageRefContext from "../../contexts/StageRefContext";
+import {clamp} from "../../util/Operations";
 
 /**
  * Component that represents the konva stage area in the canvas page.
@@ -82,6 +83,7 @@ const StageArea = () => {
                 deselectAll();
             }
         }
+
         document.addEventListener("keydown", handleDeletePressed);
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
@@ -96,12 +98,12 @@ const StageArea = () => {
          * Saves the project if ctrl + S is pressed.
          * @param e{KeyboardEvent} the event.
          */
-        const handleSavePressed = (e) => {
-            if (e.ctrlKey && e.key === "s") {
+        function handleSavePressed(e) {
+            if (e.ctrlKey && (e.key.toUpperCase() === "S")) {
                 e.preventDefault();
                 saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
             }
-        };
+        }
         document.addEventListener("keydown", handleSavePressed);
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
@@ -209,17 +211,6 @@ const StageArea = () => {
             x: pointer.x - mousePointTo.x * newScale,
             y: pointer.y - mousePointTo.y * newScale,
         });
-    }
-
-    /**
-     * Clamps a numeric value between a minimum and maximum range.
-     * @param {number} value - The numeric value to be clamped.
-     * @param {number} min - The minimum value of the range.
-     * @param {number} max - The maximum value of the range.
-     * @returns {number} The clamped value.
-     */
-    function clamp(value, min, max){
-        return Math.min(Math.max(value, min), max);
     }
 
     /**
