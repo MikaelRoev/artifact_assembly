@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useState} from "react";
-import {exportCanvasAsImageDialog} from "../../util/FileHandling";
+import {exportCanvasAsImageDialog} from "../../util/TauriDialogWondows"
 import StageRefContext from "../../contexts/StageRefContext";
 import "./ExportImageModal.css"
 

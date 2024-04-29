@@ -1,11 +1,10 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {open} from "@tauri-apps/api/dialog";
-import {openProjectDialog, saveProjectDialog} from "../../util/FileHandling";
+import {openProjectDialog, saveProjectDialog} from "../../util/TauriDialogWondows";
 import LockedContext from "../../contexts/LockedContext";
 import ElementContext from "../../contexts/ElementContext";
 import ProjectContext from "../../contexts/ProjectContext";
-import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
@@ -29,7 +28,6 @@ const NavBar = () => {
     const {stageRef} = useContext(StageRefContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
-    const {selectedElementsIndex} = useContext(SelectContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {
         setIsConfirmModalOpen,

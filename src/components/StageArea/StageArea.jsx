@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Group, Layer, Stage, Transformer} from "react-konva";
-import {saveProjectDialog} from "../../util/FileHandling"
+import {saveProjectDialog} from "../../util/TauriDialogWondows"
 import {getHueData} from "../../util/ImageManupulation";
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
@@ -269,7 +269,10 @@ const StageArea = () => {
                     case "Group":
                         return (
                             renderGroup(element, index)
-
+                        );
+                    default:
+                        return (
+                          <></>
                         );
                 }
             })
