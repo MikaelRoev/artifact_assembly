@@ -198,7 +198,6 @@ const FilterWindow = () => {
      * @param bool {boolean} the new value of the parameter.
      */
     function setBool(parameter, bool) {
-        //TODO: fix set bool / toggle bug
         selectedImagesIndex.forEach((index) => {
             elements[index][parameter] = bool;
         });
@@ -286,15 +285,16 @@ const FilterWindow = () => {
                     <FilterToggle
                         label="Grayscale"
                         id={"grayscaleToggle"}
-                        setValue={() => {
+                        onToggle={() => {
                             if (!isAnySelectedImages) return;
                             setBool("grayscale", !getBool("grayscale"));
                         }}
+                        isChecked={getBool("grayscale")}
                     />
                     <FilterToggle
                         label="Invert"
                         id={"invertToggle"}
-                        setValue={() => {
+                        onToggle={() => {
                             if (!isAnySelectedImages) return;
                             const invert = !getBool("invert");
                             setBool("invert", invert);
@@ -307,6 +307,7 @@ const FilterWindow = () => {
                                 root.style.setProperty("--invert-last", 100);
                             }
                         }}
+                        isChecked={getBool("invert")}
                     />
                     <div className={"bottomButtons"}>
                         <button
