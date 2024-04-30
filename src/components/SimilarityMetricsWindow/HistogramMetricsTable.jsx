@@ -106,6 +106,7 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
 
     return (
         <div key={`table-${selectedImage.id}`} className={"tableDiv"}>
+            {/* TODO: make table sortable */}
             <table className={"score-table"}>
                 <thead>
                 <tr>
