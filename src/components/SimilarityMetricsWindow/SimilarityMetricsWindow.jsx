@@ -104,15 +104,15 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = stageRef.current.getChildren()[0].getChildren().filter((child) => child.getClassName() === "Image")
+        const imageNodes = stageRef.current.getChildren()[0].getChildren()
+            .filter((child) => child.getClassName() === "Image");
         for (const index of selectedElementsIndex) {
             for (const imageNode of imageNodes) {
-                if (elements[index].id === imageNode.attrs.id) {
-                    const newHues = await getHueData(imageNode.toDataURL())
-                    elements[index] = {
-                        ...elements[index],
-                        hueValues: newHues,
-                    }
+                if (elements[index].id !== imageNode.attrs.id) continue;
+                const newHues = await getHueData(imageNode.toDataURL())
+                elements[index] = {
+                    ...elements[index],
+                    hueValues: newHues,
                 }
             }
         }
