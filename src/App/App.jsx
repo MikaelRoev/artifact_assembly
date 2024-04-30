@@ -6,6 +6,16 @@ import {ProjectContextProvider} from "../contexts/ProjectContext";
 import {ElementContextProvider} from "../contexts/ElementContext";
 import "./App.css";
 
+//TODO: see over all comments
+//TODO: write the README.md
+//TODO: check all deps
+//TODO: check const to function
+//TODO: css refactoring
+//TODO: refactor MVC?
+//TODO: unit tests
+//TODO: adding filters check.
+//TODO: make provider context values memo?
+
 /**
  * The application component.
  * @return {JSX.Element} the application component.

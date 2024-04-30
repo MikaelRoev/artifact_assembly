@@ -186,10 +186,10 @@ const SimilarityMetricsWindow = () => {
                     lowest = values.combined;
                     lowestElement = element;
                 }
-                const path = convertFileSrc(element.filePath)
+                const url = convertFileSrc(element.filePath)
                 rows.push(
                     <tr key={`${selectedElement.id}-${element.id}`}>
-                        <td className={"tableColumn1"}><img src={path} alt={"For table row"}/></td>
+                        <td className={"tableColumn1"}><img src={url} alt={"For table row"}/></td>
                         <td>{values.combined.toFixed(3)}</td>
                         <td>{values.euclideanDistance.toFixed(3)}</td>
                         <td>{values.bhattacharyyaDistance.toFixed(3)}</td>
@@ -199,22 +199,22 @@ const SimilarityMetricsWindow = () => {
             }
         })
 
-        const path = convertFileSrc(selectedElement.filePath);
-        const lowestPath = convertFileSrc(lowestElement.filePath);
+        const url = convertFileSrc(selectedElement.filePath);
+        const lowestUrl = convertFileSrc(lowestElement.filePath);
         return (
             <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
                 <div className={"info-div"}>
                     <p>The most similar element to</p>
-                    <img src={path} alt={"For information"}
+                    <img src={url} alt={"For information"}
                          className={"info-image"}/>
                     <p>is</p>
-                    <img src={lowestPath} alt={"For Information"}
+                    <img src={lowestUrl} alt={"For Information"}
                          className={"info-image"}/>
                 </div>
                 <table className={"score-table"}>
                     <thead>
                     <tr>
-                        <th className={"tableColumn1"}><img src={path} alt={"For table header"}/></th>
+                        <th className={"tableColumn1"}><img src={url} alt={"For table header"}/></th>
                         <th>Combined<br/>scores</th>
                         <th>Euclidean<br/>Distance</th>
                         <th>Bhattacharyya<br/>Distance</th>

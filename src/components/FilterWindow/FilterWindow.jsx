@@ -59,7 +59,8 @@ const FilterWindow = () => {
     const thresholdMin = 0;
     const root = document.querySelector(":root");
 
-    const images = useMemo(
+    //TODO: move to selectContext
+    const selectedImages = useMemo(
         () => selectedElementsIndex.map((index) => elements[index]).filter((element) => element.type === "Image"),
         [selectedElementsIndex, elements]);
 
@@ -118,11 +119,11 @@ const FilterWindow = () => {
      * @return {number} the value if the value is the same for all the selected images or 0 if not.
      */
     const getValue = useCallback((parameter) => {
-        if (images.length === 0) return 0;
-        const firstValue = images[0][parameter];
-        if (!isNaN(firstValue) && images.every(image => image[parameter] === firstValue)) return firstValue;
+        if (selectedImages.length === 0) return 0;
+        const firstValue = selectedImages[0][parameter];
+        if (!isNaN(firstValue) && selectedImages.every(image => image[parameter] === firstValue)) return firstValue;
         return 0;
-    }, [images]);
+    }, [selectedImages]);
 
     /**
      * Gets true if all the selected are true else returns false.
@@ -130,9 +131,9 @@ const FilterWindow = () => {
      * @return {boolean} true if all the selected are true else returns false.
      */
     const getBool = useCallback((parameter) => {
-        if (images.length === 0) return false;
-        return images.every(image => image[parameter]);
-    }, [images]);
+        if (selectedImages.length === 0) return false;
+        return selectedImages.every(image => image[parameter]);
+    }, [selectedImages]);
 
     /**
      * Sets the sliders and toggles on the filter window when changing which fragment to filter.
@@ -142,7 +143,7 @@ const FilterWindow = () => {
         root.style.setProperty("--saturation",
             mapToPercentage(getValue("saturation"), saturationMin, saturationMax));
         updateBrightnessStyle(getValue("value"), getBool("invert"));
-        if (images.length > 0) {
+        if (selectedImages.length > 0) {
             if (!isFilterWindowOpen) return;
             document.getElementById("grayscaleToggle")
                 .querySelector('input[name="toggleCheckbox"]').checked = !!getBool("grayscale");
@@ -158,7 +159,7 @@ const FilterWindow = () => {
                     .querySelector('input[name="toggleCheckbox"]').checked = false;
             }
         }
-    }, [getBool, getValue, images.length, isFilterWindowOpen, root.style, saturationMin, updateBrightnessStyle]);
+    }, [getBool, getValue, selectedImages.length, isFilterWindowOpen, root.style, saturationMin, updateBrightnessStyle]);
 
     /**
      * Resets the filters on the filter image.
@@ -227,7 +228,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("hue")}
                         setValue={(hu, overwrite) => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             const hue = parseInt(hu);
                             setValue("hue", hue, overwrite);
                             root.style.setProperty("--hue", -hue);
@@ -241,7 +242,7 @@ const FilterWindow = () => {
                         step={0.1}
                         value={getValue("saturation")}
                         setValue={(sat, overwrite) => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             const saturation = parseFloat(sat);
                             setValue("saturation", saturation, overwrite);
                             root.style.setProperty("--saturation",
@@ -256,7 +257,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("contrast")}
                         setValue={(contrast, overwrite) => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             setValue("contrast", parseFloat(contrast), overwrite);
                             root.style.setProperty("--contrast",
                                 mapToPercentage(contrast, contrastMin, contrastMax));
@@ -270,7 +271,7 @@ const FilterWindow = () => {
                         step={0.05}
                         value={getValue("value")}
                         setValue={(bri, overwrite) => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             const brightness = parseFloat(bri);
                             setValue("value", brightness, overwrite);
                             updateBrightnessStyle(brightness, getBool("invert"));
@@ -284,7 +285,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("threshold")}
                         setValue={(threshold, overwrite) => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             setValue("threshold", parseInt(threshold), overwrite);
                         }}
                     />
@@ -292,7 +293,7 @@ const FilterWindow = () => {
                         label="Grayscale"
                         id={"grayscaleToggle"}
                         setValue={() => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             setBool("grayscale", !getBool("grayscale"));
                         }}
                     />
@@ -300,7 +301,7 @@ const FilterWindow = () => {
                         label="Invert"
                         id={"invertToggle"}
                         setValue={() => {
-                            if (images.length === 0) return;
+                            if (selectedImages.length === 0) return;
                             const invert = !getBool("invert");
                             setBool("invert", invert);
                             updateBrightnessStyle(getValue("value"), invert);

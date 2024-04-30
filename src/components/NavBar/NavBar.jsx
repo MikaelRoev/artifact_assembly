@@ -353,6 +353,7 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className="dropdownButton"
+                                        disabled={selectedElements.length <= 1}
                                         onClick={handleLockPiecesTogether}>
                                         Lock Selected Together
                                     </button>
