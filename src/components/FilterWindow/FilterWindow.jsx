@@ -186,7 +186,6 @@ const FilterWindow = () => {
      * or as default commit a new state.
      */
     function setValue (parameter, value, overwrite = false) {
-        //TODO: fix bug with setValue & setBool
         selectedImagesIndex.forEach((index) => {
             elements[index][parameter] = value;
         });
@@ -199,6 +198,7 @@ const FilterWindow = () => {
      * @param bool {boolean} the new value of the parameter.
      */
     function setBool(parameter, bool) {
+        //TODO: fix set bool / toggle bug
         selectedImagesIndex.forEach((index) => {
             elements[index][parameter] = bool;
         });
