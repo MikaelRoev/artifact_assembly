@@ -1,4 +1,5 @@
 import {useMemo, useState} from "react";
+import {deepCopy} from "../util/Operations";
 
 /**
  * Hook for handling the state history, undo, and redo.
@@ -18,11 +19,6 @@ import {useMemo, useState} from "react";
 function useHistory(initialState, maxSteps) {
     const [index, setIndex] = useState(0);
     const [history, setHistory] = useState([initialState]);
-
-    //TODO: comment and put in util
-    function deepCopy(obj) {
-        return JSON.parse(JSON.stringify(obj));
-    }
 
     const currentState = useMemo(() => deepCopy(history[index]), [history, index]);
 
