@@ -212,7 +212,8 @@ const SimilarityMetricsWindow = () => {
                 <table className={"score-table"}>
                     <thead>
                     <tr>
-                        <th className={"tableColumn1"}><img src={selectedImage.toDataURL()} alt={"For table header"}/></th>
+                        <th className={"tableColumn1"}><img src={selectedImage.toDataURL()} alt={"For table header"}/>
+                        </th>
                         <th>Combined<br/>scores</th>
                         <th>Euclidean<br/>Distance</th>
                         <th>Bhattacharyya<br/>Distance</th>

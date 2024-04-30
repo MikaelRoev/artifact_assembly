@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useState} from "react";
 import {makeDraggable} from "../../util/WindowFunctionality";
 import FilterForm from "../FilterForm/FilterForm";
 import FilterToggle from "../FilterToggle/FilterToggle";
@@ -186,7 +186,7 @@ const FilterWindow = () => {
      * @param overwrite {boolean | undefined} whether it should overwrite the last state in the history
      * or as default commit a new state.
      */
-    function setValue (parameter, value, overwrite = false) {
+    function setValue(parameter, value, overwrite = false) {
         selectedImagesIndex.forEach((index) => {
             elements[index][parameter] = value;
         });

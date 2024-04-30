@@ -41,7 +41,7 @@ export const SelectContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      * @param index {number} the index of the element to be selected.
      */
-    function select (element, index) {
+    function select(element, index) {
         setSelectedKonvaElements([...selectedKonvaElements, element]);
         setSelectedElementsIndex([...selectedElementsIndex, index]);
     }

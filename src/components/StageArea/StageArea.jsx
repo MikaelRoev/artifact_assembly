@@ -28,8 +28,10 @@ const StageArea = () => {
     } = useContext(SelectContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {elements, setElements,
-        isAnyElements, isAnyImages, undo, redo} = useContext(ElementContext);
+    const {
+        elements, setElements,
+        isAnyElements, isAnyImages, undo, redo
+    } = useContext(ElementContext);
     const {stageRef} = useContext(StageRefContext);
     const {deleteEnabled} = useContext(DeleteEnabledContext);
 
@@ -105,6 +107,7 @@ const StageArea = () => {
                     .then(() => console.log("Project saved")).catch(console.log);
             }
         }
+
         document.addEventListener("keydown", handleSavePressed);
         return () => {
             document.removeEventListener("keydown", handleSavePressed);
@@ -128,6 +131,7 @@ const StageArea = () => {
                 undo();
             }
         }
+
         document.addEventListener("keydown", handleUndoRedoPressed);
         return () => {
             document.removeEventListener("keydown", handleUndoRedoPressed);
@@ -260,10 +264,10 @@ const StageArea = () => {
                 switch (element.type) {
                     case "Image":
                         return renderImage(element, index);
-                        /*
-                    case "Group":
-                        return renderGroup(element, index);
-                         */
+                    /*
+                case "Group":
+                    return renderGroup(element, index);
+                     */
                     default:
                         // not a valid element type
                         return (<></>);
@@ -346,7 +350,7 @@ const StageArea = () => {
                 .then(() => console.log("Information retrieved from set image dimensions"))
                 .catch(console.error);
         }
-    }, [elements.length, layerRef, elements]);
+    }, [elements.length, layerRef, elements, isAnyImages]);
 
     return (
         <Stage

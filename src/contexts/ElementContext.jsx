@@ -23,7 +23,7 @@ export const ElementContextProvider = ({children}) => {
         [images.length]);
 
     return (
-        <ElementContext.Provider value={{elements, setElements, images, isAnyElements, isAnyImages, undo, redo }}>
+        <ElementContext.Provider value={{elements, setElements, images, isAnyElements, isAnyImages, undo, redo}}>
             {children}
         </ElementContext.Provider>
     )

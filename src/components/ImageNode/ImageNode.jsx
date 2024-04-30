@@ -38,7 +38,7 @@ import FilterEnabledContext from "../../contexts/FilterEnabledContext";
  * @returns {JSX.Element} the konva image.
  * @constructor
  */
-const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
+const ImageNode = ({imageProps, onClick, onChange, onContextMenu, id}) => {
     const {filterEnabled} = useContext(FilterEnabledContext);
 
     const imageRef = useRef();
@@ -88,38 +88,38 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
         }
     }, [imageProps.filePath]);
 
-	return (
-		<KonvaImage
-			{...imageProps}
-			ref={imageRef}
+    return (
+        <KonvaImage
+            {...imageProps}
+            ref={imageRef}
             id={id}
-			filters={handleFilters()}
-			image={image}
-			onClick={onClick}
-			onTap={onClick}
-			onContextMenu={onContextMenu}
+            filters={handleFilters()}
+            image={image}
+            onClick={onClick}
+            onTap={onClick}
+            onContextMenu={onContextMenu}
             perfectDrawEnabled={false}
-			onDragEnd={(e) => {
-				onChange({
-					...imageProps,
-					x: e.target.x(),
-					y: e.target.y(),
-				});
-			}}
-			onTransformEnd={(e) => {
-				onChange({
-					...imageProps,
-					x: e.target.x(),
-					y: e.target.y(),
-					rotation: e.target.rotation(),
-				});
-			}}
-			onMouseEnter={(e) => {
+            onDragEnd={(e) => {
+                onChange({
+                    ...imageProps,
+                    x: e.target.x(),
+                    y: e.target.y(),
+                });
+            }}
+            onTransformEnd={(e) => {
+                onChange({
+                    ...imageProps,
+                    x: e.target.x(),
+                    y: e.target.y(),
+                    rotation: e.target.rotation(),
+                });
+            }}
+            onMouseEnter={(e) => {
                 //Moves selected image on top (z-index)
                 e.target.moveToTop();
-				// Adds a pointer cursor when hovering over the image
-				const container = e.target.getStage().container();
-				container.style.cursor = "default";
+                // Adds a pointer cursor when hovering over the image
+                const container = e.target.getStage().container();
+                container.style.cursor = "default";
 
                 container.style.cursor = "pointer";
             }}

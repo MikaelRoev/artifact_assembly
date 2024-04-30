@@ -51,7 +51,7 @@ const ExportImageModal = () => {
     /**
      * Function to toggle the information displayed in the modal.
      */
-    function toggleInfo () {
+    function toggleInfo() {
         setIsInfoVisible(!isInfoVisible);
     }
 
