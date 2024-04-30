@@ -230,7 +230,7 @@ const StageArea = () => {
      * @param e {KonvaEventObject<MouseEvent>} click event.
      * @param index {number} of the element clicked on.
      */
-    const handleElementClick = (e, index) => {
+    function handleElementClick(e, index) {
         if (e.evt.button === 2) return;
         const element = e.target;
         element.moveToTop();
@@ -249,20 +249,16 @@ const StageArea = () => {
     }
 
     //TODO: comment
-    const renderElements = () => {
+    function renderElements() {
         return (
             elements.length > 0 &&
             elements.map((element, index) => {
                 switch (element.type) {
                     case "Image":
-                        return (
-                            renderImage(element, index)
-                        );
+                        return renderImage(element, index);
                         /*
                     case "Group":
-                        return (
-                            renderGroup(element, index)
-                        );
+                        return renderGroup(element, index);
                          */
                     default:
                         // not a valid element type
@@ -272,7 +268,7 @@ const StageArea = () => {
         );
     }
 
-    const renderImage = (image, index) => {
+    function renderImage(image, index) {
         return (
             <ImageNode
                 key={image.id}
@@ -288,7 +284,7 @@ const StageArea = () => {
     }
 
     //TODO: comment
-    const renderGroup = (group, index) => {
+    function renderGroup(group, index) {
         return (
             <Group
                 key={index}
@@ -318,7 +314,7 @@ const StageArea = () => {
          * @param imageNodes Image nodes on the canvas.
          * @returns {Promise<void>}
          */
-        const setImageDimensions = async (imageNodes) => {
+        async function setImageDimensions(imageNodes) {
             await new Promise(resolve => setTimeout(resolve, 1000));
             for (const imageNode of imageNodes) {
                 for (const image of elements) {

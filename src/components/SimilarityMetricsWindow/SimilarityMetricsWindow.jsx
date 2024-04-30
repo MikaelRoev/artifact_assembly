@@ -56,7 +56,6 @@ const SimilarityMetricsWindow = () => {
     const {elements} = useContext(ElementContext);
     const {selectedElementsIndex} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
-    //TODO: change name of context: filter interaction to disable image delete?
     const {setDeleteEnabled} = useContext(DeleteEnabledContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);

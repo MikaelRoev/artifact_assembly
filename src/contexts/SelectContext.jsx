@@ -23,7 +23,7 @@ export const SelectContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      * @param index {number} the index of the element to be selected.
      */
-    const select = (element, index) => {
+    function select (element, index) {
         setSelectedElements([...selectedElements, element]);
         setSelectedElementsIndex([...selectedElementsIndex, index]);
     }
@@ -32,7 +32,7 @@ export const SelectContextProvider = ({children}) => {
      * Deselects an element.
      * @param index {number} the index of the element to be deselected.
      */
-    const deselect = (index) => {
+    function deselect(index) {
         const indexIndex = selectedElementsIndex.indexOf(index);
         if (indexIndex === -1) return;
         selectedElements[indexIndex].draggable(false);
@@ -48,7 +48,7 @@ export const SelectContextProvider = ({children}) => {
     /**
      * Deselects all selected elements.
      */
-    const deselectAll = () => {
+    function deselectAll() {
         selectedElements.forEach((element) => element.draggable(false));
         setSelectedElements([]);
         setSelectedElementsIndex([]);
@@ -59,7 +59,7 @@ export const SelectContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      * @param index {number} the index of the element to be selected.
      */
-    const selectOnly = (element, index) => {
+    function selectOnly(element, index) {
         selectedElements.forEach((element) => element.draggable(false));
         setSelectedElements([element]);
         setSelectedElementsIndex([index]);

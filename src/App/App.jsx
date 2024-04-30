@@ -9,7 +9,6 @@ import "./App.css";
 //TODO: see over all comments
 //TODO: write the README.md
 //TODO: check all deps
-//TODO: check const to function
 //TODO: css refactoring
 //TODO: refactor MVC?
 //TODO: unit tests
