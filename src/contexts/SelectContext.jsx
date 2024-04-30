@@ -1,4 +1,6 @@
-import React, {createContext, useState} from "react";
+import React, {createContext, useContext, useMemo, useState} from "react";
+import Konva from "konva";
+import ElementContext from "./ElementContext";
 
 /**
  * The select context that allows for getting selected elements and indices lists,
@@ -15,16 +17,32 @@ const SelectContext = createContext(null);
  * @constructor
  */
 export const SelectContextProvider = ({children}) => {
+    const {elements} = useContext(ElementContext);
+
     const [selectedElementsIndex, setSelectedElementsIndex] = useState([]);
-    const [selectedElements, setSelectedElements] = useState([]);
+    const [selectedKonvaElements, setSelectedKonvaElements] = useState([]);
+
+    const selectedElements = useMemo(() => selectedElementsIndex.map(index => elements[index]),
+        [elements, selectedElementsIndex]);
+    const isAnySelected = useMemo(() => selectedElementsIndex.length > 0,
+        [selectedElementsIndex.length]);
+
+    const selectedImagesIndex = useMemo(() =>
+        selectedElementsIndex.filter(index => elements[index].type === "Image"), [selectedElementsIndex, elements]);
+    const selectedKonvaImages = useMemo(() =>
+        selectedKonvaElements.filter(element => element instanceof Konva.Image), [selectedKonvaElements]);
+    const selectedImages = useMemo(() =>
+        selectedElements.filter(element => element.type === "Image"), [selectedElements]);
+    const isAnySelectedImages = useMemo(() => selectedImagesIndex.length > 0,
+        [selectedImagesIndex.length]);
 
     /**
      * Selects an element.
      * @param element {Shape | Stage} the element to be selected.
      * @param index {number} the index of the element to be selected.
      */
-    const select = (element, index) => {
-        setSelectedElements([...selectedElements, element]);
+    function select(element, index) {
+        setSelectedKonvaElements([...selectedKonvaElements, element]);
         setSelectedElementsIndex([...selectedElementsIndex, index]);
     }
 
@@ -32,13 +50,13 @@ export const SelectContextProvider = ({children}) => {
      * Deselects an element.
      * @param index {number} the index of the element to be deselected.
      */
-    const deselect = (index) => {
+    function deselect(index) {
         const indexIndex = selectedElementsIndex.indexOf(index);
         if (indexIndex === -1) return;
-        selectedElements[indexIndex].draggable(false);
-        const newSelected = [...selectedElements];
+        selectedKonvaElements[indexIndex].draggable(false);
+        const newSelected = [...selectedKonvaElements];
         newSelected.splice(indexIndex, 1);
-        setSelectedElements(newSelected);
+        setSelectedKonvaElements(newSelected);
 
         const newSelectedIndex = [...selectedElementsIndex];
         newSelectedIndex.splice(indexIndex, 1);
@@ -48,9 +66,9 @@ export const SelectContextProvider = ({children}) => {
     /**
      * Deselects all selected elements.
      */
-    const deselectAll = () => {
-        selectedElements.forEach((element) => element.draggable(false));
-        setSelectedElements([]);
+    function deselectAll() {
+        selectedKonvaElements.forEach((element) => element.draggable(false));
+        setSelectedKonvaElements([]);
         setSelectedElementsIndex([]);
     }
 
@@ -59,9 +77,9 @@ export const SelectContextProvider = ({children}) => {
      * @param element {Shape | Stage} the element to be selected.
      * @param index {number} the index of the element to be selected.
      */
-    const selectOnly = (element, index) => {
-        selectedElements.forEach((element) => element.draggable(false));
-        setSelectedElements([element]);
+    function selectOnly(element, index) {
+        selectedKonvaElements.forEach((element) => element.draggable(false));
+        setSelectedKonvaElements([element]);
         setSelectedElementsIndex([index]);
     }
 
@@ -73,8 +91,15 @@ export const SelectContextProvider = ({children}) => {
     const isSelected = (index) => selectedElementsIndex.includes(index);
 
     const providerValues = {
-        selectedElements,
+        selectedKonvaElements,
+        selectedKonvaImages,
         selectedElementsIndex,
+        selectedImagesIndex,
+        selectedElements,
+        selectedImages,
+        isAnySelected,
+        isAnySelectedImages,
+
         select,
         deselect,
         deselectAll,

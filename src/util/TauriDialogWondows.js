@@ -1,7 +1,6 @@
 import {dialog, fs} from "@tauri-apps/api";
 import {readFile, saveToFile} from "./FileHandling";
 
-
 /**
  * Opens the "open project"-dialog window.
  * @param setProject {function(Object)} the setter for the project.
@@ -28,7 +27,6 @@ export const openProjectDialog = async (setProject, setElements) => {
     }
 }
 
-
 /**
  * Opens the "save project as"-dialog window.
  * @param project {Object} the project.
@@ -46,7 +44,6 @@ export async function saveProjectDialog(project, setProject, elements) {
             filters: [{name: "JSON Files", extensions: ["json"]}]
         });
 
-        //TODO: deal with error
         if (!filePath) return Promise.reject(Error("no file selected or operation cancelled"));
 
         let newProject = {

@@ -34,7 +34,7 @@ const LandingPage = () => {
             .catch(error => {
                 if (error) console.error("Failed to open project:", error);
             });
-    };
+    }
 
     /**
      * Opens the canvas page.

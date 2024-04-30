@@ -1,12 +1,12 @@
 import React, {createContext, useContext, useEffect, useMemo, useRef, useState} from "react";
-import {convertFileSrc} from "@tauri-apps/api/tauri";
+import Konva from "konva";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
 import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
-import FilterInteractionContext from "../../contexts/FilterInteractionContext";
+import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import "./SimilarityMetricsWindow.css"
 import HistogramMetricsTable from "./HistogramMetricsTable";
 
@@ -23,12 +23,13 @@ export const SimilarityMetricsWindowContext = createContext(null);
  * @constructor
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
+    const {isAnyImages} = useContext(ElementContext);
+
     const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
-    const {elements} = useContext(ElementContext);
 
     useEffect(() => {
-        if (elements.length === 0) setIsSimilarityMetricsWindowOpen(false);
-    }, [elements.length]);
+        if (!isAnyImages) setIsSimilarityMetricsWindowOpen(false);
+    }, [isAnyImages]);
 
     const providerValues = useMemo(() => {
         return {
@@ -54,12 +55,13 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {elements} = useContext(ElementContext);
-    const {selectedElementsIndex} = useContext(SelectContext);
+    const {elements, images} = useContext(ElementContext);
+    const {selectedKonvaImages, selectedImagesIndex, isAnySelectedImages} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
-    //TODO: change name of context: filter interaction to disable image delete?
-    const {setIsFilterInteracting} = useContext(FilterInteractionContext);
+    const {setDeleteEnabled} = useContext(DeleteEnabledContext);
+
     const contentRef = useRef(null);
+
     const [update, setUpdate] = useState(true);
     const maxHistogramValue = 360;
     const [minInputValue, setMinInputValue] = useState(0);
@@ -105,16 +107,12 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = stageRef.current.getChildren()[0].getChildren().filter((child) => child.getClassName() === "Image")
-        for (const index of selectedElementsIndex) {
+        const imageNodes = stageRef.current.find((node) => node.getClassName() === "Image");
+        for (const index of selectedImagesIndex) {
+            const image = elements[index];
             for (const imageNode of imageNodes) {
-                if (elements[index].id === imageNode.attrs.id) {
-                    const newHues = await getHueData(imageNode.toDataURL())
-                    elements[index] = {
-                        ...elements[index],
-                        hueValues: newHues,
-                    }
-                }
+                if (image.id !== imageNode.id()) continue;
+                imageNode.attrs.hueValues = await getHueData(imageNode.toDataURL());
             }
         }
 
@@ -124,6 +122,132 @@ const SimilarityMetricsWindow = () => {
         setUpdate(false);
         await new Promise(resolve => setTimeout(resolve, 1));
         setUpdate(true);
+    }
+
+    /**
+     * Calculates the Euclidean distance, Pearson correlation, Bhattacharyya distance, Intersection between the two histograms.
+     * @param arrayA Histogram A array
+     * @param arrayB Histogram B array
+     * @returns {
+     * {bhattacharyyaDistance: number,
+     * euclideanDistance: number,
+     * pearsonCorrelation: number,
+     * histogramIntersection: number}
+     * }
+     */
+    function getHistogramScores(arrayA, arrayB) {
+        // Euclidean Distance
+        let euclidean = 0;
+        // Bhattacharyya Distance
+        let coefficient = 0;
+        // Histogram Intersection
+        let intersection = 0;
+
+        for (let i = 0; i < arrayA.length; i++) {
+            // Euclidean
+            euclidean += Math.pow(arrayA[i] - arrayB[i], 2);
+
+            // Bhattacharyya
+            coefficient += Math.sqrt(arrayA[i] * arrayB[i]);
+
+            // Intersection
+            intersection += Math.min(arrayA[i], arrayB[i]);
+        }
+
+        // Final calculation
+        const euclideanDistance = Math.sqrt(euclidean);
+        const bhattacharyyaDistance = -Math.log(coefficient);
+        const histogramIntersection = (1 - intersection);
+
+        return {
+            euclideanDistance: euclideanDistance,
+            bhattacharyyaDistance: bhattacharyyaDistance,
+            histogramIntersection: histogramIntersection,
+            combined: (euclideanDistance + bhattacharyyaDistance + histogramIntersection) / 3
+        }
+    }
+
+    /**
+     * Sets a table with the similarity scores between the selectedImage and every other element
+     * @param selectedImage {Konva.image}
+     * @returns {Element} div element with a table of scores and the most similar element to selectedImage
+     */
+    function setTable(selectedImage) {
+        let rows = [];
+        const arrayA = countAndNormalizeValues(selectedImage.attrs.hueValues, maxHistogramValue);
+        let lowest = Infinity;
+        let lowestImage = null;
+        const imageNodes = stageRef.current.find((node) => node instanceof Konva.Image);
+        imageNodes.forEach(image => {
+            if (selectedImage.id() === image.id()
+                || image.attrs.hueValues === undefined
+                || selectedImage.attrs.hueValues === undefined) return;
+            const arrayB = countAndNormalizeValues(image.attrs.hueValues, maxHistogramValue);
+            const values = getHistogramScores(arrayA, arrayB);
+            if (values.combined < lowest) {
+                lowest = values.combined;
+                lowestImage = image;
+            }
+            rows.push(
+                <tr key={`${selectedImage.id()}-${image.id()}`}>
+                    <td className={"tableColumn1"}><img src={image.toDataURL()} alt={"For table row"}/></td>
+                    <td>{values.combined.toFixed(3)}</td>
+                    <td>{values.euclideanDistance.toFixed(3)}</td>
+                    <td>{values.bhattacharyyaDistance.toFixed(3)}</td>
+                    <td>{values.histogramIntersection.toFixed(3)}</td>
+                </tr>
+            );
+        })
+
+        return (
+            lowestImage &&
+            <div key={`table-${selectedImage.id}`} className={"tableDiv"}>
+                <div className={"info-div"}>
+                    <p>The most similar element to</p>
+                    <img src={selectedImage.toDataURL()} alt={"For information"}
+                         className={"info-image"}/>
+                    <p>is</p>
+                    <img src={lowestImage.toDataURL()} alt={"For Information"}
+                         className={"info-image"}/>
+                </div>
+                <table className={"score-table"}>
+                    <thead>
+                    <tr>
+                        <th className={"tableColumn1"}><img src={selectedImage.toDataURL()} alt={"For table header"}/>
+                        </th>
+                        <th>Combined<br/>scores</th>
+                        <th>Euclidean<br/>Distance</th>
+                        <th>Bhattacharyya<br/>Distance</th>
+                        <th>Histogram<br/>Intersection</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {rows}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+    /**
+     * Counts all the values in an array and puts them into another array. It then normalizes the count values.
+     * @param array array to be counted and normalized.
+     * @param maxValue the max value possible in the array
+     * @returns {any[]}
+     */
+    function countAndNormalizeValues(array, maxValue) {
+        const probArray = new Array(maxValue + 1).fill(0);
+        array.forEach(value => {
+            if (value >= 0 && value <= maxValue) {
+                probArray[Math.floor(value)]++;
+            }
+        });
+        const totalCount = array.length;
+        probArray.forEach((value, index, arr) => {
+            arr[index] = value / totalCount;
+        });
+
+        return probArray;
     }
 
     /**
@@ -153,8 +277,8 @@ const SimilarityMetricsWindow = () => {
                     step={1}
                     value={minInputValue}
                     onChange={(e) => setMinInputValue(Number(e.target.value))}
-                    onFocus={() => setIsFilterInteracting(true)}
-                    onBlur={() => setIsFilterInteracting(false)}
+                    onFocus={() => setDeleteEnabled(false)}
+                    onBlur={() => setDeleteEnabled(true)}
                 />
 
                 <label htmlFor={"maxNumber"}>Max </label>
@@ -167,43 +291,43 @@ const SimilarityMetricsWindow = () => {
                     step={1}
                     value={maxInputValue}
                     onChange={(e) => setMaxInputValue(Number(e.target.value))}
-                    onFocus={() => setIsFilterInteracting(true)}
-                    onBlur={() => setIsFilterInteracting(false)}
+                    onFocus={() => setDeleteEnabled(false)}
+                    onBlur={() => setDeleteEnabled(true)}
                 />
                 <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
-                {selectedElementsIndex.length > 0 ?
+                {isAnySelectedImages ?
                     (update &&
-                        selectedElementsIndex.map(index => {
-                            const image = elements[index];
-                            if (image.hueValues) {
-                                const path = convertFileSrc(image.filePath)
-                                return (
-                                    <div className={"element-container"} key={index}>
-                                        <div className="histogram-container">
-                                            <div className="histogram-info">
-                                                <img src={path} alt={"For histogram"}/>
-                                                <p>{image.fileName}</p>
-                                            </div>
-                                            <Histogram
-                                                key={index}
-                                                array={image.hueValues}
-                                                widthProp={400}
-                                                heightProp={300}
-                                                binsProp={maxCutOff - minCutOff}
-                                                minCutoff={minCutOff}
-                                                maxCutoff={maxCutOff}
-                                            />
+                        selectedKonvaImages.map(image => {
+                            const hueValues = image.attrs.hueValues;
+                            return (
+                                hueValues &&
+                                <div className={"element-container"} key={image.id()}>
+                                    <div className="histogram-container">
+                                        <div className="histogram-info">
+                                            <img src={image.toDataURL()} alt={"For histogram"}/>
+                                            <p>{image.attrs.fileName}</p>
                                         </div>
+                                        <Histogram
+                                            key={image.id()}
+                                            array={hueValues}
+                                            widthProp={400}
+                                            heightProp={300}
+                                            binsProp={maxCutOff - minCutOff}
+                                            minCutoff={minCutOff}
+                                            maxCutoff={maxCutOff}
+                                        />
+                                    </div>
+                                    {
+                                        images.length > 1 &&
                                         <HistogramMetricsTable
                                             selectedImage={image}
                                             maxHistogramValue={maxHistogramValue}
                                         />
-                                    </div>
-                                )
-                            }
-                            return null;
+                                    }
+                                </div>
+                            )
                         })
                     ) :
                     (<p style={{

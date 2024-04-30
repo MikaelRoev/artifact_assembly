@@ -10,6 +10,7 @@ import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 import "./NavBar.css";
 
 /**
@@ -18,14 +19,11 @@ import "./NavBar.css";
  * @constructor
  */
 const NavBar = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
-    const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
-
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
     const {stageRef} = useContext(StageRefContext);
+    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -35,10 +33,15 @@ const NavBar = () => {
         setOnDoNotSave
     } = useContext(ConfirmCloseModalContext);
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
+    const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
+
     const navigate = useNavigate();
 
     const xOffset = 200;
-    const yOffset = 75;
+    const offsetRowCount = 10;
+    const yOffset = 400;
 
     /**
      * Closes the project and returns to the landing page.
@@ -68,10 +71,19 @@ const NavBar = () => {
      */
     function findFirstFreePosition(position) {
         while (isAnyElementAtPosition(position)) {
-            position.x += xOffset;
-            position.y += yOffset;
+            position = newPosition(position);
         }
         return {x: position.x, y: position.y}
+    }
+
+    function newPosition(position) {
+        let x = position.x + xOffset;
+        let y = position.y;
+        if (x > xOffset * offsetRowCount) {
+            x = 0;
+            y += yOffset;
+        }
+        return {x, y};
     }
 
     /**
@@ -84,8 +96,7 @@ const NavBar = () => {
         const result = await open({
             title: "Load Image",
             filters: [{name: "Images", extensions: ["jpg", "png"]}],
-            multiple: true,
-            //defaultPath: await appDataDir()
+            multiple: true
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
@@ -101,14 +112,13 @@ const NavBar = () => {
                     filePath: file,
                 };
                 idAdder++
-                position.x += xOffset;
-                position.y += yOffset;
+                position = newPosition(position);
                 return newImage;
             });
             setElements([...elements, ...newImages]);
         }
         setIsLoading(false);
-        handleFileButtonClick()
+        setFileDropdownVisible(false);
     }
 
     /**
@@ -116,11 +126,11 @@ const NavBar = () => {
      */
     function handleLockCanvasClick() {
         setIsLocked((prevLock) => !prevLock);
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     /**
-     * Constant function to set the visibility of the file dropdown menu.
+     * Function to set the visibility of the file dropdown menu.
      */
     function handleFileButtonClick() {
         setFileDropdownVisible(!fileDropdownVisible);
@@ -128,7 +138,7 @@ const NavBar = () => {
     }
 
     /**
-     * Constant function to set the visibility of the tools dropdown menu.
+     * Function to set the visibility of the tools dropdown menu.
      */
     function handleToolsButtonClick() {
         setToolsDropdownVisible(!toolsDropdownVisible);
@@ -162,23 +172,23 @@ const NavBar = () => {
      */
     function handleImageOfCanvasExport() {
         setIsExportImageModalOpen(true);
-        handleFileButtonClick()
+        setFileDropdownVisible(false);
     }
 
     /**
      * Function to open up the similarity metrics window for all the selected images.
      */
-    async function handleOpenScoreWindow(){
+    async function handleOpenScoreWindow() {
         setIsSimilarityMetricsWindowOpen(true);
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     /**
      * Function to open up the filter window for all the selected images.
      */
-    async function handleOpenFilterWindow(){
+    async function handleOpenFilterWindow() {
         setIsFilterWindowOpen(true);
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     /*
@@ -220,9 +230,9 @@ const NavBar = () => {
         const currentStageCenterY = -stage.y() / stage.scaleY() + stageHeight / 2 / stage.scaleY();
 
         //Finding the closest element
-        elements.forEach(element => {
-            const elementPosX = element.x;
-            const elementPosY = element.y;
+        stage.getChildren()[0].getChildren().forEach(element => {
+            const elementPosX = element.x();
+            const elementPosY = element.y();
 
             const dx = elementPosX - currentStageCenterX;
             const dy = elementPosY - currentStageCenterY;
@@ -236,20 +246,17 @@ const NavBar = () => {
 
         // Calculate the new X and Y values to move the stage to based on the nearest element
         if (nearestElement) {
-            const newX = -nearestElement.x + (stageWidth / 2) - (nearestElement.width / 2);
-            const newY = -nearestElement.y + (stageHeight / 2) - (nearestElement.height / 2);
+            const newX = -nearestElement.x() + (stageWidth / 2) - (nearestElement.width() / 2);
+            const newY = -nearestElement.y() + (stageHeight / 2) - (nearestElement.height() / 2);
             stage.to({
                 x: newX,
                 y: newY,
                 scaleX: 1,
                 scaleY: 1,
-                duration: 0.5,
-                onFinish: () => {
-                    project.zoom = 1;
-                }
+                duration: 0.5
             })
         }
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     return (
@@ -259,7 +266,6 @@ const NavBar = () => {
                     <button className="navButton" onClick={handleFileButtonClick}>
                         File
                     </button>
-                    {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {fileDropdownVisible && (
                         <div className="dropdown">
                             <ul>
@@ -268,9 +274,8 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, elements)
-                                                .then(handleFileButtonClick)
-                                                .catch(() => {
-                                                });
+                                                .then(setFileDropdownVisible(false))
+                                                .catch(console.log);
                                         }}>
                                         Save project
                                     </button>
@@ -280,9 +285,8 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={() => {
                                             openProjectDialog(setProject, setElements)
-                                                .then(handleFileButtonClick)
-                                                .catch(() => {
-                                                });
+                                                .then(setFileDropdownVisible(false))
+                                                .catch(() => {});
                                         }}>
                                         Open Project
                                     </button>
@@ -308,8 +312,7 @@ const NavBar = () => {
                                                 setOnSave(() => () => {
                                                     saveProjectDialog(project, setProject, elements)
                                                         .then(goToLandingPage)
-                                                        .catch(() => {
-                                                        });
+                                                        .catch(console.log);
                                                 });
                                                 setOnDoNotSave(() => () => goToLandingPage());
                                                 setIsConfirmModalOpen(true);
@@ -345,6 +348,16 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className="dropdownButton"
+                                        onClick={() => {
+                                            setFilterEnabled((prevFilter) => !prevFilter);
+                                            setToolsDropdownVisible(false);
+                                        }}>
+                                        {!filterEnabled ? "Enable Filters" : "Disable Filters"}
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className="dropdownButton"
                                         onClick={findWorkArea}>
                                         Find Work Area
                                     </button>
@@ -353,6 +366,7 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className="dropdownButton"
+                                        disabled={selectedElements.length <= 1}
                                         onClick={handleLockPiecesTogether}>
                                         Lock Selected Together
                                     </button>
