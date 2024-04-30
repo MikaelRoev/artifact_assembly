@@ -361,6 +361,7 @@ const NavBar = () => {
                                         onClick={handleLockCanvasClick}>
                                         {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                                 </li>
+                                {/*TODO: add filter enable button*/}
                             </ul>
                         </div>
                     )}

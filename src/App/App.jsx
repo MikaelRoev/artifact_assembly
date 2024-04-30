@@ -12,7 +12,7 @@ import "./App.css";
 //TODO: css refactoring
 //TODO: refactor MVC?
 //TODO: unit tests
-//TODO: adding filters check.
+//TODO: adding filters check, enable filters when filter window opens?
 //TODO: make provider context values memo?
 
 /**
