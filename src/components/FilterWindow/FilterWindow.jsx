@@ -21,8 +21,9 @@ export const FilterWindowContext = createContext(null);
  * @constructor
  */
 export const FilterWindowContextProvider = ({children}) => {
-    const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
     const {isAnyImages} = useContext(ElementContext);
+
+    const [isFilterWindowOpen, setIsFilterWindowOpen] = useState(false);
 
     useEffect(() => {
         if (!isAnyImages) setIsFilterWindowOpen(false);

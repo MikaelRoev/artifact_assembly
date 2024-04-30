@@ -22,8 +22,9 @@ export const SimilarityMetricsWindowContext = createContext(null);
  * @constructor
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
-    const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
     const {isAnyImages} = useContext(ElementContext);
+
+    const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
 
     useEffect(() => {
         if (!isAnyImages) setIsSimilarityMetricsWindowOpen(false);
@@ -59,8 +60,8 @@ const SimilarityMetricsWindow = () => {
     const {setDeleteEnabled} = useContext(DeleteEnabledContext);
 
     const contentRef = useRef(null);
-    const [update, setUpdate] = useState(true);
 
+    const [update, setUpdate] = useState(true);
     const maxHistogramValue = 360;
     const [minInputValue, setMinInputValue] = useState(0);
     const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue);

@@ -19,10 +19,6 @@ import FilterEnabledContext from "../../contexts/FilterEnabledContext";
  * @constructor
  */
 const NavBar = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
-    const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
-
     const {isLocked, setIsLocked} = useContext(LockedContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
@@ -36,6 +32,10 @@ const NavBar = () => {
         setOnSave,
         setOnDoNotSave
     } = useContext(ConfirmCloseModalContext);
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [fileDropdownVisible, setFileDropdownVisible] = useState(false);
+    const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const navigate = useNavigate();
 

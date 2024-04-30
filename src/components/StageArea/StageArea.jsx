@@ -17,21 +17,6 @@ import {clamp} from "../../util/Operations";
  * @constructor
  */
 const StageArea = () => {
-    const [ctrlPressed, setCtrlPressed] = useState(false);
-    const [shiftPressed, setShiftPressed] = useState(false);
-
-    /**
-     * Reference to the konva transformer box.
-     * @type {React.MutableRefObject<Konva.Transformer>}
-     */
-    const trRef = useRef();
-
-    /**
-     * Reference to the konva layer on the stage.
-     * @type {React.MutableRefObject<Konva.Layer>}
-     */
-    const layerRef = useRef();
-
     const {
         selectedKonvaElements,
         isAnySelected,
@@ -47,6 +32,20 @@ const StageArea = () => {
         isAnyElements, isAnyImages, undo, redo} = useContext(ElementContext);
     const {stageRef} = useContext(StageRefContext);
     const {deleteEnabled} = useContext(DeleteEnabledContext);
+
+    /**
+     * Reference to the konva transformer box.
+     * @type {React.MutableRefObject<Konva.Transformer>}
+     */
+    const trRef = useRef();
+    /**
+     * Reference to the konva layer on the stage.
+     * @type {React.MutableRefObject<Konva.Layer>}
+     */
+    const layerRef = useRef();
+
+    const [ctrlPressed, setCtrlPressed] = useState(false);
+    const [shiftPressed, setShiftPressed] = useState(false);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit

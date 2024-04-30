@@ -17,10 +17,10 @@ const SelectContext = createContext(null);
  * @constructor
  */
 export const SelectContextProvider = ({children}) => {
+    const {elements} = useContext(ElementContext);
+
     const [selectedElementsIndex, setSelectedElementsIndex] = useState([]);
     const [selectedKonvaElements, setSelectedKonvaElements] = useState([]);
-    
-    const {elements} = useContext(ElementContext);
 
     const selectedElements = useMemo(() => selectedElementsIndex.map(index => elements[index]),
         [elements, selectedElementsIndex]);

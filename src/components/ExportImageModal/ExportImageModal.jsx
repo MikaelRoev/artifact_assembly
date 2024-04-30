@@ -31,10 +31,11 @@ export const ExportImageModalContextProvider = ({children}) => {
  * @constructor
  */
 const ExportImageModal = () => {
-    const [number, setNumber] = useState(1);
-    const [isInfoVisible, setIsInfoVisible] = useState(false);
     const {isExportImageModalOpen, setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {stageRef} = useContext(StageRefContext);
+
+    const [number, setNumber] = useState(1);
+    const [isInfoVisible, setIsInfoVisible] = useState(false);
 
     /**
      * Gets the canvas as DataURL and send it to the export canvas as image dialog.
