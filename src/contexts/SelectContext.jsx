@@ -1,4 +1,4 @@
-import React, {createContext, useState} from "react";
+import React, {createContext, useMemo, useState} from "react";
 
 /**
  * The select context that allows for getting selected elements and indices lists,
@@ -16,7 +16,10 @@ const SelectContext = createContext(null);
  */
 export const SelectContextProvider = ({children}) => {
     const [selectedElementsIndex, setSelectedElementsIndex] = useState([]);
-    const [selectedElements, setSelectedElements] = useState([]);
+    const [selectedKonvaElements, setSelectedKonvaElements] = useState([]);
+
+    const isAnySelected = useMemo(() => selectedElementsIndex.length > 0,
+        [selectedElementsIndex.length]);
 
     /**
      * Selects an element.
@@ -24,7 +27,7 @@ export const SelectContextProvider = ({children}) => {
      * @param index {number} the index of the element to be selected.
      */
     function select (element, index) {
-        setSelectedElements([...selectedElements, element]);
+        setSelectedKonvaElements([...selectedKonvaElements, element]);
         setSelectedElementsIndex([...selectedElementsIndex, index]);
     }
 
@@ -35,10 +38,10 @@ export const SelectContextProvider = ({children}) => {
     function deselect(index) {
         const indexIndex = selectedElementsIndex.indexOf(index);
         if (indexIndex === -1) return;
-        selectedElements[indexIndex].draggable(false);
-        const newSelected = [...selectedElements];
+        selectedKonvaElements[indexIndex].draggable(false);
+        const newSelected = [...selectedKonvaElements];
         newSelected.splice(indexIndex, 1);
-        setSelectedElements(newSelected);
+        setSelectedKonvaElements(newSelected);
 
         const newSelectedIndex = [...selectedElementsIndex];
         newSelectedIndex.splice(indexIndex, 1);
@@ -49,8 +52,8 @@ export const SelectContextProvider = ({children}) => {
      * Deselects all selected elements.
      */
     function deselectAll() {
-        selectedElements.forEach((element) => element.draggable(false));
-        setSelectedElements([]);
+        selectedKonvaElements.forEach((element) => element.draggable(false));
+        setSelectedKonvaElements([]);
         setSelectedElementsIndex([]);
     }
 
@@ -60,8 +63,8 @@ export const SelectContextProvider = ({children}) => {
      * @param index {number} the index of the element to be selected.
      */
     function selectOnly(element, index) {
-        selectedElements.forEach((element) => element.draggable(false));
-        setSelectedElements([element]);
+        selectedKonvaElements.forEach((element) => element.draggable(false));
+        setSelectedKonvaElements([element]);
         setSelectedElementsIndex([index]);
     }
 
@@ -73,8 +76,9 @@ export const SelectContextProvider = ({children}) => {
     const isSelected = (index) => selectedElementsIndex.includes(index);
 
     const providerValues = {
-        selectedElements,
+        selectedKonvaElements,
         selectedElementsIndex,
+        isAnySelected,
         select,
         deselect,
         deselectAll,

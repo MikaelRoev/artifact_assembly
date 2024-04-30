@@ -33,8 +33,8 @@ const StageArea = () => {
     const layerRef = useRef();
 
     const {
-        selectedElements,
-        selectedElementsIndex,
+        selectedKonvaElements,
+        isAnySelected,
         select,
         deselect,
         deselectAll,
@@ -76,7 +76,7 @@ const StageArea = () => {
          */
         function handleDeletePressed(e) {
             if (["Delete", "Backspace"].includes(e.key)
-                && selectedElementsIndex.length > 0
+                && isAnySelected
                 && deleteEnabled) {
                 const newElements = elements.filter((element, index) => !isSelected(index));
                 setElements(newElements);
@@ -88,7 +88,7 @@ const StageArea = () => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [deselectAll, elements, deleteEnabled, isSelected, selectedElementsIndex.length, setElements]);
+    }, [deselectAll, elements, deleteEnabled, isSelected, setElements, isAnySelected]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -217,13 +217,13 @@ const StageArea = () => {
      * Updates the transformer to selected elements.
      */
     useEffect(() => {
-        if (trRef.current && selectedElements.length > 0) {
-            trRef.current.nodes(selectedElements);
+        if (trRef.current && isAnySelected) {
+            trRef.current.nodes(selectedKonvaElements);
             trRef.current.moveToTop();
             trRef.current.getLayer().batchDraw();
-            selectedElements.forEach((element) => element.draggable(!isLocked));
+            selectedKonvaElements.forEach((element) => element.draggable(!isLocked));
         }
-    }, [selectedElements, isLocked]);
+    }, [selectedKonvaElements, isLocked, isAnySelected]);
 
     /**
      * Event handler for element clicking. This will check the selection of the element.
@@ -374,7 +374,7 @@ const StageArea = () => {
                 ref={layerRef}>
                 {renderElements()}
                 {
-                    selectedElements.length > 0 &&
+                    isAnySelected &&
                     <Transformer
                         ref={trRef}
                         boundBoxFunc={(oldBox, newBox) => {

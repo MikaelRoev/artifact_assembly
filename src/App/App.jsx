@@ -14,6 +14,7 @@ import "./App.css";
 //TODO: unit tests
 //TODO: adding filters check, enable filters when filter window opens?
 //TODO: make provider context values memo?
+//TODO: sort imports
 
 /**
  * The application component.

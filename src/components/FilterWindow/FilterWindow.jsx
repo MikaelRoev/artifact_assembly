@@ -42,7 +42,7 @@ export const FilterWindowContextProvider = ({children}) => {
  */
 const FilterWindow = () => {
     const {elements, setElements} = useContext(ElementContext);
-    const {selectedElementsIndex} = useContext(SelectContext);
+    const {selectedElementsIndex, isAnySelected} = useContext(SelectContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {stageRef} = useContext(StageRefContext);
@@ -218,7 +218,7 @@ const FilterWindow = () => {
                 <div className={"filterWindowTitle"}>Filter</div>
                 <button className={"square exit"} onClick={() => setIsFilterWindowOpen(false)}></button>
             </div>
-            {selectedElementsIndex.length > 0 ?
+            {isAnySelected ?
                 (<div className={"filterWindowBody"}>
                     <FilterForm
                         id={"filter-hue"}
