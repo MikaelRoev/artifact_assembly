@@ -17,7 +17,7 @@ export const ElementContextProvider = ({children}) => {
     const [elements, setElements, undo, redo] = useHistory([], 20);
 
     const isAnyElements = useMemo(() => (elements.length > 0), [elements.length]);
-    const images = useMemo(() => elements.filter(element => element.type === "image"),
+    const images = useMemo(() => elements.filter(element => element.type === "Image"),
         [elements]);
     const isAnyImages = useMemo(() => (images.length > 0),
         [images.length]);
