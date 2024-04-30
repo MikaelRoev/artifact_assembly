@@ -309,7 +309,6 @@ const StageArea = () => {
 
             >
                 {group.groupElements.map((groupElement, i) => {
-                    console.log("Rendering Image:", groupElement); // Add console.log here
                     return (
                         <ImageNode
                             key={i}
@@ -326,23 +325,14 @@ const StageArea = () => {
      */
     useEffect(() => {
         /**
-         * Sets the width and height of images that does not have them yet.
+         * Sets the hue values of images that does not have it yet.
          * @param imageNodes Image nodes on the canvas.
          * @returns {Promise<void>}
          */
         async function setImageDimensions(imageNodes) {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            for (const index of selectedImagesIndex) {
-                const image = elements[index];
-                for (const imageNode of imageNodes) {
-                    if (image.id !== imageNode.attrs.id) continue;
-                    const hueValues = await getHueData(imageNode.toDataURL())
-                    elements[index] = {
-                        ...image, hueValues: hueValues,
-                        width: imageNode.width(),
-                        height: imageNode.height(),
-                    }
-                }
+            for (const imageNode of imageNodes) {
+                imageNode.attrs.hueValues = await getHueData(imageNode.toDataURL());
             }
         }
 
@@ -352,8 +342,9 @@ const StageArea = () => {
          */
         if (layerRef.current && isAnyImages) {
             const imageNodes = layerRef.current.find((node) => node.getClassName() === "Image")
-                .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
-            setImageDimensions(imageNodes).then(() => console.log("Information retrieved"))
+                .filter((child) => !child.attrs.hueValues);
+            setImageDimensions(imageNodes)
+                .then(() => console.log("Information retrieved from set image dimensions"))
                 .catch(console.error);
         }
     }, [elements.length, layerRef, elements]);
