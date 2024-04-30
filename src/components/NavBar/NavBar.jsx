@@ -10,8 +10,8 @@ import {ConfirmCloseModalContext} from "../ConfirmCloseModal/ConfirmCloseModal";
 import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
-import "./NavBar.css";
 import FilterEnabledContext from "../../contexts/FilterEnabledContext";
+import "./NavBar.css";
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.

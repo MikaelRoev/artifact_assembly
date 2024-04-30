@@ -1,7 +1,6 @@
 import {dialog, fs} from "@tauri-apps/api";
 import {readFile, saveToFile} from "./FileHandling";
 
-
 /**
  * Opens the "open project"-dialog window.
  * @param setProject {function(Object)} the setter for the project.

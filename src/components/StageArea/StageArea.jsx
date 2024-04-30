@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Group, Layer, Stage, Transformer} from "react-konva";
 import {saveProjectDialog} from "../../util/TauriDialogWondows"
 import {getHueData} from "../../util/ImageManupulation";
+import {clamp} from "../../util/Operations";
 import ImageNode from "../ImageNode/ImageNode";
 import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
@@ -9,7 +10,6 @@ import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import StageRefContext from "../../contexts/StageRefContext";
-import {clamp} from "../../util/Operations";
 
 /**
  * Component that represents the konva stage area in the canvas page.

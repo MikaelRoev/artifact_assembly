@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useEffect, useMemo, useRef, useState} from "react";
+import Konva from "konva";
 import {getHueData} from "../../util/ImageManupulation";
 import {makeDraggable, makeResizable} from "../../util/WindowFunctionality";
 import Histogram from "../Histogram/Histogram";
@@ -7,7 +8,6 @@ import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import "./SimilarityMetricsWindow.css"
-import Konva from "konva";
 
 /**
  * The context for the similarity metrics window.

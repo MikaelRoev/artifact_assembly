@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useMemo, useState} from "react";
-import ElementContext from "./ElementContext";
 import Konva from "konva";
+import ElementContext from "./ElementContext";
 
 /**
  * The select context that allows for getting selected elements and indices lists,
