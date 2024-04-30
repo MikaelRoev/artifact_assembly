@@ -248,7 +248,10 @@ const StageArea = () => {
         }
     }
 
-    //TODO: comment
+    /**
+     * Render elements ny running renderImage, or renderGroup that will do the rendering
+     * @return {false|*}
+     */
     function renderElements() {
         return (
             elements.length > 0 &&
@@ -268,6 +271,12 @@ const StageArea = () => {
         );
     }
 
+    /**
+     * Renders an image
+     * @param image
+     * @param index
+     * @return {Element}
+     */
     function renderImage(image, index) {
         return (
             <ImageNode
@@ -283,7 +292,12 @@ const StageArea = () => {
         );
     }
 
-    //TODO: comment
+    /**
+     * Renders a group and renders images inside it
+     * @param group
+     * @param index
+     * @return {Element}
+     */
     function renderGroup(group, index) {
         return (
             <Group
