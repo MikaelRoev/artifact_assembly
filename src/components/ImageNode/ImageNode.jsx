@@ -98,7 +98,6 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
 			onClick={onClick}
 			onTap={onClick}
 			onContextMenu={onContextMenu}
-			draggable={false}
             perfectDrawEnabled={false}
 			onDragEnd={(e) => {
 				onChange({
@@ -115,11 +114,9 @@ const ImageNode = ({imageProps, onClick, onChange, onContextMenu,	id}) => {
 					rotation: e.target.rotation(),
 				});
 			}}
-			onMouseDown={(e) => {
-				//Moves selected image on top (z-index)
-				e.target.moveToTop();
-			}}
 			onMouseEnter={(e) => {
+                //Moves selected image on top (z-index)
+                e.target.moveToTop();
 				// Adds a pointer cursor when hovering over the image
 				const container = e.target.getStage().container();
 				container.style.cursor = "default";
