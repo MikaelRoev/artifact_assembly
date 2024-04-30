@@ -39,8 +39,9 @@ const NavBar = () => {
 
     const navigate = useNavigate();
 
-    const angleOffset = 30;
-    const radiusOffset = 100;
+    const xOffset = 200;
+    const offsetRowCount = 10;
+    const yOffset = 400;
 
     /**
      * Closes the project and returns to the landing page.
@@ -70,36 +71,25 @@ const NavBar = () => {
      */
     function findFirstFreePosition(position) {
         while (isAnyElementAtPosition(position)) {
-            position = adjustPolarCoordinates(position.x, position.y);
+            position = newPosition(position);
         }
         return {x: position.x, y: position.y}
     }
 
-    function adjustPolarCoordinates(x, y) {
-        let { radius, angle } = cartesianToPolarCoordinates(x, y);
-        radius += radiusOffset;
-        angle += angleOffset;
-        return polarToCartesianCoordinates(radius, angle);
-    }
-
-    function polarToCartesianCoordinates(radius, angle) {
-        const radians = angle * (Math.PI / 180);
-        return {x: radius * Math.cos(radians), y: radius * Math.sin(radians)}
-    }
-
-    function cartesianToPolarCoordinates(x, y) {
-        const radius = Math.sqrt(x * x + y * y);
-        let angle = Math.atan2(y, x) * (180 / Math.PI);
-        angle = (angle + 360) % 360;
-
-        return { radius, angle };
+    function newPosition(position) {
+        let x = position.x + xOffset;
+        let y = position.y;
+        if (x > xOffset * offsetRowCount) {
+            x = 0;
+            y += yOffset;
+        }
+        return {x, y};
     }
 
     /**
      * Asynchronous function for uploading of images.
      * @returns {Promise<void>}
      */
-
     async function handleImageUpload() {
         setIsLoading(true);
         // open file explorer dialog window
@@ -122,7 +112,7 @@ const NavBar = () => {
                     filePath: file,
                 };
                 idAdder++
-                position = adjustPolarCoordinates(position.x, position.y)
+                position = newPosition(position);
                 return newImage;
             });
             setElements([...elements, ...newImages]);
@@ -390,7 +380,6 @@ const NavBar = () => {
                                         onClick={handleLockCanvasClick}>
                                         {!isLocked ? "Lock Canvas" : "Unlock Canvas"}</button>
                                 </li>
-                                {/*TODO: add filter enable button*/}
                             </ul>
                         </div>
                     )}
