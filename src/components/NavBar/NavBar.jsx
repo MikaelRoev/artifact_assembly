@@ -11,6 +11,7 @@ import {ExportImageModalContext} from "../ExportImageModal/ExportImageModal";
 import {SimilarityMetricsWindowContext} from "../SimilarityMetricsWindow/SimilarityMetricsWindow";
 import {FilterWindowContext} from "../FilterWindow/FilterWindow";
 import "./NavBar.css";
+import FilterEnabledContext from "../../contexts/FilterEnabledContext";
 
 /**
  * Component for the navigation bar that is at the top of the canvas page.
@@ -26,6 +27,7 @@ const NavBar = () => {
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {project, setProject} = useContext(ProjectContext);
     const {stageRef} = useContext(StageRefContext);
+    const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
     const {setIsFilterWindowOpen} = useContext(FilterWindowContext);
@@ -354,6 +356,15 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={handleOpenFilterWindow}>
                                         Filters
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        className="dropdownButton"
+                                        onClick={() => {
+                                            setFilterEnabled((prevFilter) => !prevFilter);
+                                        }}>
+                                        {!filterEnabled ? "Enable Filters" : "Disable Filters"}
                                     </button>
                                 </li>
                                 <li>
