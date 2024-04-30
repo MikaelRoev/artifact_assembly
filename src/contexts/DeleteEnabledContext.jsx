@@ -12,7 +12,7 @@ const DeleteEnabledContext = createContext(null);
  * @return {JSX.Element} the context provider.
  */
 export const DeleteEnabledContextProvider = ({children}) => {
-    const [deleteEnabled, setDeleteEnabled] = useState(false);
+    const [deleteEnabled, setDeleteEnabled] = useState(true);
 
     return (
         <DeleteEnabledContext.Provider value={{deleteEnabled, setDeleteEnabled}}>

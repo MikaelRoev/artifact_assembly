@@ -339,8 +339,8 @@ const StageArea = () => {
             const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === "Image")
                 .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
             if (imageNodes.length > 0) {
-                setImageDimensions(imageNodes).then(() => console.log("Information retrieved"));
-
+                setImageDimensions(imageNodes).then(() => console.log("Information retrieved"))
+                    .catch(console.error);
             }
         }
     }, [elements.length, layerRef, elements]);

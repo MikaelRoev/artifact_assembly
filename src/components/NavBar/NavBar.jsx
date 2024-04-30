@@ -84,8 +84,7 @@ const NavBar = () => {
         const result = await open({
             title: "Load Image",
             filters: [{name: "Images", extensions: ["jpg", "png"]}],
-            multiple: true,
-            //defaultPath: await appDataDir()
+            multiple: true
         });
         if (result?.length > 0) {
             let position = {x: 0, y: 0};
@@ -101,6 +100,7 @@ const NavBar = () => {
                     filePath: file,
                 };
                 idAdder++
+                //TODO: make the offset place them in a spiral
                 position.x += xOffset;
                 position.y += yOffset;
                 return newImage;
@@ -162,7 +162,7 @@ const NavBar = () => {
      */
     function handleImageOfCanvasExport() {
         setIsExportImageModalOpen(true);
-        handleFileButtonClick()
+        handleFileButtonClick();
     }
 
     /**
@@ -243,10 +243,7 @@ const NavBar = () => {
                 y: newY,
                 scaleX: 1,
                 scaleY: 1,
-                duration: 0.5,
-                onFinish: () => {
-                    project.zoom = 1;
-                }
+                duration: 0.5
             })
         }
         handleToolsButtonClick();
@@ -259,7 +256,6 @@ const NavBar = () => {
                     <button className="navButton" onClick={handleFileButtonClick}>
                         File
                     </button>
-                    {/* Dropdown menu. Add <li> elements to expand the menu */}
                     {fileDropdownVisible && (
                         <div className="dropdown">
                             <ul>
