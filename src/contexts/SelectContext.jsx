@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useMemo, useState} from "react";
 import ElementContext from "./ElementContext";
+import Konva from "konva";
 
 /**
  * The select context that allows for getting selected elements and indices lists,
@@ -25,8 +26,11 @@ export const SelectContextProvider = ({children}) => {
         [elements, selectedElementsIndex]);
     const isAnySelected = useMemo(() => selectedElementsIndex.length > 0,
         [selectedElementsIndex.length]);
+
     const selectedImagesIndex = useMemo(() =>
         selectedElementsIndex.filter(index => elements[index].type === "Image"), [selectedElementsIndex, elements]);
+    const selectedKonvaImages = useMemo(() =>
+        selectedKonvaElements.filter(element => element instanceof Konva.Image), [selectedKonvaElements]);
     const selectedImages = useMemo(() =>
         selectedElements.filter(element => element.type === "Image"), [selectedElements]);
     const isAnySelectedImages = useMemo(() => selectedImagesIndex.length > 0,
@@ -88,6 +92,7 @@ export const SelectContextProvider = ({children}) => {
 
     const providerValues = {
         selectedKonvaElements,
+        selectedKonvaImages,
         selectedElementsIndex,
         selectedImagesIndex,
         selectedElements,
