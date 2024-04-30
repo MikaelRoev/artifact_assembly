@@ -21,10 +21,16 @@ export const SelectContextProvider = ({children}) => {
     
     const {elements} = useContext(ElementContext);
 
+    const selectedElements = useMemo(() => selectedElementsIndex.map(index => elements[index]),
+        [elements, selectedElementsIndex]);
     const isAnySelected = useMemo(() => selectedElementsIndex.length > 0,
         [selectedElementsIndex.length]);
-    const selectedElements = useMemo(() => selectedElementsIndex.map(index => elements[index]), 
-        [elements, selectedElementsIndex]);
+    const selectedImagesIndex = useMemo(() =>
+        selectedElementsIndex.filter(index => elements[index].type === "Image"), [selectedElementsIndex, elements]);
+    const selectedImages = useMemo(() =>
+        selectedElements.filter(element => element.type === "Image"), [selectedElements]);
+    const isAnySelectedImages = useMemo(() => selectedImagesIndex.length > 0,
+        [selectedImagesIndex.length]);
 
     /**
      * Selects an element.
@@ -83,8 +89,12 @@ export const SelectContextProvider = ({children}) => {
     const providerValues = {
         selectedKonvaElements,
         selectedElementsIndex,
-        isAnySelected,
+        selectedImagesIndex,
         selectedElements,
+        selectedImages,
+        isAnySelected,
+        isAnySelectedImages,
+
         select,
         deselect,
         deselectAll,

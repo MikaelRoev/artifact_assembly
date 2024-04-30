@@ -54,11 +54,13 @@ const SimilarityMetricsWindow = () => {
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
     const {elements} = useContext(ElementContext);
-    const {selectedElementsIndex, isAnySelected} = useContext(SelectContext);
+    const {selectedImages, selectedImagesIndex, isAnySelectedImages} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
     const {setDeleteEnabled} = useContext(DeleteEnabledContext);
+
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
+
     const maxHistogramValue = 360;
     const [minInputValue, setMinInputValue] = useState(0);
     const [maxInputValue, setMaxInputValue] = useState(maxHistogramValue);
@@ -103,9 +105,8 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        const imageNodes = stageRef.current.getChildren()[0].getChildren()
-            .filter((child) => child.getClassName() === "Image");
-        for (const index of selectedElementsIndex) {
+        const imageNodes = stageRef.current.find((node) => node.getClassName() === "Image");
+        for (const index of selectedImagesIndex) {
             for (const imageNode of imageNodes) {
                 if (elements[index].id !== imageNode.attrs.id) continue;
                 const newHues = await getHueData(imageNode.toDataURL())
@@ -296,21 +297,20 @@ const SimilarityMetricsWindow = () => {
                 <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
-                {isAnySelected ?
+                {isAnySelectedImages ?
                     (update &&
-                        selectedElementsIndex.map(index => {
-                            const image = elements[index];
+                        selectedImages.map(image => {
                             if (image.hueValues) {
                                 const path = convertFileSrc(image.filePath)
                                 return (
-                                    <div className={"element-container"} key={index}>
+                                    <div className={"element-container"} key={image.id}>
                                         <div className="histogram-container">
                                             <div className="histogram-info">
                                                 <img src={path} alt={"For histogram"}/>
                                                 <p>{image.fileName}</p>
                                             </div>
                                             <Histogram
-                                                key={index}
+                                                key={image.id}
                                                 array={image.hueValues}
                                                 widthProp={400}
                                                 heightProp={300}

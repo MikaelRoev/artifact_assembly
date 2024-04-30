@@ -42,7 +42,7 @@ export const FilterWindowContextProvider = ({children}) => {
  */
 const FilterWindow = () => {
     const {elements, setElements} = useContext(ElementContext);
-    const {selectedElementsIndex, isAnySelected, selectedElements} = useContext(SelectContext);
+    const {selectedImagesIndex, selectedImages, isAnySelectedImages} = useContext(SelectContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {stageRef} = useContext(StageRefContext);
@@ -58,11 +58,6 @@ const FilterWindow = () => {
     const thresholdMax = 350;
     const thresholdMin = 0;
     const root = document.querySelector(":root");
-
-    //TODO: move to selectContext
-    const selectedImages = useMemo(
-        () => selectedElements.filter((element) => element.type === "Image"),
-        [selectedElements]);
 
     /**
      * Calculates the percentage representation of a value within a specified range.
@@ -119,11 +114,11 @@ const FilterWindow = () => {
      * @return {number} the value if the value is the same for all the selected images or 0 if not.
      */
     const getValue = useCallback((parameter) => {
-        if (selectedImages.length === 0) return 0;
+        if (!isAnySelectedImages) return 0;
         const firstValue = selectedImages[0][parameter];
         if (!isNaN(firstValue) && selectedImages.every(image => image[parameter] === firstValue)) return firstValue;
         return 0;
-    }, [selectedImages]);
+    }, [isAnySelectedImages, selectedImages]);
 
     /**
      * Gets true if all the selected are true else returns false.
@@ -131,9 +126,9 @@ const FilterWindow = () => {
      * @return {boolean} true if all the selected are true else returns false.
      */
     const getBool = useCallback((parameter) => {
-        if (selectedImages.length === 0) return false;
+        if (!isAnySelectedImages) return false;
         return selectedImages.every(image => image[parameter]);
-    }, [selectedImages]);
+    }, [isAnySelectedImages, selectedImages]);
 
     /**
      * Sets the sliders and toggles on the filter window when changing which fragment to filter.
@@ -143,23 +138,21 @@ const FilterWindow = () => {
         root.style.setProperty("--saturation",
             mapToPercentage(getValue("saturation"), saturationMin, saturationMax));
         updateBrightnessStyle(getValue("value"), getBool("invert"));
-        if (selectedImages.length > 0) {
-            if (!isFilterWindowOpen) return;
-            document.getElementById("grayscaleToggle")
-                .querySelector('input[name="toggleCheckbox"]').checked = !!getBool("grayscale");
-            if (getBool("invert")) {
-                root.style.setProperty("--invert-first", 100);
-                root.style.setProperty("--invert-last", 0);
-                document.getElementById("invertToggle")
-                    .querySelector('input[name="toggleCheckbox"]').checked = true;
-            } else {
-                root.style.setProperty("--invert-first", 0);
-                root.style.setProperty("--invert-last", 100);
-                document.getElementById("invertToggle")
-                    .querySelector('input[name="toggleCheckbox"]').checked = false;
-            }
+        if (!isAnySelectedImages || !isFilterWindowOpen) return;
+        document.getElementById("grayscaleToggle")
+            .querySelector('input[name="toggleCheckbox"]').checked = !!getBool("grayscale");
+        if (getBool("invert")) {
+            root.style.setProperty("--invert-first", 100);
+            root.style.setProperty("--invert-last", 0);
+            document.getElementById("invertToggle")
+                .querySelector('input[name="toggleCheckbox"]').checked = true;
+        } else {
+            root.style.setProperty("--invert-first", 0);
+            root.style.setProperty("--invert-last", 100);
+            document.getElementById("invertToggle")
+                .querySelector('input[name="toggleCheckbox"]').checked = false;
         }
-    }, [getBool, getValue, selectedImages.length, isFilterWindowOpen, root.style, saturationMin, updateBrightnessStyle]);
+    }, [getBool, getValue, isFilterWindowOpen, root.style, saturationMin, saturationMax, updateBrightnessStyle, isAnySelectedImages]);
 
     /**
      * Resets the filters on the filter image.
@@ -193,7 +186,8 @@ const FilterWindow = () => {
      * or as default commit a new state.
      */
     function setValue (parameter, value, overwrite = false) {
-        selectedElementsIndex.forEach((index) => {
+        //TODO: fix bug with setValue & setBool
+        selectedImagesIndex.forEach((index) => {
             elements[index][parameter] = value;
         });
         setElements(elements, overwrite);
@@ -205,7 +199,7 @@ const FilterWindow = () => {
      * @param bool {boolean} the new value of the parameter.
      */
     function setBool(parameter, bool) {
-        selectedElementsIndex.forEach((index) => {
+        selectedImagesIndex.forEach((index) => {
             elements[index][parameter] = bool;
         });
         setElements(elements);
@@ -218,7 +212,7 @@ const FilterWindow = () => {
                 <div className={"filterWindowTitle"}>Filter</div>
                 <button className={"square exit"} onClick={() => setIsFilterWindowOpen(false)}></button>
             </div>
-            {isAnySelected ?
+            {isAnySelectedImages ?
                 (<div className={"filterWindowBody"}>
                     <FilterForm
                         id={"filter-hue"}
@@ -228,7 +222,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("hue")}
                         setValue={(hu, overwrite) => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             const hue = parseInt(hu);
                             setValue("hue", hue, overwrite);
                             root.style.setProperty("--hue", -hue);
@@ -242,7 +236,7 @@ const FilterWindow = () => {
                         step={0.1}
                         value={getValue("saturation")}
                         setValue={(sat, overwrite) => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             const saturation = parseFloat(sat);
                             setValue("saturation", saturation, overwrite);
                             root.style.setProperty("--saturation",
@@ -257,7 +251,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("contrast")}
                         setValue={(contrast, overwrite) => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             setValue("contrast", parseFloat(contrast), overwrite);
                             root.style.setProperty("--contrast",
                                 mapToPercentage(contrast, contrastMin, contrastMax));
@@ -271,7 +265,7 @@ const FilterWindow = () => {
                         step={0.05}
                         value={getValue("value")}
                         setValue={(bri, overwrite) => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             const brightness = parseFloat(bri);
                             setValue("value", brightness, overwrite);
                             updateBrightnessStyle(brightness, getBool("invert"));
@@ -285,7 +279,7 @@ const FilterWindow = () => {
                         step={1}
                         value={getValue("threshold")}
                         setValue={(threshold, overwrite) => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             setValue("threshold", parseInt(threshold), overwrite);
                         }}
                     />
@@ -293,7 +287,7 @@ const FilterWindow = () => {
                         label="Grayscale"
                         id={"grayscaleToggle"}
                         setValue={() => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             setBool("grayscale", !getBool("grayscale"));
                         }}
                     />
@@ -301,7 +295,7 @@ const FilterWindow = () => {
                         label="Invert"
                         id={"invertToggle"}
                         setValue={() => {
-                            if (selectedImages.length === 0) return;
+                            if (!isAnySelectedImages) return;
                             const invert = !getBool("invert");
                             setBool("invert", invert);
                             updateBrightnessStyle(getValue("value"), invert);

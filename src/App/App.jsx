@@ -15,6 +15,7 @@ import "./App.css";
 //TODO: adding filters check, enable filters when filter window opens?
 //TODO: make provider context values memo?
 //TODO: sort imports
+//TODO: sort hooks
 
 /**
  * The application component.
