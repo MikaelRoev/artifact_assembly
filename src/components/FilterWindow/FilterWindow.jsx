@@ -42,7 +42,7 @@ export const FilterWindowContextProvider = ({children}) => {
  */
 const FilterWindow = () => {
     const {elements, setElements} = useContext(ElementContext);
-    const {selectedElementsIndex, isAnySelected} = useContext(SelectContext);
+    const {selectedElementsIndex, isAnySelected, selectedElements} = useContext(SelectContext);
     const {isFilterWindowOpen, setIsFilterWindowOpen} = useContext(FilterWindowContext);
     const {filterEnabled, setFilterEnabled} = useContext(FilterEnabledContext);
     const {stageRef} = useContext(StageRefContext);
@@ -61,8 +61,8 @@ const FilterWindow = () => {
 
     //TODO: move to selectContext
     const selectedImages = useMemo(
-        () => selectedElementsIndex.map((index) => elements[index]).filter((element) => element.type === "Image"),
-        [selectedElementsIndex, elements]);
+        () => selectedElements.filter((element) => element.type === "Image"),
+        [selectedElements]);
 
     /**
      * Calculates the percentage representation of a value within a specified range.

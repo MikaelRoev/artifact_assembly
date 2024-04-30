@@ -1,4 +1,5 @@
-import React, {createContext, useMemo, useState} from "react";
+import React, {createContext, useContext, useMemo, useState} from "react";
+import ElementContext from "./ElementContext";
 
 /**
  * The select context that allows for getting selected elements and indices lists,
@@ -17,9 +18,13 @@ const SelectContext = createContext(null);
 export const SelectContextProvider = ({children}) => {
     const [selectedElementsIndex, setSelectedElementsIndex] = useState([]);
     const [selectedKonvaElements, setSelectedKonvaElements] = useState([]);
+    
+    const {elements} = useContext(ElementContext);
 
     const isAnySelected = useMemo(() => selectedElementsIndex.length > 0,
         [selectedElementsIndex.length]);
+    const selectedElements = useMemo(() => selectedElementsIndex.map(index => elements[index]), 
+        [elements, selectedElementsIndex]);
 
     /**
      * Selects an element.
@@ -79,6 +84,7 @@ export const SelectContextProvider = ({children}) => {
         selectedKonvaElements,
         selectedElementsIndex,
         isAnySelected,
+        selectedElements,
         select,
         deselect,
         deselectAll,
