@@ -21,7 +21,7 @@ const NavBar = () => {
     const [toolsDropdownVisible, setToolsDropdownVisible] = useState(false);
 
     const {project, setProject} = useContext(ProjectContext);
-    const {stage, getAllImages, getSelectedElements, setElements, loadInImages,
+    const {stage, allImages, selectedElements, setElements, loadInImages,
         groupSelected, state, undo, redo, isLocked, setIsLocked} = useContext(StageContext);
     const {setIsSimilarityMetricsWindowOpen} = useContext(SimilarityMetricsWindowContext);
     const {setIsExportImageModalOpen} = useContext(ExportImageModalContext);
@@ -53,7 +53,7 @@ const NavBar = () => {
      *  false if there are no elements at the position.
      */
     function isAnyElementAtPosition(position) {
-        return getAllImages().some(element => {
+        return allImages.some(element => {
             return element.x() === position.x && element.y() === position.y
         })
     }
@@ -215,7 +215,7 @@ const NavBar = () => {
         const currentStageCenterY = -stage.y() / stage.scaleY() + stageHeight / 2 / stage.scaleY();
 
         //Finding the closest element
-        getAllImages().forEach(image => {
+        allImages.forEach(image => {
             const dx = image.x() - currentStageCenterX;
             const dy = image.y() - currentStageCenterY;
             const distance = Math.sqrt(dx ** 2 + dy ** 2);
@@ -345,7 +345,7 @@ const NavBar = () => {
                                 <li>
                                     <button
                                         className="dropdownButton"
-                                        disabled={getSelectedElements().length <= 1}
+                                        disabled={selectedElements.length <= 1}
                                         onClick={groupSelected}>
                                         Lock Selected Together
                                     </button>

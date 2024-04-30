@@ -51,7 +51,7 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {stage, getAllImages, getSelectedImages, isAnySelectedImages} = useContext(StageContext);
+    const {stage, allImages, selectedImages, isAnySelectedImages} = useContext(StageContext);
     //TODO: change name of context: filter interaction?
     const {setIsFilterInteracting} = useContext(FilterInteractionContext);
     const contentRef = useRef(null);
@@ -99,7 +99,7 @@ const SimilarityMetricsWindow = () => {
      * @returns {Promise<void>}
      */
     async function updateHistograms() {
-        for (const image of getSelectedImages()) {
+        for (const image of selectedImages) {
             image.attrs.hueValues = await getHueData(image.toDataURL());
         }
 
@@ -165,7 +165,7 @@ const SimilarityMetricsWindow = () => {
         const arrayA = countAndNormalizeValues(selectedElement.attrs.hueValues, maxHistogramValue);
         let lowest = Infinity;
         let lowestElement = null;
-        getAllImages().forEach((konvaImage) => {
+        allImages.forEach((konvaImage) => {
             if (selectedElement.id() !== konvaImage.id && (konvaImage.attrs.hueValues !== undefined && selectedElement.attrs.hueValues !== undefined)) {
                 const arrayB = countAndNormalizeValues(konvaImage.attrs.hueValues, maxHistogramValue);
                 const values = getHistogramScores(arrayA, arrayB);
@@ -283,9 +283,9 @@ const SimilarityMetricsWindow = () => {
                 <button onClick={handleReset}>Reset</button>
             </div>
             <div ref={contentRef} className="window-content">
-                {isAnySelectedImages() ?
+                {isAnySelectedImages ?
                     (update &&
-                        getSelectedImages().map(image => {
+                        selectedImages.map(image => {
                             if (image.attrs.hueValues) {
                                 console.log("has hue values")
                                 return (

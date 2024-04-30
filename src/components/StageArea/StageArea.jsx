@@ -18,10 +18,10 @@ const StageArea = () => {
 
     const {
         stage,
-        getSelectTransformer,
-        getSelectedElements,
-        getAllImages,
-        getAllElements,
+        selectTransformer,
+        selectedElements,
+        allImages,
+        allElements,
         addChanges,
 
         select,
@@ -57,12 +57,10 @@ const StageArea = () => {
      * Changes the ability to rotate and drag the selected elements when isLocked changes.
      */
     useEffect(() => {
-        const selectTransformer = getSelectTransformer();
-        const selectElements = getSelectedElements();
-        if (!selectTransformer || !selectElements) return;
+        if (!selectTransformer || !selectedElements) return;
         selectTransformer.rotateEnabled(!isLocked);
-        selectElements.forEach(element => element.draggable(!isLocked));
-    }, [getSelectTransformer, getSelectedElements, isLocked]);
+        selectedElements.forEach(element => element.draggable(!isLocked));
+    }, [selectTransformer, selectedElements, stage, isLocked]);
 
     /**
      * Sets up and cleans up the delete event listener.
@@ -73,7 +71,7 @@ const StageArea = () => {
          * @param e{KeyboardEvent} the event.
          */
         function handleDeletePressed(e) {
-            if (["Delete", "Backspace"].includes(e.key) && getSelectedElements().length > 0
+            if (["Delete", "Backspace"].includes(e.key) && selectedElements.length > 0
                 && !isFilterInteracting) {
                 deleteSelected();
             }
@@ -83,7 +81,7 @@ const StageArea = () => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [deleteSelected, getSelectedElements, isFilterInteracting]);
+    }, [deleteSelected, selectedElements, isFilterInteracting]);
 
     /**
      * Sets up and cleans up the save event listener.
@@ -249,11 +247,11 @@ const StageArea = () => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (getAllImages().length === 0) return;
-        const konvaImages = getAllImages().filter((child) => !child.attrs.hueValues);
+        if (allImages.length === 0) return;
+        const konvaImages = allImages.filter((child) => !child.attrs.hueValues);
         if (konvaImages.length === 0) return;
         setImageHueValues(konvaImages).then(() => console.log("Information retrieved"));
-    }, [getAllImages]);
+    }, [allImages]);
 
     useEffect(() => {
         /**
@@ -282,23 +280,21 @@ const StageArea = () => {
             console.log("emitter on");
         })
 
-        const elements = getAllElements();
-        elements.forEach(element => {
+        allElements.forEach(element => {
             element.on("click", handleElementClick);
             element.on("tap", handleElementClick);
         });
 
         return () => {
-            elements.forEach(element => {
+            allElements.forEach(element => {
                 element.off("click");
                 element.off("tap");
             })
         };
-    }, [ctrlPressed, deselect, getAllElements, isSelected, select, selectOnly, shiftPressed]);
+    }, [ctrlPressed, deselect, allElements, isSelected, select, selectOnly, shiftPressed]);
 
     useEffect(() => {
-        const elements = getAllElements();
-        elements.forEach(element => {
+        allElements.forEach(element => {
             /**
              * Saves the changes to history when move end.
              */
@@ -315,12 +311,12 @@ const StageArea = () => {
         })
 
         return () => {
-            elements.forEach(element => {
+            allElements.forEach(element => {
                 element.off("dragend");
                 element.off("transformend");
             })
         }
-    }, [addChanges, getAllElements]);
+    }, [addChanges, allElements]);
 
     return (
         <div id="stage-area"/>

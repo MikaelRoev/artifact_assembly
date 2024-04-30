@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useEffect, useState} from "react";
+import React, {createContext, useCallback, useEffect, useMemo, useState} from "react";
 import Konva from "konva";
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 import useHistory from "../hooks/useHistory";
@@ -19,6 +19,19 @@ const StageContext = createContext(null);
  */
 export const StageContextProvider = ({children}) => {
     const [stage, setStage] = useState(null);
+    const selectLayer = stage && stage.findOne("#select-layer");
+    const staticLayer = stage && stage.findOne("#static-layer");
+    const selectedElements = useMemo(() => selectLayer ? selectLayer.getChildren()
+        .filter(node => !(node instanceof Konva.Transformer)) : [], [selectLayer]);
+    const selectTransformer = stage && stage.findOne("#select-transformer");
+    const selectedImages = selectLayer ? selectLayer.find(node => node instanceof Konva.Image) : [];
+    const allImages = stage ? stage.find(node => node instanceof Konva.Image) : [];
+    const isAnyImages = allImages.length > 0;
+    const isAnySelectedImages = selectedImages.length > 0;
+    const staticElements = useMemo(() => staticLayer ? staticLayer.getChildren() : [], 
+        [staticLayer]);
+    const allElements = useMemo(() => stage ? [...selectedElements, ...staticElements] : [], 
+        [selectedElements, stage, staticElements]);
 
     const [historyState, setHistoryState, undoState, redoState] = useHistory([], 20);
 
@@ -28,7 +41,7 @@ export const StageContextProvider = ({children}) => {
     const {projectElements} = state;
     
     /**
-     * Makes and add a konva group into a container.
+     * Makes and add a Konva group into a container.
      * @param groupProps {{groupElements: Object[]}} needed to make the konva group containing its children.
      * @param container {Konva.Container} to add the group into.
      */
@@ -40,6 +53,10 @@ export const StageContextProvider = ({children}) => {
         container.add(group);
     }, []);
 
+    /**
+     * Adds the list of elements to be displayed on screen
+     * @param elements {Object[]}
+     */
     const addElement = useCallback( (elementProps, container) => {
         switch (elementProps.type) {
             case "Image":
@@ -76,89 +93,11 @@ export const StageContextProvider = ({children}) => {
         });
         newStage.add(staticLayer, selectLayer);
         setStage(newStage);
-        
+
         return () => {
             newStage.destroy();
         }
     }, [addElement, projectElements]);
-
-    /**
-     * Getter for the select layer.
-     * @return {Konva.Layer | null} the select layer in the stage or null if it could not find it.
-     */
-    function getSelectLayer() {
-        if (!stage) return null;
-        return stage.findOne("#select-layer");
-    }
-
-    /**
-     * Getter for the static layer.
-     * @return {Konva.Layer | null} the static layer in the stage or null if it could not find it.
-     */
-    function getStaticLayer() {
-        if (!stage) return null;
-        return stage.findOne("#static-layer");
-    }
-
-    /**
-     * Getter for the selected elements.
-     * @return {Konva.Node[]} the elements in the selected layer excluding transformers.
-     */
-    function getSelectedElements() {
-        const selectLayer = getSelectLayer();
-        return selectLayer ? selectLayer.getChildren().filter(node => !(node instanceof Konva.Transformer)) : [];
-    }
-
-    /**
-     * Getter for the select transformer box.
-     * @return {Konva.Transformer | null} the select transformer.
-     */
-    function getSelectTransformer() {
-        const selectLayer = getSelectLayer();
-        return selectLayer ? selectLayer.findOne("#select-transformer") : null;
-    }
-
-    /**
-     * Getter for all the selected images in the select layer.
-     * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
-     */
-    function getSelectedImages() {
-        const selectLayer = getSelectLayer();
-        return selectLayer ? selectLayer.find(node => node instanceof Konva.Image) : [];
-    }
-
-    /**
-     * Getter for all the images in the stage.
-     * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
-     */
-    function getAllImages() {
-        return stage ? stage.find(node => node instanceof Konva.Image) : [];
-    }
-
-    /**
-     * Checks if there are any images on the canvas.
-     * @return {boolean} true if there are any images on the stage or false if there are none.
-     */
-    function isAnyImages() {
-        return getAllImages().length > 0;
-    }
-
-    /**
-     * Checks if there are any selected images on the canvas.
-     * @return {boolean} true if there are any images in the selected layer or false if there are none.
-     */
-    function isAnySelectedImages() {
-        return getSelectedImages().length > 0;
-    }
-
-    /**
-     * Getter for all the elements in the stage.
-     * @return {Konva.Node[]} all elements of type image under the stage in the hierarchy.
-     */
-    const getAllElements = useCallback(() => {
-        const staticLayer = getStaticLayer();
-        return staticLayer ? [...getSelectedElements(), ...staticLayer.getChildren()] : [];
-    }, [getSelectedElements, getStaticLayer]);
 
     /**
      * Finds the index of the element in the state by id.
@@ -222,7 +161,6 @@ export const StageContextProvider = ({children}) => {
      * }[]} is the list of values of the images that is needed to make the konva images.
      */
     function loadInImages (imageProps) {
-        const staticLayer = getStaticLayer();
         imageProps.forEach(imageState => {
             addImage(imageState, staticLayer);
         })
@@ -261,10 +199,10 @@ export const StageContextProvider = ({children}) => {
     function select(element) {
         element.draggable(!isLocked);
 
-        element.moveTo(getSelectLayer());
+        element.moveTo(selectLayer);
 
-        const previousSelected = getSelectTransformer().nodes();
-        getSelectTransformer().nodes([...previousSelected, element]);
+        const previousSelected = selectTransformer.nodes();
+        selectTransformer.nodes([...previousSelected, element]);
     }
 
     /**
@@ -274,23 +212,23 @@ export const StageContextProvider = ({children}) => {
     function deselect(element) {
         element.draggable(false);
 
-        element.moveTo(getStaticLayer());
+        element.moveTo(staticLayer);
 
-        const updatedNodes = getSelectTransformer().nodes().filter(node => node.id() !== element.id());
-        getSelectTransformer().nodes(updatedNodes);
+        const updatedNodes = selectTransformer.nodes().filter(node => node.id() !== element.id());
+        selectTransformer.nodes(updatedNodes);
     }
 
     /**
      * Deselects all selected elements.
      */
     function deselectAll()  {
-        getSelectedElements().forEach(function (element) {
+        selectedElements.forEach(function (element) {
             element.draggable(false);
 
-            element.moveTo(getStaticLayer());
+            element.moveTo(staticLayer);
         });
 
-        getSelectTransformer().nodes([]);
+        selectTransformer.nodes([]);
     }
 
     /**
@@ -308,28 +246,27 @@ export const StageContextProvider = ({children}) => {
      * @return {boolean} true if element is selected, false if not.
      */
     function isSelected(element) {
-        return getSelectedElements().some(selectedElement => selectedElement.id() === element.id());
+        return selectedElements.some(selectedElement => selectedElement.id() === element.id());
     }
 
     /**
      * Delete all selected elements.
      */
     function deleteSelected() {
-        getSelectedElements().forEach(function (element) {
+        selectedElements.forEach(function (element) {
             element.destroy();
         })
 
         const newState = historyState.filter((elementState) => !isSelected(elementState));
         setHistoryState(newState);
 
-        getSelectTransformer().nodes([]);
+        selectTransformer.nodes([]);
     }
 
     function groupSelected() {
         console.log("group selected")
 
         // get selected konva images
-        const selectedImages = getSelectedImages();
         console.log("the selected images: ", selectedImages);
 
         // use konva group
@@ -343,32 +280,32 @@ export const StageContextProvider = ({children}) => {
             image.draggable(false);
         });
         console.log("after grouping them: ", group);
-        console.log("this layer should be empty: ", getSelectLayer())
+        console.log("this layer should be empty: ", selectLayer)
 
         // destroy all selected elements
-        getSelectedElements().forEach( element => {
+        selectedElements.forEach( element => {
             element.destroy();
         })
 
-        console.log("transform nodes before: ", getSelectTransformer().nodes())
+        console.log("transform nodes before: ", selectTransformer.nodes())
 
         // remove all from transformer nodes
-        getSelectTransformer().nodes([]);
-        console.log("transform halfway: ", getSelectTransformer().nodes())
+        selectTransformer.nodes([]);
+        console.log("transform halfway: ", selectTransformer.nodes())
 
         // select group (add to the selected layer)
         select(group);
-        console.log("this layer should have a group: ", getSelectLayer())
-        console.log("transform nodes after: ", getSelectTransformer().nodes())
+        console.log("this layer should have a group: ", selectLayer)
+        console.log("transform nodes after: ", selectTransformer.nodes())
     }
 
     /**
      * Updates the stage based on the state.
      */
     useEffect(() => {
-        const konvaIdSet = new Set(getAllElements().map(element => element.id()));
+        const konvaIdSet = new Set(allElements.map(element => element.id()));
 
-        getAllElements().forEach(element => {
+        allElements.forEach(element => {
             const stateElement = historyState.find(e => e.id === element.id());
             if (stateElement) {
                 element.attrs = {
@@ -381,10 +318,10 @@ export const StageContextProvider = ({children}) => {
         })
 
         historyState.filter(element => !konvaIdSet.has(element.id)).forEach(element => {
-            if (element.type === "Image") addImage(element, getStaticLayer());
-            else if (element ==="Group") addGroup(element, getStaticLayer());
+            if (element.type === "Image") addImage(element, staticLayer);
+            else if (element ==="Group") addGroup(element, staticLayer);
         })
-    }, [addGroup, getAllElements, getStaticLayer, historyState]);
+    }, [addGroup, allElements, staticLayer, historyState]);
 
     function undo() {
         undoState();
@@ -396,17 +333,17 @@ export const StageContextProvider = ({children}) => {
 
     const providerValues = {
         stage,
-        getStaticLayer,
-        getAllElements,
-        getAllImages,
+        staticLayer,
+        allElements,
+        allImages,
         isAnyImages,
         setElements,
         loadInImages,
         addChanges,
 
-        getSelectTransformer,
-        getSelectedElements,
-        getSelectedImages,
+        selectTransformer,
+        selectedElements,
+        selectedImages,
         isAnySelectedImages,
         select,
         deselect,
