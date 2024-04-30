@@ -203,6 +203,14 @@ const SimilarityMetricsWindow = () => {
         const lowestPath = convertFileSrc(lowestElement.filePath);
         return (
             <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
+                <div className={"info-div"}>
+                    <p>The most similar element to</p>
+                    <img src={path} alt={"For information"}
+                         className={"info-image"}/>
+                    <p>is</p>
+                    <img src={lowestPath} alt={"For Information"}
+                         className={"info-image"}/>
+                </div>
                 <table className={"score-table"}>
                     <thead>
                     <tr>
@@ -217,14 +225,6 @@ const SimilarityMetricsWindow = () => {
                     {rows}
                     </tbody>
                 </table>
-                <div className={"info-div"}>
-                    <p>The most similar element to</p>
-                    <img src={path} alt={"For information"}
-                         className={"info-image"}/>
-                    <p>is</p>
-                    <img src={lowestPath} alt={"For Information"}
-                         className={"info-image"}/>
-                </div>
             </div>
         )
     }
