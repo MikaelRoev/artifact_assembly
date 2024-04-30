@@ -12,7 +12,7 @@ import ConfirmCloseModal, {
 import {LockedContextProvider} from "../../contexts/LockedContext";
 import {FilterEnabledContextProvider} from "../../contexts/FilterEnabledContext";
 import {SelectContextProvider} from "../../contexts/SelectContext";
-import {FilterInteractionContextProvider} from "../../contexts/FilterInteractionContext";
+import {DeleteEnabledContextProvider} from "../../contexts/DeleteEnabledContext";
 import {StageRefContextProvider} from "../../contexts/StageRefContext";
 import "./Canvas.css";
 
@@ -27,7 +27,7 @@ const Canvas = () => {
             <SelectContextProvider>
                 <LockedContextProvider>
                     <FilterEnabledContextProvider>
-                        <FilterInteractionContextProvider>
+                        <DeleteEnabledContextProvider>
                             <FilterWindowContextProvider>
                                 <SimilarityMetricsWindowContextProvider>
                                     <ExportImageModalContextProvider>
@@ -44,7 +44,7 @@ const Canvas = () => {
                                     </ExportImageModalContextProvider>
                                 </SimilarityMetricsWindowContextProvider>
                             </FilterWindowContextProvider>
-                        </FilterInteractionContextProvider>
+                        </DeleteEnabledContextProvider>
                     </FilterEnabledContextProvider>
                 </LockedContextProvider>
             </SelectContextProvider>

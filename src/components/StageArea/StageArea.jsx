@@ -7,7 +7,7 @@ import LockedContext from "../../contexts/LockedContext";
 import ProjectContext from "../../contexts/ProjectContext";
 import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
-import FilterInteractionContext from "../../contexts/FilterInteractionContext";
+import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import {clamp} from "../../util/Operations";
 
@@ -45,7 +45,7 @@ const StageArea = () => {
     const {project, setProject} = useContext(ProjectContext);
     const {elements, setElements, undo, redo} = useContext(ElementContext);
     const {stageRef} = useContext(StageRefContext);
-    const {isFilterInteracting} = useContext(FilterInteractionContext);
+    const {deleteEnabled} = useContext(DeleteEnabledContext);
 
     const zoomScale = 1.17; //How much zoom each time
     const zoomMin = 0.001; //zoom out limit
@@ -77,7 +77,7 @@ const StageArea = () => {
         function handleDeletePressed(e) {
             if (["Delete", "Backspace"].includes(e.key)
                 && selectedElementsIndex.length > 0
-                && !isFilterInteracting) {
+                && deleteEnabled) {
                 const newElements = elements.filter((element, index) => !isSelected(index));
                 setElements(newElements);
                 deselectAll();
@@ -88,7 +88,7 @@ const StageArea = () => {
         return () => {
             document.removeEventListener("keydown", handleDeletePressed);
         };
-    }, [deselectAll, elements, isFilterInteracting, isSelected, selectedElementsIndex.length, setElements]);
+    }, [deselectAll, elements, deleteEnabled, isSelected, selectedElementsIndex.length, setElements]);
 
     /**
      * Sets up and cleans up the save event listener.

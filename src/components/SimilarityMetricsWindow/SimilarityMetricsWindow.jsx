@@ -6,7 +6,7 @@ import Histogram from "../Histogram/Histogram";
 import ElementContext from "../../contexts/ElementContext";
 import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
-import FilterInteractionContext from "../../contexts/FilterInteractionContext";
+import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import "./SimilarityMetricsWindow.css"
 
 /**
@@ -57,7 +57,7 @@ const SimilarityMetricsWindow = () => {
     const {selectedElementsIndex} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
     //TODO: change name of context: filter interaction to disable image delete?
-    const {setIsFilterInteracting} = useContext(FilterInteractionContext);
+    const {setDeleteEnabled} = useContext(DeleteEnabledContext);
     const contentRef = useRef(null);
     const [update, setUpdate] = useState(true);
     const maxHistogramValue = 360;
@@ -277,8 +277,8 @@ const SimilarityMetricsWindow = () => {
                     step={1}
                     value={minInputValue}
                     onChange={(e) => setMinInputValue(Number(e.target.value))}
-                    onFocus={() => setIsFilterInteracting(true)}
-                    onBlur={() => setIsFilterInteracting(false)}
+                    onFocus={() => setDeleteEnabled(false)}
+                    onBlur={() => setDeleteEnabled(true)}
                 />
 
                 <label htmlFor={"maxNumber"}>Max </label>
@@ -291,8 +291,8 @@ const SimilarityMetricsWindow = () => {
                     step={1}
                     value={maxInputValue}
                     onChange={(e) => setMaxInputValue(Number(e.target.value))}
-                    onFocus={() => setIsFilterInteracting(true)}
-                    onBlur={() => setIsFilterInteracting(false)}
+                    onFocus={() => setDeleteEnabled(false)}
+                    onBlur={() => setDeleteEnabled(true)}
                 />
                 <button onClick={handleReset}>Reset</button>
             </div>

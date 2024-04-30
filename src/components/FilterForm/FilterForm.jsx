@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import FilterInteractionContext from "../../contexts/FilterInteractionContext";
+import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import "./FilterForm.css";
 
 /**
@@ -20,7 +20,7 @@ import "./FilterForm.css";
  * @constructor
  */
 const FilterForm = ({label, min, max, step, value, setValue, id}) => {
-    const {setIsFilterInteracting} = useContext(FilterInteractionContext);
+    const {setDeleteEnabled} = useContext(DeleteEnabledContext);
 
     return (
         <div className="form-group" id={id}>
@@ -43,8 +43,8 @@ const FilterForm = ({label, min, max, step, value, setValue, id}) => {
                 step={step}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                onFocus={() => setIsFilterInteracting(true)}
-                onBlur={() => setIsFilterInteracting(false)}
+                onFocus={() => setDeleteEnabled(false)}
+                onBlur={() => setDeleteEnabled(true)}
             />
             <button
                 className="resetButton"
