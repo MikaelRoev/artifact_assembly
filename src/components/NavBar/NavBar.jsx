@@ -118,7 +118,7 @@ const NavBar = () => {
             setElements([...elements, ...newImages]);
         }
         setIsLoading(false);
-        handleFileButtonClick()
+        setFileDropdownVisible(false);
     }
 
     /**
@@ -126,11 +126,11 @@ const NavBar = () => {
      */
     function handleLockCanvasClick() {
         setIsLocked((prevLock) => !prevLock);
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     /**
-     * Constant function to set the visibility of the file dropdown menu.
+     * Function to set the visibility of the file dropdown menu.
      */
     function handleFileButtonClick() {
         setFileDropdownVisible(!fileDropdownVisible);
@@ -138,7 +138,7 @@ const NavBar = () => {
     }
 
     /**
-     * Constant function to set the visibility of the tools dropdown menu.
+     * Function to set the visibility of the tools dropdown menu.
      */
     function handleToolsButtonClick() {
         setToolsDropdownVisible(!toolsDropdownVisible);
@@ -172,7 +172,7 @@ const NavBar = () => {
      */
     function handleImageOfCanvasExport() {
         setIsExportImageModalOpen(true);
-        handleFileButtonClick();
+        setFileDropdownVisible(false);
     }
 
     /**
@@ -180,7 +180,7 @@ const NavBar = () => {
      */
     async function handleOpenScoreWindow() {
         setIsSimilarityMetricsWindowOpen(true);
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     /**
@@ -188,7 +188,7 @@ const NavBar = () => {
      */
     async function handleOpenFilterWindow() {
         setIsFilterWindowOpen(true);
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     /*
@@ -256,7 +256,7 @@ const NavBar = () => {
                 duration: 0.5
             })
         }
-        handleToolsButtonClick();
+        setToolsDropdownVisible(false);
     }
 
     return (
@@ -274,7 +274,7 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, elements)
-                                                .then(handleFileButtonClick)
+                                                .then(setFileDropdownVisible(false))
                                                 .catch(() => {
                                                 });
                                         }}>
@@ -286,7 +286,7 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={() => {
                                             openProjectDialog(setProject, setElements)
-                                                .then(handleFileButtonClick)
+                                                .then(setFileDropdownVisible(false))
                                                 .catch(() => {
                                                 });
                                         }}>
@@ -353,6 +353,7 @@ const NavBar = () => {
                                         className="dropdownButton"
                                         onClick={() => {
                                             setFilterEnabled((prevFilter) => !prevFilter);
+                                            setToolsDropdownVisible(false);
                                         }}>
                                         {!filterEnabled ? "Enable Filters" : "Disable Filters"}
                                     </button>
