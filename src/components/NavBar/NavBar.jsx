@@ -37,8 +37,8 @@ const NavBar = () => {
 
     const navigate = useNavigate();
 
-    const xOffset = 200;
-    const yOffset = 75;
+    const angleOffset = 30;
+    const radiusOffset = 100;
 
     /**
      * Closes the project and returns to the landing page.
@@ -68,16 +68,36 @@ const NavBar = () => {
      */
     function findFirstFreePosition(position) {
         while (isAnyElementAtPosition(position)) {
-            position.x += xOffset;
-            position.y += yOffset;
+            position = adjustPolarCoordinates(position.x, position.y);
         }
         return {x: position.x, y: position.y}
+    }
+
+    function adjustPolarCoordinates(x, y) {
+        let { radius, angle } = cartesianToPolarCoordinates(x, y);
+        radius += radiusOffset;
+        angle += angleOffset;
+        return polarToCartesianCoordinates(radius, angle);
+    }
+
+    function polarToCartesianCoordinates(radius, angle) {
+        const radians = angle * (Math.PI / 180);
+        return {x: radius * Math.cos(radians), y: radius * Math.sin(radians)}
+    }
+
+    function cartesianToPolarCoordinates(x, y) {
+        const radius = Math.sqrt(x * x + y * y);
+        let angle = Math.atan2(y, x) * (180 / Math.PI);
+        angle = (angle + 360) % 360;
+
+        return { radius, angle };
     }
 
     /**
      * Asynchronous function for uploading of images.
      * @returns {Promise<void>}
      */
+
     async function handleImageUpload() {
         setIsLoading(true);
         // open file explorer dialog window
@@ -100,9 +120,7 @@ const NavBar = () => {
                     filePath: file,
                 };
                 idAdder++
-                //TODO: make the offset place them in a spiral
-                position.x += xOffset;
-                position.y += yOffset;
+                position = adjustPolarCoordinates(position.x, position.y)
                 return newImage;
             });
             setElements([...elements, ...newImages]);
@@ -168,7 +186,7 @@ const NavBar = () => {
     /**
      * Function to open up the similarity metrics window for all the selected images.
      */
-    async function handleOpenScoreWindow(){
+    async function handleOpenScoreWindow() {
         setIsSimilarityMetricsWindowOpen(true);
         handleToolsButtonClick();
     }
@@ -176,7 +194,7 @@ const NavBar = () => {
     /**
      * Function to open up the filter window for all the selected images.
      */
-    async function handleOpenFilterWindow(){
+    async function handleOpenFilterWindow() {
         setIsFilterWindowOpen(true);
         handleToolsButtonClick();
     }
