@@ -8,6 +8,7 @@ import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import FilterInteractionContext from "../../contexts/FilterInteractionContext";
 import "./SimilarityMetricsWindow.css"
+import HistogramMetricsTable from "./HistogramMetricsTable";
 
 /**
  * The context for the similarity metrics window.
@@ -126,131 +127,6 @@ const SimilarityMetricsWindow = () => {
     }
 
     /**
-     * Calculates the Euclidean distance, Pearson correlation, Bhattacharyya distance, Intersection between the two histograms.
-     * @param arrayA Histogram A array
-     * @param arrayB Histogram B array
-     * @returns {
-     * {bhattacharyyaDistance: number,
-     * euclideanDistance: number,
-     * pearsonCorrelation: number,
-     * histogramIntersection: number}
-     * }
-     */
-    function getHistogramScores(arrayA, arrayB) {
-        // Euclidean Distance
-        let euclidean = 0;
-        // Bhattacharyya Distance
-        let coefficient = 0;
-        // Histogram Intersection
-        let intersection = 0;
-
-        for (let i = 0; i < arrayA.length; i++) {
-            // Euclidean
-            euclidean += Math.pow(arrayA[i] - arrayB[i], 2);
-
-            // Bhattacharyya
-            coefficient += Math.sqrt(arrayA[i] * arrayB[i]);
-
-            // Intersection
-            intersection += Math.min(arrayA[i], arrayB[i]);
-        }
-
-        // Final calculation
-        const euclideanDistance = Math.sqrt(euclidean);
-        const bhattacharyyaDistance = -Math.log(coefficient);
-        const histogramIntersection = (1 - intersection);
-
-        return {
-            euclideanDistance: euclideanDistance,
-            bhattacharyyaDistance: bhattacharyyaDistance,
-            histogramIntersection: histogramIntersection,
-            combined: (euclideanDistance + bhattacharyyaDistance + histogramIntersection) / 3
-        }
-    }
-
-    /**
-     * Sets a table with the similarity scores between the selectedElement and every other element
-     * @param selectedElement
-     * @returns {Element} div element with a table of scores and the most similar element to selectedElement
-     */
-    function setTable(selectedElement) {
-        let rows = [];
-        const arrayA = countAndNormalizeValues(selectedElement.hueValues, maxHistogramValue);
-        let lowest = Infinity;
-        let lowestElement = null;
-        elements.forEach((element) => {
-            if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
-                const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
-                const values = getHistogramScores(arrayA, arrayB);
-                if (values.combined < lowest) {
-                    lowest = values.combined;
-                    lowestElement = element;
-                }
-                const path = convertFileSrc(element.filePath)
-                rows.push(
-                    <tr key={`${selectedElement.id}-${element.id}`}>
-                        <td className={"tableColumn1"}><img src={path} alt={"For table row"}/></td>
-                        <td>{values.combined.toFixed(3)}</td>
-                        <td>{values.euclideanDistance.toFixed(3)}</td>
-                        <td>{values.bhattacharyyaDistance.toFixed(3)}</td>
-                        <td>{values.histogramIntersection.toFixed(3)}</td>
-                    </tr>
-                );
-            }
-        })
-
-        const path = convertFileSrc(selectedElement.filePath);
-        const lowestPath = convertFileSrc(lowestElement.filePath);
-        return (
-            <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
-                <table className={"score-table"}>
-                    <thead>
-                    <tr>
-                        <th className={"tableColumn1"}><img src={path} alt={"For table header"}/></th>
-                        <th>Combined<br/>scores</th>
-                        <th>Euclidean<br/>Distance</th>
-                        <th>Bhattacharyya<br/>Distance</th>
-                        <th>Histogram<br/>Intersection</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {rows}
-                    </tbody>
-                </table>
-                <div className={"info-div"}>
-                    <p>The most similar element to</p>
-                    <img src={path} alt={"For information"}
-                         className={"info-image"}/>
-                    <p>is</p>
-                    <img src={lowestPath} alt={"For Information"}
-                         className={"info-image"}/>
-                </div>
-            </div>
-        )
-    }
-
-    /**
-     * Counts all the values in an array and puts them into another array. It then normalizes the count values.
-     * @param array array to be counted and normalized.
-     * @param maxValue the max value possible in the array
-     * @returns {any[]}
-     */
-    function countAndNormalizeValues(array, maxValue) {
-        const probArray = new Array(maxValue + 1).fill(0);
-        array.forEach(value => {
-            if (value >= 0 && value <= maxValue) {
-                probArray[Math.floor(value)]++;
-            }
-        });
-        const totalCount = array.length;
-        probArray.forEach((value, index, arr) => {
-            arr[index] = value / totalCount;
-        });
-
-        return probArray;
-    }
-
-    /**
      * Resets the values in the inputs to default.
      */
     function handleReset() {
@@ -320,9 +196,10 @@ const SimilarityMetricsWindow = () => {
                                                 maxCutoff={maxCutOff}
                                             />
                                         </div>
-                                        <div>
-                                            {setTable(image)}
-                                        </div>
+                                        <HistogramMetricsTable
+                                            selectedImage={image}
+                                            maxHistogramValue={maxHistogramValue}
+                                        />
                                     </div>
                                 )
                             }
