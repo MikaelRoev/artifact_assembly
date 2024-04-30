@@ -1,35 +1,35 @@
 import React, {useContext} from 'react';
-import {convertFileSrc} from "@tauri-apps/api/tauri";
-import ElementContext from "../../contexts/ElementContext";
 import HistogramMetricsRow from "./HistogramMetricsRow";
+import Konva from "konva";
+import StageRefContext from "../../contexts/StageRefContext";
 
 /**
  * Represents a table with the histogram similarity scores between the selected image and every other image.
- * @param selectedImage {
- *     {
- *          filepath: string,
- *          hueValues: number[],
- *          id: string
- *     }
- * } the image the table belongs to.
+ * @param selectedImage {Konva.Image} the image the table belongs to.
  * @param maxHistogramValue the number of bins in the histogram.
  * @returns {Element} div element with a table of scores and the most similar element to selectedElement
  */
 const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
-    const {elements} = useContext(ElementContext);
+    const {stageRef} = useContext(StageRefContext);
 
-    const url= convertFileSrc(selectedImage.filePath);
-    const arrayA = countAndNormalizeValues(selectedImage.hueValues, maxHistogramValue);
+    const url= selectedImage.toDataURL();
+    const arrayA = countAndNormalizeValues(selectedImage.attrs.hueValues, maxHistogramValue);
 
-    const images = elements.filter((element) => (
-        element.type === "Image"
-        && selectedImage.id !== element.id
-        && (element.hueValues !== undefined && selectedImage.hueValues !== undefined)
-    ));
+    const imageNodes = stageRef.current.find((node) => node instanceof Konva.Image)
+        .filter(image => !(selectedImage.id() === image.id()
+                || image.attrs.hueValues === undefined
+                || selectedImage.attrs.hueValues === undefined));
 
-    const imageScores = images.map((image) => {
-        const arrayB = countAndNormalizeValues(image.hueValues, maxHistogramValue);
-        return {image: image, metrics: getHistogramScores(arrayA, arrayB)}
+    let lowest = Infinity;
+    let lowestImage = null;
+    const imageScores = imageNodes.map((image) => {
+        const arrayB = countAndNormalizeValues(image.attrs.hueValues, maxHistogramValue);
+        const metrics = getHistogramScores(arrayA, arrayB);
+        if (metrics.combined < lowest) {
+            lowest = metrics.combined;
+            lowestImage = image;
+        }
+        return {image: image, metrics: metrics}
     });
 
     /*
@@ -60,8 +60,8 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
     }
 
     /**
-     * Calculates the Euclidean distance, Pearson correlation, Bhattacharyya distance, Intersection and a Combined metric
-     * between the two histograms.
+     * Calculates the Euclidean distance, Pearson correlation,
+     * Bhattacharyya distance, Intersection and a Combined metric between the two histograms.
      * @param arrayA {number[]} Histogram A array
      * @param arrayB {number[]} Histogram B array
      * @returns {
@@ -105,8 +105,18 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
     }
 
     return (
-        <div key={`table-${selectedImage.id}`} className={"tableDiv"}>
-            {/* TODO: make table sortable */}
+        <div key={`table-${selectedImage.id()}`} className={"tableDiv"}>
+            {/* TODO: make table sortable */
+                lowestImage &&
+                <div className={"info-div"}>
+                    <p>The most similar element to</p>
+                    <img src={url} alt={"For information"}
+                         className={"info-image"}/>
+                    <p>is</p>
+                    <img src={lowestImage.toDataURL()} alt={"For Information"}
+                         className={"info-image"}/>
+                </div>
+            }
             <table className={"score-table"}>
                 <thead>
                 <tr>
@@ -119,7 +129,7 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
                 </thead>
                 <tbody>
                 {imageScores.map((entry) => (
-                    <HistogramMetricsRow key={entry.image.id} image = {entry.image} histogramMetrics={entry.metrics} />
+                    <HistogramMetricsRow key={entry.image.id()} image = {entry.image} histogramMetrics={entry.metrics} />
                 ))}
                 </tbody>
             </table>

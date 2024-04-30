@@ -1,28 +1,22 @@
 import React from 'react';
-import {convertFileSrc} from "@tauri-apps/api/tauri";
 import "./SimilarityMetricsWindow.css";
 
 /**
  * Represents the row of the histogram similarity metrics table.
- * @param selectedImageArray {number[]} the normalized histogram values of the image the table belongs to.
- * @param image {
- * {id: string
- * filepath: string}
- * } the image that will be compared to the tables image in this row.
+ * @param image {Konva.Image} the image that will be compared to the tables image in this row.
  * @param histogramMetrics {
  *     combined: number,
  *     euclideanDistance: number,
  *     bhattacharyyaDistance: number,
  *     histogramIntersection: number
  * } the metrics scores to be shown in the row.
- * @param maxHistogramValue the number of bins in the histogram.
  * @return {JSX.IntrinsicElements.tr} a row in the table.
  */
 const HistogramMetricsRow = ({ image, histogramMetrics}) => {
     return (
-        <tr key={image.id}>
+        <tr key={image.id()}>
             <td className={"tableColumn1"}>
-                <img src={convertFileSrc(image.filePath)} alt={"Image for table row"}/>
+                <img src={image.toDataURL()} alt={"For table row"}/>
             </td>
             <td>{histogramMetrics.combined.toFixed(3)}</td>
             <td>{histogramMetrics.euclideanDistance.toFixed(3)}</td>
