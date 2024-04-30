@@ -23,11 +23,11 @@ export const SimilarityMetricsWindowContext = createContext(null);
  */
 export const SimilarityMetricsWindowContextProvider = ({children}) => {
     const [isSimilarityMetricsWindowOpen, setIsSimilarityMetricsWindowOpen] = useState(false);
-    const {elements} = useContext(ElementContext);
+    const {isAnyImages} = useContext(ElementContext);
 
     useEffect(() => {
-        if (elements.length === 0) setIsSimilarityMetricsWindowOpen(false);
-    }, [elements.length]);
+        if (!isAnyImages) setIsSimilarityMetricsWindowOpen(false);
+    }, [isAnyImages]);
 
     const providerValues = useMemo(() => {
         return {
@@ -53,7 +53,7 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {elements} = useContext(ElementContext);
+    const {elements, images} = useContext(ElementContext);
     const {selectedImages, selectedImagesIndex, isAnySelectedImages} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
     const {setDeleteEnabled} = useContext(DeleteEnabledContext);
@@ -107,11 +107,12 @@ const SimilarityMetricsWindow = () => {
     async function updateHistograms() {
         const imageNodes = stageRef.current.find((node) => node.getClassName() === "Image");
         for (const index of selectedImagesIndex) {
+            const image = elements[index];
             for (const imageNode of imageNodes) {
-                if (elements[index].id !== imageNode.attrs.id) continue;
+                if (image.id !== imageNode.attrs.id) continue;
                 const newHues = await getHueData(imageNode.toDataURL())
                 elements[index] = {
-                    ...elements[index],
+                    ...image,
                     hueValues: newHues,
                 }
             }
@@ -169,26 +170,26 @@ const SimilarityMetricsWindow = () => {
     }
 
     /**
-     * Sets a table with the similarity scores between the selectedElement and every other element
-     * @param selectedElement
-     * @returns {Element} div element with a table of scores and the most similar element to selectedElement
+     * Sets a table with the similarity scores between the selectedImage and every other element
+     * @param selectedImage
+     * @returns {Element} div element with a table of scores and the most similar element to selectedImage
      */
-    function setTable(selectedElement) {
+    function setTable(selectedImage) {
         let rows = [];
-        const arrayA = countAndNormalizeValues(selectedElement.hueValues, maxHistogramValue);
+        const arrayA = countAndNormalizeValues(selectedImage.hueValues, maxHistogramValue);
         let lowest = Infinity;
-        let lowestElement = null;
-        elements.forEach((element) => {
-            if (selectedElement.id !== element.id && (element.hueValues !== undefined && selectedElement.hueValues !== undefined)) {
-                const arrayB = countAndNormalizeValues(element.hueValues, maxHistogramValue);
+        let lowestImage = null;
+        images.forEach(image => {
+            if (selectedImage.id !== image.id && (image.hueValues !== undefined && selectedImage.hueValues !== undefined)) {
+                const arrayB = countAndNormalizeValues(image.hueValues, maxHistogramValue);
                 const values = getHistogramScores(arrayA, arrayB);
                 if (values.combined < lowest) {
                     lowest = values.combined;
-                    lowestElement = element;
+                    lowestImage = image;
                 }
-                const url = convertFileSrc(element.filePath)
+                const url = convertFileSrc(image.filePath)
                 rows.push(
-                    <tr key={`${selectedElement.id}-${element.id}`}>
+                    <tr key={`${selectedImage.id}-${image.id}`}>
                         <td className={"tableColumn1"}><img src={url} alt={"For table row"}/></td>
                         <td>{values.combined.toFixed(3)}</td>
                         <td>{values.euclideanDistance.toFixed(3)}</td>
@@ -199,10 +200,10 @@ const SimilarityMetricsWindow = () => {
             }
         })
 
-        const url = convertFileSrc(selectedElement.filePath);
-        const lowestUrl = convertFileSrc(lowestElement.filePath);
+        const url = convertFileSrc(selectedImage.filePath);
+        const lowestUrl = convertFileSrc(lowestImage.filePath);
         return (
-            <div key={`table-${selectedElement.id}`} className={"tableDiv"}>
+            <div key={`table-${selectedImage.id}`} className={"tableDiv"}>
                 <div className={"info-div"}>
                     <p>The most similar element to</p>
                     <img src={url} alt={"For information"}

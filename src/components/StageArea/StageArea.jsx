@@ -34,6 +34,7 @@ const StageArea = () => {
 
     const {
         selectedKonvaElements,
+        selectedImagesIndex,
         isAnySelected,
         select,
         deselect,
@@ -43,7 +44,8 @@ const StageArea = () => {
     } = useContext(SelectContext);
     const {isLocked} = useContext(LockedContext);
     const {project, setProject} = useContext(ProjectContext);
-    const {elements, setElements, undo, redo} = useContext(ElementContext);
+    const {elements, setElements,
+        isAnyElements, isAnyImages, undo, redo} = useContext(ElementContext);
     const {stageRef} = useContext(StageRefContext);
     const {deleteEnabled} = useContext(DeleteEnabledContext);
 
@@ -254,7 +256,7 @@ const StageArea = () => {
      */
     function renderElements() {
         return (
-            elements.length > 0 &&
+            isAnyElements &&
             elements.map((element, index) => {
                 switch (element.type) {
                     case "Image":
@@ -330,16 +332,15 @@ const StageArea = () => {
          */
         async function setImageDimensions(imageNodes) {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            for (const imageNode of imageNodes) {
-                for (const image of elements) {
-                    const index = elements.indexOf(image);
-                    if (imageNode.attrs.id === image.id) {
-                        const hueValues = await getHueData(imageNode.toDataURL());
-                        elements[index] = {
-                            ...image, hueValues: hueValues,
-                            width: imageNode.width(),
-                            height: imageNode.height(),
-                        }
+            for (const index of selectedImagesIndex) {
+                const image = elements[index];
+                for (const imageNode of imageNodes) {
+                    if (image.id !== imageNode.attrs.id) continue;
+                    const hueValues = await getHueData(imageNode.toDataURL())
+                    elements[index] = {
+                        ...image, hueValues: hueValues,
+                        width: imageNode.width(),
+                        height: imageNode.height(),
                     }
                 }
             }
@@ -349,13 +350,11 @@ const StageArea = () => {
          * Checks if it is images on the canvas and only runs the function if there is
          * an image that needs its width and height updated.
          */
-        if (layerRef.current && elements.length > 0) {
-            const imageNodes = layerRef.current.getChildren().filter((child) => child.getClassName() === "Image")
+        if (layerRef.current && isAnyImages) {
+            const imageNodes = layerRef.current.find((node) => node.getClassName() === "Image")
                 .filter((child) => !child.attrs.width || !child.attrs.height || !child.attrs.hueValues);
-            if (imageNodes.length > 0) {
-                setImageDimensions(imageNodes).then(() => console.log("Information retrieved"))
-                    .catch(console.error);
-            }
+            setImageDimensions(imageNodes).then(() => console.log("Information retrieved"))
+                .catch(console.error);
         }
     }, [elements.length, layerRef, elements]);
 
