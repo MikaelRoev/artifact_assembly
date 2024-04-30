@@ -6,6 +6,11 @@ import {ProjectContextProvider} from "../contexts/ProjectContext";
 import {ElementContextProvider} from "../contexts/ElementContext";
 import "./App.css";
 
+//TODO: see over all comments
+//TODO: write the README.md
+//TODO: check all deps
+//TODO: check const to function
+
 /**
  * The application component.
  * @return {JSX.Element} the application component.

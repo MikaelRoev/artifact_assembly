@@ -248,6 +248,7 @@ const StageArea = () => {
         }
     }
 
+    //TODO: comment
     const renderElements = () => {
         return (
             elements.length > 0 &&
@@ -257,14 +258,15 @@ const StageArea = () => {
                         return (
                             renderImage(element, index)
                         );
+                        /*
                     case "Group":
                         return (
                             renderGroup(element, index)
                         );
+                         */
                     default:
-                        return (
-                          <></>
-                        );
+                        // not a valid element type
+                        return (<></>);
                 }
             })
         );
@@ -285,6 +287,7 @@ const StageArea = () => {
         );
     }
 
+    //TODO: comment
     const renderGroup = (group, index) => {
         return (
             <Group

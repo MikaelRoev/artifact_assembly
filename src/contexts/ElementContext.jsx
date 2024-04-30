@@ -16,6 +16,8 @@ const ElementContext = createContext(null);
 export const ElementContextProvider = ({children}) => {
     const [elements, setElements, undo, redo] = useHistory([], 20);
 
+    //TODO: make filtered elements. like images and groups
+
     return (
         <ElementContext.Provider value={{elements, setElements, undo, redo }}>
             {children}
