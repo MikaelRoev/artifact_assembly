@@ -55,9 +55,8 @@ const ConfirmCloseModal = () => {
             <button
                 className="modalButton"
                 onClick={() => {
-                    console.log("save button click")
-                    setIsConfirmModalOpen(false);
                     onSave();
+                    setIsConfirmModalOpen(false);
                 }}>
                 Save
             </button>

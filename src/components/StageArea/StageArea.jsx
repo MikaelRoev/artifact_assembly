@@ -34,7 +34,6 @@ const StageArea = () => {
 
     const {
         selectedKonvaElements,
-        selectedImagesIndex,
         isAnySelected,
         select,
         deselect,
@@ -103,7 +102,8 @@ const StageArea = () => {
         function handleSavePressed(e) {
             if (e.ctrlKey && (e.key.toUpperCase() === "S")) {
                 e.preventDefault();
-                saveProjectDialog(project, setProject, elements).then(() => console.log("project saved"));
+                saveProjectDialog(project, setProject, elements)
+                    .then(() => console.log("Project saved")).catch(console.log);
             }
         }
         document.addEventListener("keydown", handleSavePressed);

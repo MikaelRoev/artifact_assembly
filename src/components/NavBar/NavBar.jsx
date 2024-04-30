@@ -275,8 +275,7 @@ const NavBar = () => {
                                         onClick={() => {
                                             saveProjectDialog(project, setProject, elements)
                                                 .then(setFileDropdownVisible(false))
-                                                .catch(() => {
-                                                });
+                                                .catch(console.log);
                                         }}>
                                         Save project
                                     </button>
@@ -287,8 +286,7 @@ const NavBar = () => {
                                         onClick={() => {
                                             openProjectDialog(setProject, setElements)
                                                 .then(setFileDropdownVisible(false))
-                                                .catch(() => {
-                                                });
+                                                .catch(() => {});
                                         }}>
                                         Open Project
                                     </button>
@@ -314,8 +312,7 @@ const NavBar = () => {
                                                 setOnSave(() => () => {
                                                     saveProjectDialog(project, setProject, elements)
                                                         .then(goToLandingPage)
-                                                        .catch(() => {
-                                                        });
+                                                        .catch(console.log);
                                                 });
                                                 setOnDoNotSave(() => () => goToLandingPage());
                                                 setIsConfirmModalOpen(true);

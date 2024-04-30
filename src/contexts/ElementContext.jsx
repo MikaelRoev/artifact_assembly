@@ -21,7 +21,6 @@ export const ElementContextProvider = ({children}) => {
         [elements]);
     const isAnyImages = useMemo(() => (images.length > 0),
         [images.length]);
-    //TODO: bug with similarity tool
 
     return (
         <ElementContext.Provider value={{elements, setElements, images, isAnyElements, isAnyImages, undo, redo }}>
