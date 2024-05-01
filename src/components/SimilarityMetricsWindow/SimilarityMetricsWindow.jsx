@@ -107,12 +107,8 @@ const SimilarityMetricsWindow = () => {
      */
     async function updateHistograms() {
         const imageNodes = stageRef.current.find((node) => node.getClassName() === "Image");
-        for (const index of selectedImagesIndex) {
-            const image = elements[index];
-            for (const imageNode of imageNodes) {
-                if (image.id !== imageNode.id()) continue;
-                imageNode.attrs.hueValues = await getHueData(imageNode.toDataURL());
-            }
+        for (const imageNode of imageNodes) {
+            imageNode.attrs.hueValues = await getHueData(imageNode.toDataURL());
         }
 
         setMinCutOff(minInputValue);
