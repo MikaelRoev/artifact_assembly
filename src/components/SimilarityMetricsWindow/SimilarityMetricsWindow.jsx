@@ -7,7 +7,7 @@ import SelectContext from "../../contexts/SelectContext";
 import StageRefContext from "../../contexts/StageRefContext";
 import DeleteEnabledContext from "../../contexts/DeleteEnabledContext";
 import "./SimilarityMetricsWindow.css"
-import HistogramMetricsTable from "./HistogramMetricsTable";
+import HistogramMetricsTable from "../HistogramMetricsTable/HistogramMetricsTable";
 
 /**
  * The context for the similarity metrics window.

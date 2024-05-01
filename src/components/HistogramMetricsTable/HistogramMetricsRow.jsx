@@ -1,5 +1,5 @@
 import React from 'react';
-import "./SimilarityMetricsWindow.css";
+import "../SimilarityMetricsWindow/SimilarityMetricsWindow.css";
 
 /**
  * Represents the row of the histogram similarity metrics table.
