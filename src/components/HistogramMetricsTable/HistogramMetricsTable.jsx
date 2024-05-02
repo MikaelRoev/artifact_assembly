@@ -31,6 +31,7 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
         }
         return {image: image, metrics: metrics}
     });
+    imageScores.sort((a, b) => (a.metrics.combined - b.metrics.combined));
 
     /*
     function sortImageScores(metric) {
