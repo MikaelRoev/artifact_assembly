@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import HistogramMetricsRow from "./HistogramMetricsRow";
 import Konva from "konva";
 import StageRefContext from "../../contexts/StageRefContext";
@@ -12,13 +12,15 @@ import StageRefContext from "../../contexts/StageRefContext";
 const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
     const {stageRef} = useContext(StageRefContext);
 
-    const url= selectedImage.toDataURL();
+    const [sortParameter, setSortParameter] = useState("combined");
+
+    const url = selectedImage.toDataURL();
     const arrayA = countAndNormalizeValues(selectedImage.attrs.hueValues, maxHistogramValue);
 
     const imageNodes = stageRef.current.find((node) => node instanceof Konva.Image)
         .filter(image => !(selectedImage.id() === image.id()
-                || image.attrs.hueValues === undefined
-                || selectedImage.attrs.hueValues === undefined));
+            || image.attrs.hueValues === undefined
+            || selectedImage.attrs.hueValues === undefined));
 
     let lowest = Infinity;
     let lowestImage = null;
@@ -31,13 +33,7 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
         }
         return {image: image, metrics: metrics}
     });
-    imageScores.sort((a, b) => (a.metrics.combined - b.metrics.combined));
-
-    /*
-    function sortImageScores(metric) {
-        return imageScores.sort((a, b) => a.metrics[metric] - b.metrics[metric]);
-    }
-     */
+    imageScores.sort((a, b) => a.metrics[sortParameter] - b.metrics[sortParameter]);
 
     /**
      * Counts all the values in an array and puts them into another array. It then normalizes the count values.
@@ -107,7 +103,7 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
 
     return (
         <div key={`table-${selectedImage.id()}`} className={"tableDiv"}>
-            {/* TODO: make table sortable */
+            {
                 lowestImage &&
                 <div className={"info-div"}>
                     <p>The most similar element to</p>
@@ -122,15 +118,39 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
                 <thead>
                 <tr>
                     <th className={"tableColumn1"}><img src={url} alt={"For table header"}/></th>
-                    <th>Combined<br/>scores</th>
-                    <th>Euclidean<br/>Distance</th>
-                    <th>Bhattacharyya<br/>Distance</th>
-                    <th>Histogram<br/>Intersection</th>
+                    <th>
+                        <button onClick={() => {
+                            setSortParameter("combined");
+                        }}>
+                            Combined<br/>scores
+                        </button>
+                    </th>
+                    <th>
+                        <button onClick={() => {
+                            setSortParameter("euclideanDistance");
+                        }}>
+                            Euclidean<br/>Distance
+                        </button>
+                    </th>
+                    <th>
+                        <button onClick={() => {
+                            setSortParameter("bhattacharyyaDistance");
+                        }}>
+                            Bhattacharyya<br/>Distance
+                        </button>
+                    </th>
+                    <th>
+                        <button onClick={() => {
+                            setSortParameter("histogramIntersection");
+                        }}>
+                            Histogram<br/>Intersection
+                        </button>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 {imageScores.map((entry) => (
-                    <HistogramMetricsRow key={entry.image.id()} image = {entry.image} histogramMetrics={entry.metrics} />
+                    <HistogramMetricsRow key={entry.image.id()} image={entry.image} histogramMetrics={entry.metrics}/>
                 ))}
                 </tbody>
             </table>
