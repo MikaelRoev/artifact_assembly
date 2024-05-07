@@ -364,6 +364,7 @@ const StageArea = () => {
             ref={stageRef}>
             <Layer
                 className="layer"
+                imageSmoothingEnabled={false}
                 ref={layerRef}>
                 {renderElements()}
                 {
