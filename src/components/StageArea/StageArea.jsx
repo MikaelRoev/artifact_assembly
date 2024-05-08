@@ -238,7 +238,6 @@ const StageArea = () => {
     function handleElementClick(e, index) {
         if (e.evt.button === 2) return;
         const element = e.target;
-        element.moveToTop();
 
         if (ctrlPressed || shiftPressed) {
             if (isSelected(index)) {
