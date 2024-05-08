@@ -182,7 +182,7 @@ const StageArea = () => {
      * and ctrl key is not pressed.
      * @param e{KonvaEventObject<MouseEvent>} the event.
      */
-    const checkDeselect = (e) => {
+    const handleDeselect = (e) => {
         if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
             deselectAll();
         }
@@ -358,8 +358,8 @@ const StageArea = () => {
             draggable
             className="stage"
             onWheel={zoomStage}
-            onMouseDown={checkDeselect}
-            onTouchStart={checkDeselect}
+            onMouseDown={handleDeselect}
+            onTouchStart={handleDeselect}
             ref={stageRef}>
             <Layer
                 className="layer"
