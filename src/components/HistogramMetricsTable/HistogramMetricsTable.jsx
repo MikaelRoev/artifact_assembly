@@ -2,6 +2,7 @@ import React, {useContext, useState} from 'react';
 import HistogramMetricsRow from "./HistogramMetricsRow";
 import Konva from "konva";
 import StageRefContext from "../../contexts/StageRefContext";
+import "./HistogramMetrics.css"
 
 /**
  * Represents a table with the histogram similarity scores between the selected image and every other image.
@@ -119,28 +120,28 @@ const HistogramMetricsTable = ({selectedImage, maxHistogramValue}) => {
                 <tr>
                     <th className={"tableColumn1"}><img src={url} alt={"For table header"}/></th>
                     <th>
-                        <button onClick={() => {
+                        <button className={"sortButton"} onClick={() => {
                             setSortParameter("combined");
                         }}>
                             Combined<br/>scores
                         </button>
                     </th>
                     <th>
-                        <button onClick={() => {
+                        <button className={"sortButton"} onClick={() => {
                             setSortParameter("euclideanDistance");
                         }}>
                             Euclidean<br/>Distance
                         </button>
                     </th>
                     <th>
-                        <button onClick={() => {
+                        <button className={"sortButton"} onClick={() => {
                             setSortParameter("bhattacharyyaDistance");
                         }}>
                             Bhattacharyya<br/>Distance
                         </button>
                     </th>
                     <th>
-                        <button onClick={() => {
+                        <button className={"sortButton"} onClick={() => {
                             setSortParameter("histogramIntersection");
                         }}>
                             Histogram<br/>Intersection

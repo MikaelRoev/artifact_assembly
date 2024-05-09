@@ -139,49 +139,6 @@
     hyphens: auto;
 }
 
-.tableDiv {
-    margin-block: 15px;
-}
-
-.tableDiv table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.tableDiv th,
-.tableDiv td {
-    border: 2px solid #000;
-    padding: 8px;
-    text-align: left;
-}
-
-.tableDiv th {
-    background-color: #f4f4f4;
-}
-
-.tableColumn1 {
-    height: 100px
-}
-
-.tableColumn1 img {
-    height: 100%;
-    width: auto;
-}
-
-.info-div * {
-    display: inline-block;
-    vertical-align: middle;
-    margin-inline: 10px;
-}
-
-.info-image {
-    height: 100px;
-}
-
-.score-table {
-    width: fit-content;
-}
-
 .histInput {
     width: 50px
 }
