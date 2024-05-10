@@ -17,11 +17,11 @@ const FilterToggle = ({label, onToggle, id, isChecked}) => {
             id={id}>
             <p>{label}</p>
             <label
-                className="switch"
-                onMouseDown={() => onToggle()}>
+                className="switch">
                 <input
                     type="checkbox"
                     name="toggleCheckbox"
+                    onChange={onToggle}
                     checked={isChecked}
                 />
                 <span className="slider rounded"/>
