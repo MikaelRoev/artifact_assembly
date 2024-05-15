@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {open} from "@tauri-apps/api/dialog";
-import {openProjectDialog, saveProjectDialog} from "../../util/TauriDialogWondows";
+import {openProjectDialog, saveProjectDialog} from "../../util/TauriDialogWindows";
 import LockedContext from "../../contexts/LockedContext";
 import ElementContext from "../../contexts/ElementContext";
 import ProjectContext from "../../contexts/ProjectContext";

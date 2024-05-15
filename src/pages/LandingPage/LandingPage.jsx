@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {appWindow} from "@tauri-apps/api/window";
-import {openProjectDialog} from "../../util/TauriDialogWondows";
+import {openProjectDialog} from "../../util/TauriDialogWindows";
 import ProjectList from "../../components/ProjectList/ProjectList";
 import ProjectContext from "../../contexts/ProjectContext";
 import ElementContext from "../../contexts/ElementContext";

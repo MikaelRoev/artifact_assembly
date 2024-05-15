@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Group, Layer, Stage, Transformer} from "react-konva";
-import {saveProjectDialog} from "../../util/TauriDialogWondows"
+import {saveProjectDialog} from "../../util/TauriDialogWindows"
 import {getHueData} from "../../util/ImageManupulation";
 import {clamp} from "../../util/Operations";
 import ImageNode from "../ImageNode/ImageNode";
