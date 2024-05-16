@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Group, Layer, Stage, Transformer} from "react-konva";
-import {saveProjectDialog} from "../../util/TauriDialogWondows"
+import {saveProjectDialog} from "../../util/TauriDialogWindows"
 import {getHueData} from "../../util/ImageManupulation";
 import {clamp} from "../../util/Operations";
 import ImageNode from "../ImageNode/ImageNode";
@@ -182,11 +182,11 @@ const StageArea = () => {
      * and ctrl key is not pressed.
      * @param e{KonvaEventObject<MouseEvent>} the event.
      */
-    const handleDeselect = (e) => {
+    function handleDeselect (e){
         if (e.target === e.currentTarget && e.evt.button !== 2 && !ctrlPressed && !shiftPressed) {
             deselectAll();
         }
-    };
+    }
 
     /**
      * Zooms the Konva stage when a mouse or touchpad scroll event is triggered.
