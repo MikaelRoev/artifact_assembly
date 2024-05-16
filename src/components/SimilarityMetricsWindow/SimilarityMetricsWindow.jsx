@@ -54,8 +54,8 @@ const SimilarityMetricsWindow = () => {
         isSimilarityMetricsWindowOpen,
         setIsSimilarityMetricsWindowOpen
     } = useContext(SimilarityMetricsWindowContext);
-    const {elements, images} = useContext(ElementContext);
-    const {selectedKonvaImages, selectedImagesIndex, isAnySelectedImages} = useContext(SelectContext);
+    const {images} = useContext(ElementContext);
+    const {selectedKonvaImages, isAnySelectedImages} = useContext(SelectContext);
     const {stageRef} = useContext(StageRefContext);
     const {setDeleteEnabled} = useContext(DeleteEnabledContext);
 
