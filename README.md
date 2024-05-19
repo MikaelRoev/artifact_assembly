@@ -1,11 +1,11 @@
 # Artifact Assembly
 
-The goal of this project is to develop a software solution that helps users reconstruct original artefacts from smaller, damaged pieces. Specifically, the software will use images of archaeological textile fragments and let the archaeologists manually piece together the original object.
+The goal of this project is to develop a software solution that helps users reconstruct original artefacts from smaller, damaged pieces. Specifically, the software will use images of archaeological textile fragments and let the archaeologists manually piece together the original object with the help of Computer Vision features.
 
 ## Software History
 This project started as a precursor to [Casper's](https://github.com/casperfg) [Master's Thesis](https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/3079162), which he planned to pursue in the spring semester of 2023. The challenge of assembling fragments of the past, particularly those that are fragile and damaged, is a significant one for archaeologists. This project aims to provide a tool that will make this process more efficient and effective.
 
-The software was continued by [Oda](https://github.com/odastein), [Mikael](https://github.com/MikaelRoev) and [Mathias](https://github.com/Mathiaiv) as part of their bachelor's Thesis. 
+The software was continued by [Oda](https://github.com/odastein), [Mikael](https://github.com/MikaelRoev) and [Mathias](https://github.com/Mathiaiv) as part of their bachelor's Thesis in the spring of 2024. Focusing on the user experience adding features to improve the usability of the software.
 
 ## Authors
 - [@Casper F Gulbrandsen](https://github.com/casperfg)
@@ -80,16 +80,16 @@ To create installation files, run this command:
 
 The installation files can be found inside the src-tauri folder.
 
-```bash
-.1 /src-tauri/.
-.2 target/.
-.3 release/.
-.4 bundle/.
-.5 msi/.
-.6 install\_file.msi.
-.5 nsis/.
-.6 install\_file.exe.
-```
+<pre>
+/src-tauri/
+└── target/
+    └── release/
+        └── bundle/
+            ├── msi/
+            │   └── <b>install_file.msi</b>
+            └── nsis/
+                └── <b>install_file.exe</b>
+</pre>
 
 #### Starting and Running
 The development test will start after the command is run, and will run as long as the command is not stopped or the software is exited. Then, the command will need to be ran again to start the development test. 
